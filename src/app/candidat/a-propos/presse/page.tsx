@@ -5,7 +5,6 @@ import { useState, useRef, useEffect } from "react";
 import { Calendar, ChevronLeft, ChevronRight, X, ZoomIn } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import Topbar from "@/components/Topbar";
 
 type PressItem = {
   id: string;
@@ -319,8 +318,7 @@ export default function GalerieVideosPage() {
 
   return (
     <>
-      <Topbar />
-      <Navbar />
+          <Navbar />
       
       <main className="pt-20">
         <section className="relative w-full overflow-hidden bg-[#f8f7f4] py-16 md:py-24">
@@ -507,4 +505,4 @@ export default function GalerieVideosPage() {
       <Footer />
     </>
   );
-}
+} 
