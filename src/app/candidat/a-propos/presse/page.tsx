@@ -1,4 +1,3 @@
-// src/app/a-propos/galerie-videos/page.tsx
 "use client";
 
 import { useState, useRef, useEffect } from "react";
@@ -6,6 +5,7 @@ import { Calendar, ChevronLeft, ChevronRight, X, ZoomIn } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
+// ============ TYPE DEFINITIONS ============
 type PressItem = {
   id: string;
   title: string;
@@ -14,6 +14,7 @@ type PressItem = {
   link: string;
 };
 
+// ============ DATA ============
 const PRESS_ITEMS: PressItem[] = [
   {
     id: "1",
@@ -255,13 +256,15 @@ const PRESS_ITEMS: PressItem[] = [
   },
 ];
 
-// Group items into slides of 5
-const SLIDES = [];
+// ============ GROUP ITEMS INTO SLIDES OF 5 ============
+// ✅ FIXED: Added explicit type definition
+const SLIDES: PressItem[][] = [];
 for (let i = 0; i < PRESS_ITEMS.length; i += 5) {
   SLIDES.push(PRESS_ITEMS.slice(i, i + 5));
 }
 
-export default function GalerieVideosPage() {
+// ============ COMPONENT ============
+export default function PressePage() {
   const [selectedItem, setSelectedItem] = useState<PressItem | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -318,7 +321,7 @@ export default function GalerieVideosPage() {
 
   return (
     <>
-          <Navbar />
+      <Navbar />
       
       <main className="pt-20">
         <section className="relative w-full overflow-hidden bg-[#f8f7f4] py-16 md:py-24">
@@ -332,7 +335,7 @@ export default function GalerieVideosPage() {
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
               <div>
                 <span className="inline-block px-4 py-1.5 bg-brand-imperial/10 text-brand-imperial uppercase tracking-widest rounded-full font-label-md text-xs font-bold border border-brand-imperial/20 backdrop-blur-sm mb-4">
-                  Galerie Vidéos
+                  Presse
                 </span>
                 <h2 className="font-display-lg text-brand-imperial text-balance">
                   La Presse en Parle
@@ -376,7 +379,7 @@ export default function GalerieVideosPage() {
                     key={slideIndex}
                     className="min-w-full grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 p-6"
                   >
-                    {slide.map((item) => (
+                    {slide.map((item: PressItem) => (
                       <div
                         key={item.id}
                         className="relative group cursor-pointer overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
@@ -505,4 +508,4 @@ export default function GalerieVideosPage() {
       <Footer />
     </>
   );
-} 
+}

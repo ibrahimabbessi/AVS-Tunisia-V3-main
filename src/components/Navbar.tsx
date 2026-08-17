@@ -13,9 +13,35 @@ import {
   FaXTwitter,
 } from "react-icons/fa6";
 
-// Topbar component integrated inside Navbar
+// ============ TYPE DEFINITIONS ============
+type DropdownItem = {
+  name: string;
+  href: string;
+  hasSubmenu?: boolean;
+};
+
+type NavLink = {
+  name: string;
+  href: string;
+  hasDropdown?: boolean;
+  dropdownKey?: string;
+};
+
+type SocialLink = {
+  key: string;
+  url: string;
+  icon: React.ElementType;
+};
+
+type Language = {
+  code: string;
+  label: string;
+  flag: string;
+};
+
+// ============ TOPBAR COMPONENT ============
 function Topbar() {
-  const SOCIAL_LINKS = [
+  const SOCIAL_LINKS: SocialLink[] = [
     { key: "facebook", url: "https://www.facebook.com/AVSforma", icon: FaFacebookF },
     { key: "instagram", url: "https://www.instagram.com/herglaformaavs/", icon: FaInstagram },
     { key: "linkedin", url: "https://www.linkedin.com/company/avstunisiagroup/posts/?feedView=all", icon: FaLinkedinIn },
@@ -131,6 +157,7 @@ function Topbar() {
   );
 }
 
+// ============ MAIN NAVBAR COMPONENT ============
 export default function Navbar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
@@ -144,12 +171,13 @@ export default function Navbar() {
   const BASE_PATH = "/candidat";
 
   // Helper function to create paths with /candidat prefix
-  const createPath = (path: string) => {
+  const createPath = (path: string): string => {
     if (path === "/") return BASE_PATH;
     return `${BASE_PATH}${path}`;
   };
 
-  const navLinks = [
+  // ============ NAVIGATION DATA ============
+  const navLinks: NavLink[] = [
     { name: "Accueil", href: "/" },
     { name: "À Propos", href: "/a-propos", hasDropdown: true, dropdownKey: "aPropos" },
     { name: "Hergla Forma", href: "/hergla-forma", hasDropdown: true, dropdownKey: "herglaForma" },
@@ -158,7 +186,7 @@ export default function Navbar() {
     { name: "Contact", href: "/contact" },
   ];
 
-  const aProposItems = [
+  const aProposItems: DropdownItem[] = [
     { name: "Équipe", href: "/a-propos/equipe" },
     { name: "Projets Pilotes", href: "/a-propos/projets-pilotes" },
     { name: "Presse", href: "/a-propos/presse" },
@@ -166,7 +194,7 @@ export default function Navbar() {
     { name: "Success Stories", href: "/a-propos/success-stories" },
   ];
 
-  const herglaFormaItems = [
+  const herglaFormaItems: DropdownItem[] = [
     { 
       name: "Contenu des cours d'allemand", 
       href: "/hergla-forma/contenu-cours-allemand",
@@ -178,25 +206,26 @@ export default function Navbar() {
     { name: "Formation en language", href: "/hergla-forma/formation-en-langue" },
   ];
 
-  const iftGlobalItems = [
+  const iftGlobalItems: DropdownItem[] = [
     { name: "Notre démarche", href: "/ift-global/notre-demarche" },
     { name: "Offre d'emploi", href: "/ift-global/offre-emploi" },
     { name: "Formations professionnelles", href: "/ift-global/formations-professionnelles" },
   ];
 
-  const languageSubmenuItems = [
+  const languageSubmenuItems: DropdownItem[] = [
     { name: "A1", href: "/hergla-forma/contenu-cours-allemand/a1" },
     { name: "A2", href: "/hergla-forma/contenu-cours-allemand/a2" },
     { name: "B1", href: "/hergla-forma/contenu-cours-allemand/b1" },
     { name: "B2", href: "/hergla-forma/contenu-cours-allemand/b2" },
   ];
 
-  const languages = [
+  const languages: Language[] = [
     { code: "fr", label: "Français", flag: "🇫🇷" },
     { code: "en", label: "English", flag: "🇬🇧" },
     { code: "de", label: "Deutsch", flag: "🇩🇪" },
   ];
 
+  // ============ RENDER ============
   return (
     <nav className="fixed top-0 left-0 w-full z-50">
       {/* Topbar integrated */}
@@ -219,10 +248,10 @@ export default function Navbar() {
               const isActive = pathname === linkHref || (linkHref !== BASE_PATH && pathname.startsWith(linkHref + '/'));
 
               if (link.hasDropdown) {
-                const isOpen = link.dropdownKey === "aPropos" ? isAProposOpen : 
+                const isDropdownOpen = link.dropdownKey === "aPropos" ? isAProposOpen : 
                               link.dropdownKey === "herglaForma" ? isHerglaFormaOpen : 
                               isIftGlobalOpen;
-                const setIsOpen = link.dropdownKey === "aPropos" ? setIsAProposOpen : 
+                const setIsDropdownOpen = link.dropdownKey === "aPropos" ? setIsAProposOpen : 
                                  link.dropdownKey === "herglaForma" ? setIsHerglaFormaOpen : 
                                  setIsIftGlobalOpen;
                 const items = link.dropdownKey === "aPropos" ? aProposItems : 
@@ -234,9 +263,9 @@ export default function Navbar() {
                   <li 
                     key={link.href} 
                     className="h-full flex items-center relative"
-                    onMouseEnter={() => setIsOpen(true)}
+                    onMouseEnter={() => setIsDropdownOpen(true)}
                     onMouseLeave={() => {
-                      setIsOpen(false);
+                      setIsDropdownOpen(false);
                       if (hasSubmenu) setIsLanguageSubmenuOpen(false);
                     }}
                   >
@@ -254,13 +283,13 @@ export default function Navbar() {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          setIsOpen(!isOpen);
+                          setIsDropdownOpen(!isDropdownOpen);
                         }}
                         className="p-1 hover:bg-surface-container-low rounded-md transition-colors"
                         aria-label="Toggle dropdown"
                       >
                         <svg 
-                          className={`w-3.5 h-3.5 text-on-surface-variant transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                          className={`w-3.5 h-3.5 text-on-surface-variant transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`}
                           fill="none" 
                           stroke="currentColor" 
                           viewBox="0 0 24 24"
@@ -271,13 +300,16 @@ export default function Navbar() {
                     </div>
                     
                     {/* Dropdown Menu */}
-                    {isOpen && (
+                    {isDropdownOpen && (
                       <div className="absolute top-full left-0 mt-0 w-56 bg-white rounded-lg shadow-lg border border-outline-variant/30 py-1.5">
                         {items.map((item) => {
                           const itemHref = createPath(item.href);
                           const isItemActive = pathname === itemHref || pathname.startsWith(itemHref + '/');
                           
-                          if (item.hasSubmenu) {
+                          // Check if this item has a submenu
+                          const itemHasSubmenu = hasSubmenu && 'hasSubmenu' in item && item.hasSubmenu === true;
+                          
+                          if (itemHasSubmenu) {
                             return (
                               <div key={item.href} className="relative">
                                 <button
@@ -309,7 +341,7 @@ export default function Navbar() {
                                             pathname === subItemHref ? "bg-secondary/10 text-secondary font-medium" : "text-on-surface"
                                           }`}
                                           onClick={() => {
-                                            setIsOpen(false);
+                                            setIsDropdownOpen(false);
                                             setIsLanguageSubmenuOpen(false);
                                           }}
                                         >
@@ -330,7 +362,7 @@ export default function Navbar() {
                               className={`block px-3.5 py-2 text-xs transition-colors hover:bg-secondary/10 hover:text-secondary ${
                                 isItemActive ? "bg-secondary/10 text-secondary font-medium" : "text-on-surface"
                               }`}
-                              onClick={() => setIsOpen(false)}
+                              onClick={() => setIsDropdownOpen(false)}
                             >
                               {item.name}
                             </Link>
@@ -491,7 +523,10 @@ export default function Navbar() {
                               const itemHref = createPath(item.href);
                               const isItemActive = pathname === itemHref || pathname.startsWith(itemHref + '/');
                               
-                              if (item.hasSubmenu && hasSubmenu) {
+                              // Check if this item has a submenu
+                              const itemHasSubmenu = hasSubmenu && 'hasSubmenu' in item && item.hasSubmenu === true;
+                              
+                              if (itemHasSubmenu) {
                                 return (
                                   <div key={item.href}>
                                     <button
