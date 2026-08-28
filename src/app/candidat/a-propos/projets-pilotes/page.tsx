@@ -1,73 +1,41 @@
-// src/app/candidat/a-propos/success-stories/takwa-ben-slama/page.tsx
-
 "use client";
 
-import Link from "next/link";
-import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import {
-  ArrowLeft,
-  Calendar,
-  MapPin,
-  Award,
-  Heart,
-  Quote,
-  Star,
-  Share2,
-  ThumbsUp,
-  MessageCircle,
-} from "lucide-react";
+import { useState, useEffect } from "react";
 
-// ============================================================
-// UTILITY FUNCTIONS
-// ============================================================
+// Helper function to get Google Drive image URL
+const getDriveImageUrl = (id: string) => {
+  return `https://drive.google.com/thumbnail?id=${id}&sz=w800`;
+};
 
-/**
- * Converts Google Drive URLs to direct image URLs
- */
-function getGoogleDriveImageUrl(url: string, size: string = 'w800'): string {
-  // If it's already a direct URL that's not from Google Drive, return it
-  if (url.startsWith('http') && !url.includes('drive.google.com')) {
-    return url;
-  }
+// Gallery images for Public-Private Partnership
+const PUBLIC_PRIVATE_IMAGES = [
+  { id: 1, src: getDriveImageUrl("1s5gtMtAo_0yREVxdc_jaPu1YXOYsh36f"), alt: "Public-Private Partnership 1" },
+  { id: 2, src: getDriveImageUrl("1OzijwE2uT7Uvd72ICHGu2btdcfaA0XLV"), alt: "Public-Private Partnership 2" },
+  { id: 3, src: getDriveImageUrl("1tJ4QSVMSjjn9YM0jGiaqeqqzn2AG0iYV"), alt: "Public-Private Partnership 3" },
+  { id: 4, src: getDriveImageUrl("1ead6VsC4IaSii7q68kggM-tXvCwUYJXz"), alt: "Public-Private Partnership 4" },
+  { id: 5, src: getDriveImageUrl("1JATiyfGBhAXhay6qWFF0I3tfLuv1xgEw"), alt: "Public-Private Partnership 5" },
+  { id: 6, src: getDriveImageUrl("1RnFtdtfVa628dHoUxOsHa_d4x9ONQux9"), alt: "Public-Private Partnership 6" },
+  { id: 7, src: getDriveImageUrl("1bbGvZWcAKXk-Iz8sCsZ0igXvDOZtjVkx"), alt: "Public-Private Partnership 7" },
+  { id: 8, src: getDriveImageUrl("1H_Gm-fGDEqq_CyDae3_kk1EK-AZiRxOF"), alt: "Public-Private Partnership 8" },
+];
 
-  // Extract file ID from various Google Drive URL formats
-  let fileId = url;
-  
-  // Pattern 1: https://drive.google.com/uc?export=view&id=FILE_ID
-  // Pattern 2: https://drive.google.com/uc?export=download&id=FILE_ID
-  const match1 = url.match(/[?&]id=([^&]+)/);
-  if (match1) {
-    fileId = match1[1];
-  }
-  
-  // Pattern 3: https://drive.google.com/file/d/FILE_ID/view
-  const match2 = url.match(/\/file\/d\/([^\/]+)/);
-  if (match2) {
-    fileId = match2[1];
-  }
-  
-  // Pattern 4: https://drive.google.com/open?id=FILE_ID
-  const match3 = url.match(/[?&]id=([^&]+)/);
-  if (match3) {
-    fileId = match3[1];
-  }
+// Gallery images for Private-Private Partnership
+const PRIVATE_PRIVATE_IMAGES = [
+  { id: 11, src: getDriveImageUrl("1lVoj1ZBwm8oE9i2uzPOhqDJ2VSesRM3c"), alt: "Private-Private Partnership 1" },
+  { id: 12, src: getDriveImageUrl("14OQFPP0ujCACE4jPkZWC6kn1zmMUEtnQ"), alt: "Private-Private Partnership 2" },
+  { id: 13, src: getDriveImageUrl("1ygP7sfAtosXXcHDiUtVOt85cC5qmTNG4"), alt: "Private-Private Partnership 3" },
+  { id: 14, src: getDriveImageUrl("1VoeTB7zyipmL6H-pQYY4YNhmYIA92dLw"), alt: "Private-Private Partnership 4" },
+  { id: 15, src: getDriveImageUrl("12-nEETZJ8D2X9rIHi8RE4Q2AvryIFkzf"), alt: "Private-Private Partnership 5" },
+  { id: 16, src: getDriveImageUrl("1mHiBfh8Ci9yeUjQayhsnDhY3y8AmA3u0"), alt: "Private-Private Partnership 6" },
+  { id: 17, src: getDriveImageUrl("1pW2bisG6nl62vupe4FzyT0woUYO_-2o-"), alt: "Private-Private Partnership 7" },
+  { id: 18, src: getDriveImageUrl("1cey2vFybE4bwwUPekAPO29PAWCO_XSFc"), alt: "Private-Private Partnership 8" },
+  { id: 19, src: getDriveImageUrl("1c6DKa_oJp3Yg7a_mUVhvfv0ZMhssOxTA"), alt: "Private-Private Partnership 9" },
+];
 
-  // If it's just the ID without the URL
-  if (url.length === 33 && !url.includes('/') && !url.includes('?')) {
-    fileId = url;
-  }
-
-  // Return the thumbnail URL (most reliable for images)
-  return `https://drive.google.com/thumbnail?id=${fileId}&sz=${size}`;
-}
-
-// ============================================================
-// IMAGE GALLERY COMPONENT
-// ============================================================
-
-function ImageGallery({ images }: { images: string[] }) {
+// Image Gallery Component with Auto-slide and Thumbnails
+function ImageGallery({ images }: { images: typeof PUBLIC_PRIVATE_IMAGES }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [imgError, setImgError] = useState<Record<number, boolean>>({});
   const [isPaused, setIsPaused] = useState(false);
@@ -89,10 +57,6 @@ function ImageGallery({ images }: { images: string[] }) {
     setThumbErrors(prev => ({ ...prev, [id]: true }));
   };
 
-  const getImageUrl = (index: number, size: string = 'w800') => {
-    return getGoogleDriveImageUrl(images[index], size);
-  };
-
   // Auto-slide effect every 3 seconds
   useEffect(() => {
     if (isPaused) return;
@@ -111,20 +75,20 @@ function ImageGallery({ images }: { images: string[] }) {
       onMouseLeave={() => setIsPaused(false)}
     >
       {/* Main Slider */}
-      <div className="relative h-64 md:h-80 lg:h-96 rounded-xl overflow-hidden bg-surface-container-low">
+      <div className="relative h-48 md:h-64 lg:h-80 rounded-xl overflow-hidden bg-surface-container-low">
         {images.map((image, index) => (
           <div
-            key={index}
+            key={image.id}
             className={`absolute inset-0 transition-opacity duration-700 ${
               index === currentIndex ? "opacity-100" : "opacity-0"
             }`}
           >
-            {!imgError[index] ? (
+            {!imgError[image.id] ? (
               <img
-                src={getImageUrl(index)}
-                alt={`Photo ${index + 1}`}
-                className="w-full h-full object-contain"
-                onError={() => handleImageError(index)}
+                src={image.src}
+                alt={image.alt}
+                className="w-full h-full object-cover"
+                onError={() => handleImageError(image.id)}
               />
             ) : (
               <div className="w-full h-full bg-gradient-to-br from-brand-imperial/10 to-secondary/10 flex items-center justify-center">
@@ -184,12 +148,12 @@ function ImageGallery({ images }: { images: string[] }) {
         </button>
       </div>
 
-      {/* Thumbnail Strip */}
+      {/* Thumbnail Strip - No horizontal scroller */}
       <div className="mt-4">
         <div className="flex flex-wrap gap-2">
           {images.map((image, index) => (
             <button
-              key={index}
+              key={image.id}
               onClick={() => setCurrentIndex(index)}
               className={`relative flex-shrink-0 w-20 h-14 md:w-24 md:h-16 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
                 index === currentIndex
@@ -197,12 +161,12 @@ function ImageGallery({ images }: { images: string[] }) {
                   : "border-outline-variant hover:border-secondary/50"
               }`}
             >
-              {!thumbErrors[index] ? (
+              {!thumbErrors[image.id] ? (
                 <img
-                  src={getImageUrl(index, 'w200')}
+                  src={image.src.replace('sz=w800', 'sz=w200')}
                   alt={`Thumbnail ${index + 1}`}
                   className="w-full h-full object-cover"
-                  onError={() => handleThumbError(index)}
+                  onError={() => handleThumbError(image.id)}
                 />
               ) : (
                 <div className="w-full h-full bg-surface-container-low flex items-center justify-center">
@@ -220,215 +184,173 @@ function ImageGallery({ images }: { images: string[] }) {
   );
 }
 
-// ============================================================
-// COMPONENT
-// ============================================================
+// Project Card Component
+function ProjectCard({
+  title,
+  type,
+  subtitle,
+  description,
+  objectives,
+  impact,
+  stats,
+  galleryImages,
+  isReversed = false,
+}: {
+  title: string;
+  type: string;
+  subtitle: string;
+  description: string;
+  objectives: string[];
+  impact: string;
+  stats: { value: string; label: string }[];
+  galleryImages: typeof PUBLIC_PRIVATE_IMAGES;
+  isReversed?: boolean;
+}) {
+  return (
+    <div className={`flex flex-col ${isReversed ? 'lg:flex-row-reverse' : 'lg:flex-row'} gap-8 lg:gap-12`}>
+      <div className="lg:w-1/2">
+        <ImageGallery images={galleryImages} />
+      </div>
+      
+      <div className="lg:w-1/2 space-y-6">
+        <div>
+          <span className="inline-block px-3 py-1 bg-brand-ice text-brand-imperial uppercase tracking-wider rounded-full font-label-md text-xs font-bold border border-brand-imperial/10">
+            {type}
+          </span>
+          <h2 className="font-headline-lg text-brand-imperial mt-3">
+            {title}
+          </h2>
+          <p className="font-label-md text-secondary mt-1">
+            {subtitle}
+          </p>
+        </div>
+        
+        <p className="font-body-md text-on-surface-variant leading-relaxed">
+          {description}
+        </p>
+        
+        <div className="space-y-2">
+          <h4 className="font-label-md text-brand-imperial">Objectifs clés</h4>
+          <ul className="space-y-1.5">
+            {objectives.map((objective, index) => (
+              <li key={index} className="flex items-start gap-2 text-sm text-on-surface-variant">
+                <svg className="w-4 h-4 text-secondary mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                {objective}
+              </li>
+            ))}
+          </ul>
+        </div>
+        
+        <div className="p-4 bg-surface-container-low rounded-xl border border-outline-variant/30">
+          <h4 className="font-label-md text-brand-imperial mb-1">Impact</h4>
+          <p className="text-sm text-on-surface-variant leading-relaxed">
+            {impact}
+          </p>
+        </div>
+        
+        <div className="flex gap-6">
+          {stats.map((stat, index) => (
+            <div key={index}>
+              <div className="font-display-lg text-secondary text-2xl">
+                {stat.value}
+              </div>
+              <div className="text-caption text-on-surface-variant">
+                {stat.label}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
-export default function TakwaBenSlamaPage() {
-  const story = {
-    id: "takwa-ben-slama",
-    name: "Takwa Ben Slama",
-    description: "Ausbildung en Allemagne - Infirmière",
-    badge: "Diplômée 2024",
-    date: "2020 - 2024",
-    location: "Allemagne",
-    category: "Santé",
-    rating: 5,
-    fullStory: `Je tiens à exprimer ma profonde gratitude envers l'agence AVS Forma qui m'a accompagnée dans mon projet de partir en Allemagne pour effectuer un Ausbildung.
-
-Leur soutien et leur professionnalisme m'ont été d'une aide inestimable tout au long du processus. Je dois souligner que cette agence s'est révélée hautement fiable. Dès le début, ils m'ont fourni des informations précises et claires concernant les démarches administratives, les exigences et les délais à respecter. Ils ont été présents à chaque étape et m'ont guidé de manière efficace. Cependant, je tiens à souligner que ce processus demande de la patience et une préparation minutieuse de la langue allemande.
-
-En effet, la maîtrise de l'allemand est la clé essentielle pour réussir son intégration en Allemagne. Heureusement, l'agence m'a encouragé à m'investir pleinement dans l'apprentissage de la langue, ce qui s'est avéré décisif dans mon parcours.
-
-Grâce à leur accompagnement et à mes efforts dans l'apprentissage de la langue, j'ai pu réaliser mon rêve et entamer une Ausbildung réussie en Allemagne. Je recommande vivement cette agence à toute personne désireuse de partir étudier ou travailler en Allemagne, à condition d'être prête à investir du temps et des efforts dans la préparation de la langue allemande.
-
-Je me souviens encore des premiers jours où j'appréhendais l'inconnu, mais aujourd'hui, je suis tellement reconnaissante de cette opportunité. J'ai pu m'immerger dans une nouvelle culture, rencontrer des gens formidables et enrichir mon bagage professionnel d'une manière que je n'aurais jamais pu imaginer. Encore une fois, merci infiniment à l'équipe de l'agence pour leur soutien et leur expertise. Leur engagement envers la réussite de leur clientèle est véritablement exemplaire.`,
-    images: [
-      "1WCH5fBu19IAF4aG98-nVrLTFwHMXvPWj",
-      "1PIPnja_ZJSM2ziQT2I4Gi_Ld98XH5oMU",
-      "1SoNGp4AfOP0Wl74U-NY9Bx4PcVUQYWhN",
-      "18kmk-F3iumdjx1ygeY046sIX86sqSCsn",
-      "1MRJAH7MJcYrGsur1WfTpvd7Ta1r5NuRr",
-      "1CO7y1OM1HGu_tdybmZP_4CEptV7-Ba5R",
-    ],
-  };
-
+export default function ProjetsPilotesPage() {
   return (
     <>
       <Navbar />
-
-      {/* Hero Section */}
-      <section className="relative pt-40 pb-8 md:pt-48 md:pb-8 bg-gradient-to-b from-brand-imperial/5 via-surface-container-low to-transparent overflow-hidden">
-        <div className="absolute top-0 right-0 w-1/2 h-full opacity-5">
-          <div className="absolute top-20 right-20 w-64 h-64 rounded-full bg-secondary blur-3xl"></div>
-          <div className="absolute bottom-20 left-20 w-96 h-96 rounded-full bg-brand-imperial blur-3xl"></div>
-        </div>
-        <div className="max-w-container-max mx-auto px-margin-mobile md:px-gutter relative z-10">
-          <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-start">
-            <div className="flex-1 max-w-4xl">
-              <Link
-                href="/candidat/a-propos/success-stories"
-                className="inline-flex items-center gap-2 text-brand-imperial hover:gap-3 transition-all duration-300 mb-4 font-medium"
-              >
-                <ArrowLeft className="size-4" />
-                Retour aux success stories
-              </Link>
-              <div className="flex flex-wrap items-center gap-3 mb-4">
-                <span className="inline-flex items-center px-4 py-1.5 bg-brand-imperial/10 text-brand-imperial uppercase tracking-wider rounded-full font-label-md text-xs font-bold border border-brand-imperial/20 backdrop-blur-sm">
-                  {story.category}
-                </span>
-                {story.badge && (
-                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-secondary/10 text-secondary rounded-full font-label-md text-xs font-bold border border-secondary/20">
-                    <Award className="size-3" />
-                    {story.badge}
-                  </span>
-                )}
-              </div>
-              <h1 className="font-display-lg-mobile md:font-display-lg text-brand-imperial mt-6 leading-tight">
-                {story.name}
-              </h1>
-              <div className="w-20 h-1 bg-secondary rounded-full mt-6"></div>
-              <p className="font-body-lg text-on-surface-variant mt-6 leading-relaxed">
-                {story.description}
-              </p>
-              <div className="mt-4 flex flex-wrap gap-4">
-                {story.date && (
-                  <span className="inline-flex items-center gap-2 text-sm text-on-surface-variant">
-                    <Calendar className="size-4" />
-                    {story.date}
-                  </span>
-                )}
-                {story.location && (
-                  <span className="inline-flex items-center gap-2 text-sm text-on-surface-variant">
-                    <MapPin className="size-4" />
-                    {story.location}
-                  </span>
-                )}
-                {story.rating && (
-                  <span className="inline-flex items-center gap-1 text-yellow-400">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="size-4 fill-current" />
-                    ))}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* Gallery - Using the ImageGallery component */}
-            <div className="flex-1 max-w-lg">
-              <ImageGallery images={story.images} />
-            </div>
+      
+      {/* Hero Section - removed bottom padding */}
+      <section className="relative pt-32 pb-0 md:pt-40 md:pb-0 bg-gradient-to-b from-brand-imperial/5 via-surface-container-low to-transparent">
+        <div className="max-w-container-max mx-auto px-margin-mobile md:px-gutter">
+          <div className="max-w-4xl">
+            <span className="inline-flex items-center px-4 py-1.5 bg-brand-imperial/10 text-brand-imperial uppercase tracking-wider rounded-full font-label-md text-xs font-bold border border-brand-imperial/20 backdrop-blur-sm">
+              Nos Partenariats
+            </span>
+            <h1 className="font-display-lg-mobile md:font-display-lg text-brand-imperial mt-6 leading-tight">
+              Partenariats Stratégiques
+            </h1>
+            <div className="w-20 h-1 bg-secondary rounded-full mt-6"></div>
+            <p className="font-body-lg text-on-surface-variant mt-6 leading-relaxed max-w-3xl">
+              Des collaborations innovantes pour former les talents de demain
+            </p>
           </div>
         </div>
       </section>
 
-      {/* Story Content */}
-      <section className="max-w-container-max mx-auto px-margin-mobile md:px-gutter py-12 pb-section-gap-lg">
-        <div className="grid gap-8 lg:grid-cols-3">
-          {/* Main Content */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-outline-variant/30">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 bg-brand-imperial/10 rounded-lg">
-                  <Quote className="size-5 text-brand-imperial" />
-                </div>
-                <h2 className="font-headline-lg text-on-surface">Mon histoire</h2>
-              </div>
-              <div className="prose prose-lg max-w-none text-on-surface-variant leading-relaxed whitespace-pre-line">
-                {story.fullStory}
-              </div>
-              <div className="mt-6 flex items-center gap-2 text-brand-imperial bg-brand-imperial/5 px-4 py-3 rounded-lg">
-                <Heart className="size-4 fill-brand-imperial/20" />
-                <span className="font-medium">Une histoire inspirante</span>
-              </div>
-            </div>
+      {/* Projects Section - added top padding to bring it closer */}
+      <section className="max-w-container-max mx-auto px-margin-mobile md:px-gutter pt-8 pb-0 space-y-24">
+        <ProjectCard
+          title="Partenariat Public Privé"
+          type="Public-Private"
+          subtitle="Partenariat Éducatif entre AVS FORMA et la Faculté des Sciences Économiques et de Gestion de Sousse"
+          description="Nous avons le plaisir de vous annoncer un partenariat éducatif passionnant entre notre centre de formation allemand AVS FORMA, et la Faculté des Sciences Économiques et de Gestion de Sousse. Cette collaboration vise à intégrer la langue allemande au sein du programme d'enseignement de la faculté, élargissant ainsi les horizons académiques et professionnels des étudiants. Ce partenariat stratégique est une opportunité unique qui s'inscrit dans notre engagement mutuel envers l'excellence éducative et le développement des compétences internationales."
+          objectives={[
+            "Intégrer la langue allemande dans le programme universitaire",
+            "Améliorer les profils académiques et professionnels des étudiants",
+            "Faciliter l'accès aux opportunités internationales",
+            "Renforcer la collaboration entre les institutions académiques et de formation",
+          ]}
+          impact="Cette collaboration contribue à l'évolution de l'enseignement supérieur à la Faculté des Sciences Économiques et de Gestion de Sousse en fournissant aux étudiants une préparation complète et diversifiée pour relever les défis mondiaux. Ensemble, nous ouvrons de nouvelles voies vers l'excellence éducative et professionnelle."
+          stats={[
+            { value: "+100", label: "Étudiants formés" },
+            { value: "2024", label: "Année de lancement" },
+          ]}
+          galleryImages={PUBLIC_PRIVATE_IMAGES}
+        />
 
-            {/* Back and Share */}
-            <div className="mt-6 flex flex-wrap justify-between items-center gap-4">
-              <Link
-                href="/candidat/a-propos/success-stories"
-                className="inline-flex items-center gap-2 text-brand-imperial font-medium hover:gap-3 transition-all duration-300"
-              >
-                <ArrowLeft className="size-4" />
-                Toutes les success stories
-              </Link>
-              <div className="flex items-center gap-2 text-sm text-on-surface-variant">
-                <span>Partager</span>
-                <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                  <Share2 className="size-4" />
-                </button>
-                <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                  <ThumbsUp className="size-4" />
-                </button>
-                <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                  <MessageCircle className="size-4" />
-                </button>
-              </div>
-            </div>
+        <div className="h-px bg-outline-variant/30"></div>
 
-            {/* Related Stories CTA */}
-            <div className="mt-8 p-6 bg-gradient-to-r from-brand-ice/30 to-brand-imperial/10 rounded-2xl border border-brand-imperial/20">
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div>
-                  <h3 className="font-headline-md text-on-surface">
-                    ✨ D'autres success stories
-                  </h3>
-                  <p className="text-sm text-on-surface-variant">
-                    Découvrez les parcours inspirants d'autres talents
-                  </p>
-                </div>
-                <Link
-                  href="/candidat/a-propos/success-stories"
-                  className="inline-flex items-center gap-2 px-6 py-2.5 bg-brand-imperial text-white rounded-lg font-medium hover:bg-brand-imperial/90 transition-all duration-300 hover:scale-[1.02]"
-                >
-                  Voir toutes
-                  <ArrowLeft className="size-4 rotate-180" />
-                </Link>
-              </div>
-            </div>
-          </div>
+        <ProjectCard
+          title="Partenariat Privé Privé"
+          type="Private-Private"
+          subtitle="Partenariat Éducatif entre AVS FORMA et la Faculté privée Leaders University"
+          description="Avec grand enthousiasme, AVS Hergla Forma et LEADERS UNIVERSITY Business School et Faculté d'informatique de Nabeul unissent leurs forces pour établir un partenariat éducatif privilégié. Cette collaboration novatrice vise à créer des opportunités exceptionnelles pour les jeunes tunisiens désireux de s'intégrer au marché du travail allemand, notamment dans le domaine de l'informatique."
+          objectives={[
+            "Préparer les étudiants aux carrières dans le marché IT allemand",
+            "Combiner la formation technique et linguistique",
+            "Offrir une éducation pratique et orientée carrière",
+            "Soutenir l'intégration des étudiants dans des environnements internationaux",
+          ]}
+          impact="Grâce à cette association, AVS Hergla Forma et LEADERS UNIVERSITY s'engagent conjointement à former et à guider les jeunes esprits tunisiens, en leur offrant les compétences linguistiques et techniques nécessaires pour exceller dans le marché de l'informatique en Allemagne."
+          stats={[
+            { value: "+100", label: "Étudiants formés" },
+            { value: "2024", label: "Année de lancement" },
+          ]}
+          galleryImages={PRIVATE_PRIVATE_IMAGES}
+          isReversed={true}
+        />
+      </section>
 
-          {/* Sidebar - CTA Section */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-lg p-6 border border-outline-variant/30 sticky top-24">
-              <h3 className="font-headline-md text-on-surface mb-4 flex items-center gap-2">
-                <span>🚀</span> Rejoignez l'aventure
-              </h3>
-              <p className="text-sm text-on-surface-variant mb-6">
-                Vous aussi, réalisez votre rêve de partir étudier ou travailler en Allemagne.
-              </p>
-
-              {/* CTA Section */}
-              <div className="space-y-3">
-                <Link
-                  href="/candidat/candidature"
-                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-brand-imperial text-white rounded-lg font-medium hover:bg-brand-imperial/90 transition-all duration-300 hover:scale-[1.02]"
-                >
-                  Rejoindre l'aventure
-                  <svg
-                    className="size-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 7l5 5m0 0l-5 5m5-5H6"
-                    />
-                  </svg>
-                </Link>
-                <Link
-                  href="/candidat/contact"
-                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-secondary text-white rounded-lg font-medium hover:bg-secondary/90 transition-all duration-300 hover:scale-[1.02]"
-                >
-                  Contactez-nous
-                  <MessageCircle className="size-4" />
-                </Link>
-              </div>
-            </div>
-          </div>
+      <section className="bg-surface-container-low border-t border-outline-variant/30">
+        <div className="max-w-container-max mx-auto px-margin-mobile md:px-gutter py-section-gap-lg text-center">
+          <h2 className="font-headline-lg text-brand-imperial mb-4">
+            Prêt à Rejoindre nos Programmes ?
+          </h2>
+          <p className="font-body-md text-on-surface-variant max-w-2xl mx-auto mb-8">
+            Découvrez comment nos partenariats peuvent vous aider à atteindre vos objectifs académiques et professionnels.
+          </p>
+          <a
+            href="/contact"
+            className="inline-flex items-center gap-3 px-8 py-3.5 bg-gradient-to-r from-brand-imperial to-brand-imperial/90 rounded-xl text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
+          >
+            <span className="font-label-md text-label-md">Contactez-nous</span>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </a>
         </div>
       </section>
 
