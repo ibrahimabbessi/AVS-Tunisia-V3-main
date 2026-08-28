@@ -7,10 +7,12 @@ import Footer from "@/components/Footer";
 import Link from "next/link";
 import Topbar from "@/components/Topbar";
 
-// Helper function for Google Drive images
-function drive(fileId: string, size: number = 1000) {
-  return `https://drive.google.com/thumbnail?id=${fileId}&sz=w${size}`;
-}
+// Cloudinary helper
+const CLOUDINARY_BASE = "https://res.cloudinary.com/girgi5fd/image/upload/";
+
+const cloudinary = (path: string) => {
+  return `${CLOUDINARY_BASE}${path}`;
+};
 
 export default function Page() {
   // Slider state
@@ -19,22 +21,22 @@ export default function Page() {
 
   const slides = [
     {
-      image: drive("19Y2RTkDWRqIvUSrF-OqQV0wIIgBnZ2Rv"),
+      image: cloudinary("v1786965592/img1.jpg"),
       title: "L'excellence au service de votre avenir",
       subtitle: "Découvrez comment nous transformons les ambitions en réussites",
     },
     {
-      image: drive("1OZs6AGKI7ISRz1na7fT_hX5zrvmHMcdK"),
+      image: cloudinary("v1786965592/img2.jpg"),
       title: "Une équipe dédiée à votre succès",
       subtitle: "Des experts passionnés à vos côtés à chaque étape",
     },
     {
-      image: drive("12f8UOOz5WKcjW-G6dk43INtSogITngGA"),
+      image: cloudinary("v1786965605/img4.jpg"),
       title: "Des opportunités concrètes en Allemagne",
       subtitle: "Formation, recrutement et accompagnement sur mesure",
     },
     {
-      image: drive("1rIRDYQOcNsWFGSNp36KkfVTADaPcDWzs"),
+      image: cloudinary("v1786965597/img5.jpg"),
       title: "Votre pont vers une carrière d'excellence",
       subtitle: "De la formation linguistique à l'intégration professionnelle",
     },

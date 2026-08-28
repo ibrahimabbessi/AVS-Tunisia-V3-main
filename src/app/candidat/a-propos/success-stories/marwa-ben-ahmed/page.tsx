@@ -1,5 +1,3 @@
-// src/app/candidat/a-propos/success-stories/takwa-ben-slama/page.tsx
-
 "use client";
 
 import Link from "next/link";
@@ -224,32 +222,26 @@ function ImageGallery({ images }: { images: string[] }) {
 // COMPONENT
 // ============================================================
 
-export default function TakwaBenSlamaPage() {
+export default function MarwaBenAhmedPage() {
   const story = {
-    id: "takwa-ben-slama",
-    name: "Takwa Ben Slama",
-    description: "Ausbildung en Allemagne - Infirmière",
+    id: "marwa-ben-ahmed",
+    name: "Marwa Ben Ahmed",
+    description: "Ausbildung en Allemagne - Infirmière diplômée",
     badge: "Diplômée 2024",
     date: "2020 - 2024",
     location: "Allemagne",
     category: "Santé",
     rating: 5,
-    fullStory: `Je tiens à exprimer ma profonde gratitude envers l'agence AVS Forma qui m'a accompagnée dans mon projet de partir en Allemagne pour effectuer un Ausbildung.
+    fullStory: `Sur les traces du succès des étudiants en soins infirmiers d'excellence, nous félicitons Marwa qui a commencé son voyage avec nous en 2020 avec un visa de formation professionnelle en Allemagne.
 
-Leur soutien et leur professionnalisme m'ont été d'une aide inestimable tout au long du processus. Je dois souligner que cette agence s'est révélée hautement fiable. Dès le début, ils m'ont fourni des informations précises et claires concernant les démarches administratives, les exigences et les délais à respecter. Ils ont été présents à chaque étape et m'ont guidé de manière efficace. Cependant, je tiens à souligner que ce processus demande de la patience et une préparation minutieuse de la langue allemande.
+Aujourd'hui, ses efforts sont couronnés par l'obtention de son diplôme d'infirmière dans le pays de ses rêves, l'Allemagne !
 
-En effet, la maîtrise de l'allemand est la clé essentielle pour réussir son intégration en Allemagne. Heureusement, l'agence m'a encouragé à m'investir pleinement dans l'apprentissage de la langue, ce qui s'est avéré décisif dans mon parcours.
+À tous ceux qui aspirent à réaliser leur rêve dans ce domaine, nous sommes ici pour vous soutenir et vous guider vers le succès.
 
-Grâce à leur accompagnement et à mes efforts dans l'apprentissage de la langue, j'ai pu réaliser mon rêve et entamer une Ausbildung réussie en Allemagne. Je recommande vivement cette agence à toute personne désireuse de partir étudier ou travailler en Allemagne, à condition d'être prête à investir du temps et des efforts dans la préparation de la langue allemande.
-
-Je me souviens encore des premiers jours où j'appréhendais l'inconnu, mais aujourd'hui, je suis tellement reconnaissante de cette opportunité. J'ai pu m'immerger dans une nouvelle culture, rencontrer des gens formidables et enrichir mon bagage professionnel d'une manière que je n'aurais jamais pu imaginer. Encore une fois, merci infiniment à l'équipe de l'agence pour leur soutien et leur expertise. Leur engagement envers la réussite de leur clientèle est véritablement exemplaire.`,
+Rejoignez-nous et commencez votre parcours vers l'excellence et la réussite !`,
     images: [
-      "1WCH5fBu19IAF4aG98-nVrLTFwHMXvPWj",
-      "1PIPnja_ZJSM2ziQT2I4Gi_Ld98XH5oMU",
-      "1SoNGp4AfOP0Wl74U-NY9Bx4PcVUQYWhN",
-      "18kmk-F3iumdjx1ygeY046sIX86sqSCsn",
-      "1MRJAH7MJcYrGsur1WfTpvd7Ta1r5NuRr",
-      "1CO7y1OM1HGu_tdybmZP_4CEptV7-Ba5R",
+      "https://res.cloudinary.com/girgi5fd/image/upload/v1787730379/Copie_de_25.Marwa.png",
+      "https://res.cloudinary.com/girgi5fd/image/upload/v1787730375/Copie_de_Make_your_Dream_come_true_With_AVS_5.png",
     ],
   };
 
@@ -332,7 +324,7 @@ Je me souviens encore des premiers jours où j'appréhendais l'inconnu, mais auj
                 <div className="p-2 bg-brand-imperial/10 rounded-lg">
                   <Quote className="size-5 text-brand-imperial" />
                 </div>
-                <h2 className="font-headline-lg text-on-surface">Mon histoire</h2>
+                <h2 className="font-headline-lg text-on-surface">Son parcours</h2>
               </div>
               <div className="prose prose-lg max-w-none text-on-surface-variant leading-relaxed whitespace-pre-line">
                 {story.fullStory}

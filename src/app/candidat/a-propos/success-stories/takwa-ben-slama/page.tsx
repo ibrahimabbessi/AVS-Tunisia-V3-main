@@ -1,5 +1,3 @@
-// src/app/candidat/a-propos/success-stories/takwa-ben-slama/page.tsx
-
 "use client";
 
 import Link from "next/link";

@@ -428,14 +428,14 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Connexion Button */}
+            {/* Connexion Button 
             <Link
               href={createPath("/connexion")}
               className="font-label-md text-label-md bg-transparent border-[1.5px] border-secondary text-secondary hover:bg-secondary/5 px-5 py-2 rounded-lg transition-colors duration-300 text-[10px]"
             >
               Connexion
             </Link>
-
+*/}
             {/* Candidature Button */}
             <Link
               href={createPath("/candidature")}
@@ -637,6 +637,8 @@ export default function Navbar() {
             </div>
 
             <div className="flex flex-col space-y-2 pt-2 border-t border-outline-variant/30">
+              
+              
               <Link
                 href={createPath("/connexion")}
                 onClick={() => setIsOpen(false)}

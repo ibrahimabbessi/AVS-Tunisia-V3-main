@@ -1,5 +1,3 @@
-// src/app/candidat/a-propos/success-stories/takwa-ben-slama/page.tsx
-
 "use client";
 
 import Link from "next/link";
@@ -224,32 +222,30 @@ function ImageGallery({ images }: { images: string[] }) {
 // COMPONENT
 // ============================================================
 
-export default function TakwaBenSlamaPage() {
+export default function AymenAmmarPage() {
   const story = {
-    id: "takwa-ben-slama",
-    name: "Takwa Ben Slama",
-    description: "Ausbildung en Allemagne - Infirmière",
-    badge: "Diplômée 2024",
+    id: "aymen-ammar",
+    name: "Aymen Ammar",
+    description: "Pflegefachmann - Diplômé en soins infirmiers en Allemagne",
+    badge: "Diplômé 2024",
     date: "2020 - 2024",
     location: "Allemagne",
     category: "Santé",
     rating: 5,
-    fullStory: `Je tiens à exprimer ma profonde gratitude envers l'agence AVS Forma qui m'a accompagnée dans mon projet de partir en Allemagne pour effectuer un Ausbildung.
+    fullStory: `Je tiens à exprimer ma satisfaction et ma profonde appréciation envers AVS Forma.
 
-Leur soutien et leur professionnalisme m'ont été d'une aide inestimable tout au long du processus. Je dois souligner que cette agence s'est révélée hautement fiable. Dès le début, ils m'ont fourni des informations précises et claires concernant les démarches administratives, les exigences et les délais à respecter. Ils ont été présents à chaque étape et m'ont guidé de manière efficace. Cependant, je tiens à souligner que ce processus demande de la patience et une préparation minutieuse de la langue allemande.
+J'ai vécu une expérience exceptionnelle en collaborant avec eux.
 
-En effet, la maîtrise de l'allemand est la clé essentielle pour réussir son intégration en Allemagne. Heureusement, l'agence m'a encouragé à m'investir pleinement dans l'apprentissage de la langue, ce qui s'est avéré décisif dans mon parcours.
+Leur équipe a dépassé toutes mes attentes, et je tiens à les remercier chaleureusement pour leur travail exceptionnel.
 
-Grâce à leur accompagnement et à mes efforts dans l'apprentissage de la langue, j'ai pu réaliser mon rêve et entamer une Ausbildung réussie en Allemagne. Je recommande vivement cette agence à toute personne désireuse de partir étudier ou travailler en Allemagne, à condition d'être prête à investir du temps et des efforts dans la préparation de la langue allemande.
+Grâce à leur accompagnement professionnel et leur soutien constant, j'ai pu réaliser mon rêve de devenir Pflegefachmann en Allemagne. Leur expertise dans le domaine de la formation professionnelle et leur connaissance approfondie des procédures administratives m'ont été d'une aide précieuse tout au long de mon parcours.
 
-Je me souviens encore des premiers jours où j'appréhendais l'inconnu, mais aujourd'hui, je suis tellement reconnaissante de cette opportunité. J'ai pu m'immerger dans une nouvelle culture, rencontrer des gens formidables et enrichir mon bagage professionnel d'une manière que je n'aurais jamais pu imaginer. Encore une fois, merci infiniment à l'équipe de l'agence pour leur soutien et leur expertise. Leur engagement envers la réussite de leur clientèle est véritablement exemplaire.`,
+Aujourd'hui, je suis fièrement diplômé et je recommande vivement AVS Forma à tous ceux qui souhaitent entreprendre une formation en Allemagne. Leur engagement envers la réussite de leurs candidats est véritablement remarquable.
+
+Merci infiniment à toute l'équipe pour leur dévouement et leur professionnalisme.`,
     images: [
-      "1WCH5fBu19IAF4aG98-nVrLTFwHMXvPWj",
-      "1PIPnja_ZJSM2ziQT2I4Gi_Ld98XH5oMU",
-      "1SoNGp4AfOP0Wl74U-NY9Bx4PcVUQYWhN",
-      "18kmk-F3iumdjx1ygeY046sIX86sqSCsn",
-      "1MRJAH7MJcYrGsur1WfTpvd7Ta1r5NuRr",
-      "1CO7y1OM1HGu_tdybmZP_4CEptV7-Ba5R",
+      "https://res.cloudinary.com/girgi5fd/image/upload/v1787731342/Portait_111_Ayman.jpg",
+      "https://res.cloudinary.com/girgi5fd/image/upload/v1787730375/Copie_de_Ayman_Ammar.png",
     ],
   };
 
@@ -332,7 +328,7 @@ Je me souviens encore des premiers jours où j'appréhendais l'inconnu, mais auj
                 <div className="p-2 bg-brand-imperial/10 rounded-lg">
                   <Quote className="size-5 text-brand-imperial" />
                 </div>
-                <h2 className="font-headline-lg text-on-surface">Mon histoire</h2>
+                <h2 className="font-headline-lg text-on-surface">Son témoignage</h2>
               </div>
               <div className="prose prose-lg max-w-none text-on-surface-variant leading-relaxed whitespace-pre-line">
                 {story.fullStory}

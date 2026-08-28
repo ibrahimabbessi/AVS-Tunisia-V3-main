@@ -5,10 +5,17 @@ import Footer from "@/components/Footer";
 import { useState } from "react";
 import Topbar from "@/components/Topbar";
 
+// Cloudinary helper
+const CLOUDINARY_BASE = "https://res.cloudinary.com/girgi5fd/image/upload/";
+
+const cloudinary = (path: string) => {
+  return `${CLOUDINARY_BASE}${path}`;
+};
+
 const TEAM = [
   {
     name: "Ikbal Lamine",
-    imageId: "1YhkvkwqE3T2mZp7LB1c9ht6iRMi5yInA",
+    image: "v1786966061/Foto_Ikbal_Lamine.jpg",
     primaryRole: "Fondatrice & PDG",
     secondaryRoles: [
       "Fondatrice & Gérante AVS",
@@ -22,26 +29,12 @@ const TEAM = [
     },
     experience: "15+ ans",
     languages: ["Français", "Arabe", "Anglais", "Allemand"],
-  },
-  {
-    name: "Ghazala Boussidia",
-    imageId: "1ccGAWOGzU4zIi2zhGWlXnTMeAku1FCxN",
-    primaryRole: "Team Leader & Chef de Projet",
-    secondaryRoles: [
-      "Team Leader",
-      "Chef de Projet",
-      "Directrice Coordinatrice du Groupe",
-    ],
-    socialLinks: {
-      linkedin: "https://www.linkedin.com/in/ghazala-boussidia-avstunisia/",
-      email: "mailto:ghazala.boussidia@avstunisia.com",
-    },
-    experience: "10+ ans",
-    languages: ["Français", "Arabe", "Anglais", "Allemand"],
+    expertise: ["Fondatrice", "Coach International", "Consultante"],
+    yearsOfExperience: "15+",
   },
   {
     name: "Mohamed Ben Said",
-    imageId: "1-jMf_f6ycK8Fvu91-TBi2SLnFB3Jac0V",
+    image: "v1786966062/Foto_Mohamed_Ben_Said.jpg",
     primaryRole: "Teamleiter | Projektmanagement | International Recruiting",
     secondaryRoles: [
       "IFT Global Staffing & Consulting Services",
@@ -55,10 +48,30 @@ const TEAM = [
     },
     experience: "8+ ans",
     languages: ["Français", "Arabe", "Anglais", "Allemand"],
+    expertise: ["Team Leader", "Chef de Projet", "Coordination"],
+    yearsOfExperience: "8+",
+  },
+  {
+    name: "Ghazala Boussidia",
+    image: "v1786966065/Foto_Ghzala_Boussadia.png",
+    primaryRole: "Team Leader & Chef de Projet",
+    secondaryRoles: [
+      "Team Leader",
+      "Chef de Projet",
+      "Directrice Coordinatrice du Groupe",
+    ],
+    socialLinks: {
+      linkedin: "https://www.linkedin.com/in/ghazala-boussidia-avstunisia/",
+      email: "mailto:ghazala.boussidia@avstunisia.com",
+    },
+    experience: "10+ ans",
+    languages: ["Français", "Arabe", "Anglais", "Allemand"],
+    expertise: ["Directeur Administratif", "Manager Financier", "Formateur"],
+    yearsOfExperience: "10+",
   },
   {
     name: "Zaineb Ben Rajeb",
-    imageId: "1NqpOQxIT7GEXoRoys90aGchWjxpyqKNW",
+    image: "v1786966062/Foto_Zaineb_Ben_Rajeb.jpg",
     primaryRole: "Responsable Administrative",
     secondaryRoles: [
       "Gestion administrative",
@@ -71,24 +84,14 @@ const TEAM = [
     },
     experience: "5+ ans",
     languages: ["Français", "Arabe", "Anglais"],
+    expertise: ["Gestion administrative", "Coordination", "Suivi"],
+    yearsOfExperience: "5+",
   },
 ];
 
-// Helper function with multiple URL formats
-const getDriveImageUrl = (id: string) => {
-  const formats = [
-    `https://drive.google.com/thumbnail?id=${id}&sz=w400`,
-    `https://drive.google.com/uc?export=view&id=${id}`,
-    `https://drive.google.com/uc?export=download&id=${id}`,
-    `https://lh3.googleusercontent.com/d/${id}`,
-  ];
-  return formats[0];
-};
-
-// Team Member Card Component with Enhanced Flip
+// Team Member Card Component with Enhanced Flip - Homepage Style
 function TeamMemberCard({ member, index }: { member: typeof TEAM[0], index: number }) {
   const [imgError, setImgError] = useState(false);
-  const [currentUrlIndex, setCurrentUrlIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [isFlipped, setIsFlipped] = useState(false);
 
@@ -96,168 +99,180 @@ function TeamMemberCard({ member, index }: { member: typeof TEAM[0], index: numb
     return name.split(' ').map(n => n[0]).join('');
   };
 
-  const urlFormats = [
-    `https://drive.google.com/thumbnail?id=${member.imageId}&sz=w400`,
-    `https://drive.google.com/uc?export=view&id=${member.imageId}`,
-    `https://drive.google.com/uc?export=download&id=${member.imageId}`,
-  ];
-
-  const handleImageError = () => {
-    if (currentUrlIndex < urlFormats.length - 1) {
-      setCurrentUrlIndex(currentUrlIndex + 1);
-      setIsLoading(true);
-    } else {
-      setImgError(true);
-      setIsLoading(false);
-    }
-  };
+  const imageUrl = cloudinary(member.image);
 
   return (
     <div
-      className="group relative h-[480px] perspective-1000 cursor-pointer"
+      className="relative perspective-1000"
       onMouseEnter={() => setIsFlipped(true)}
-      onMouseLeave={() => setIsFlipped(false)}
-      style={{ animationDelay: `${index * 100}ms` }}
+      onMouseLeave={() => {
+        setIsFlipped(false);
+      }}
     >
       <div
-        className={`relative w-full h-full transition-transform duration-700 transform-style-3d ${
+        className={`relative w-full transition-transform duration-700 transform-style-3d ${
           isFlipped ? "rotate-y-180" : ""
         }`}
+        style={{ minHeight: "480px" }}
       >
-        {/* Front Face */}
+        {/* Front Face - Homepage Style */}
         <div className="absolute inset-0 backface-hidden">
-          <div className="h-full rounded-2xl border border-outline-variant bg-gradient-to-br from-surface-container-lowest to-surface-container-low overflow-hidden transition-all duration-500 hover:shadow-2xl hover:border-secondary/50">
-            <div className="absolute inset-0 bg-gradient-to-t from-brand-imperial/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            
-            <div className="relative p-6 text-center h-full flex flex-col items-center justify-center">
-              {/* Decorative element */}
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-brand-imperial/20 to-transparent"></div>
-              
-              {/* Image Container */}
-              <div className="relative inline-block mb-4">
-                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-brand-imperial to-secondary opacity-20 group-hover:opacity-30 transition-opacity duration-500 blur-xl"></div>
-                <div className="relative h-32 w-32 mx-auto rounded-full border-4 border-white shadow-xl overflow-hidden ring-2 ring-brand-imperial/10 group-hover:ring-secondary/50 transition-all duration-300">
-                  {!imgError ? (
-                    <>
-                      {isLoading && (
-                        <div className="absolute inset-0 bg-gradient-to-br from-brand-imperial/10 to-secondary/10 animate-pulse flex items-center justify-center">
-                          <div className="w-8 h-8 border-4 border-brand-imperial/20 border-t-brand-imperial rounded-full animate-spin"></div>
-                        </div>
-                      )}
-                      <img
-                        src={urlFormats[currentUrlIndex]}
-                        alt={member.name}
-                        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
-                          isLoading ? 'opacity-0' : 'opacity-100'
-                        }`}
-                        onLoad={() => setIsLoading(false)}
-                        onError={handleImageError}
-                      />
-                    </>
-                  ) : (
-                    <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-brand-imperial to-secondary flex items-center justify-center text-white font-display-lg text-3xl">
-                      {getInitials(member.name)}
-                    </div>
-                  )}
-                  
-                  {/* Status indicator */}
-                  <div className="absolute bottom-1 right-1 h-3.5 w-3.5 rounded-full bg-green-400 border-2 border-white"></div>
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <h3 className="font-headline-md text-primary text-lg group-hover:text-secondary transition-colors duration-300">
-                  {member.name}
-                </h3>
-                
-                <div className="inline-block px-4 py-1 bg-brand-imperial/5 rounded-full border border-brand-imperial/10">
-                  <p className="font-label-md text-brand-imperial text-xs">
-                    {member.primaryRole}
-                  </p>
-                </div>
-
-                {/* Experience & Languages badges */}
-                <div className="flex flex-wrap justify-center gap-1.5 mt-2">
-                  {member.experience && (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-secondary/10 text-secondary rounded-full text-[10px] font-medium">
-                      <span className="material-symbols-outlined text-[12px]">work</span>
-                      {member.experience}
-                    </span>
-                  )}
-                  {member.languages && member.languages.slice(0, 3).map((lang) => (
-                    <span key={lang} className="px-2 py-0.5 bg-brand-ice/50 text-brand-imperial rounded-full text-[10px] font-medium">
-                      {lang}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Hover indicator with icon */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 text-xs text-on-surface-variant/50 font-label-md">
-                <span className="material-symbols-outlined text-[14px]">touch_app</span>
-                Hover pour en savoir plus
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Back Face */}
-        <div className="absolute inset-0 backface-hidden rotate-y-180">
-          <div className="h-full rounded-2xl border border-secondary/30 bg-gradient-to-br from-brand-imperial/5 via-surface-container-lowest to-secondary/5 overflow-hidden p-6 flex flex-col items-center justify-between shadow-lg">
-            {/* Back decorative element */}
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-secondary/40 to-transparent"></div>
-            
-            {/* Small image on back */}
-            <div className="relative inline-block">
-              <div className="relative h-20 w-20 mx-auto rounded-full border-3 border-white shadow-xl overflow-hidden ring-2 ring-secondary/30">
+          <div className="h-full rounded-2xl bg-surface-container-lowest border border-outline-variant/30 p-8 text-center shadow-sm hover:shadow-xl transition-shadow duration-300 flex flex-col">
+            {/* Image with gradient overlay */}
+            <div className="relative -mt-16 mb-4">
+              <div className="relative inline-block">
+                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-brand-imperial/10 to-secondary/10 blur-xl opacity-50"></div>
                 {!imgError ? (
-                  <img
-                    src={urlFormats[currentUrlIndex]}
-                    alt={member.name}
-                    className="w-full h-full object-cover"
-                    onError={() => {}}
-                  />
+                  <>
+                    {isLoading && (
+                      <div className="absolute inset-0 rounded-full bg-gradient-to-br from-brand-imperial/10 to-secondary/10 animate-pulse flex items-center justify-center">
+                        <div className="w-8 h-8 border-4 border-brand-imperial/20 border-t-brand-imperial rounded-full animate-spin"></div>
+                      </div>
+                    )}
+                    <img
+                      src={imageUrl}
+                      alt={member.name}
+                      className={`relative h-28 w-28 mx-auto rounded-full object-cover border-4 border-white shadow-lg transition-opacity duration-300 ${
+                        isLoading ? 'opacity-0' : 'opacity-100'
+                      }`}
+                      onLoad={() => setIsLoading(false)}
+                      onError={() => {
+                        setIsLoading(false);
+                        setImgError(true);
+                      }}
+                    />
+                  </>
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-brand-imperial to-secondary flex items-center justify-center text-white font-display-lg text-2xl">
+                  <div className="relative h-28 w-28 mx-auto rounded-full bg-gradient-to-br from-brand-imperial to-secondary flex items-center justify-center text-white font-display-lg text-3xl border-4 border-white shadow-lg">
                     {getInitials(member.name)}
                   </div>
                 )}
+                {/* Status indicator */}
+                <div className="absolute bottom-1 right-1 h-4 w-4 rounded-full bg-green-400 border-2 border-white"></div>
               </div>
             </div>
-            
-            <div className="text-center">
-              <h3 className="font-headline-md text-primary text-base">
+
+            <div className="flex-1">
+              <h3 className="font-headline-md text-primary text-lg">
                 {member.name}
               </h3>
-              <p className="font-label-md text-secondary text-xs">
+              <p className="font-label-md text-brand-imperial mt-1 text-sm">
                 {member.primaryRole}
               </p>
+              
+              {/* Expertise tags */}
+              <div className="flex flex-wrap gap-1.5 justify-center mt-3">
+                {member.expertise.map((skill) => (
+                  <span
+                    key={skill}
+                    className="px-2.5 py-1 bg-brand-ice/50 text-brand-imperial rounded-full text-[10px] font-medium"
+                  >
+                    {skill}
+                  </span>
+                ))}
+              </div>
+
+              {/* Secondary roles */}
+              <div className="mt-4 space-y-1">
+                {member.secondaryRoles.slice(0, 3).map((role) => (
+                  <p
+                    key={role}
+                    className="font-caption text-on-surface-variant text-xs leading-relaxed"
+                  >
+                    {role}
+                  </p>
+                ))}
+              </div>
+
+              {/* Experience indicator */}
+              <div className="mt-4 flex items-center justify-center gap-2">
+                <span className="text-xs text-on-surface-variant/60">⭐</span>
+                <span className="text-xs text-on-surface-variant/60">
+                  {member.yearsOfExperience} ans d'expérience
+                </span>
+              </div>
+
+              {/* Languages */}
+              <div className="mt-2 flex items-center justify-center gap-1.5">
+                {member.languages.map((lang) => (
+                  <span
+                    key={lang}
+                    className="px-2 py-0.5 bg-surface-container-low rounded-full text-[9px] text-on-surface-variant/70"
+                  >
+                    {lang}
+                  </span>
+                ))}
+              </div>
             </div>
-            
-            {/* Secondary Roles */}
-            <div className="flex-1 w-full pt-3">
-              <div className="flex flex-col gap-1.5">
-                {member.secondaryRoles.map((role, idx) => (
-                  <div key={idx} className="flex items-start gap-2">
-                    <span className="material-symbols-outlined text-brand-imperial text-[16px] mt-0.5 shrink-0">
+
+            {/* Flip button */}
+            <button
+              onClick={() => setIsFlipped(!isFlipped)}
+              className="mt-4 w-full py-2.5 px-4 bg-brand-imperial/5 text-brand-imperial rounded-xl font-label-md text-xs hover:bg-brand-imperial/10 transition-all duration-300 flex items-center justify-center gap-2"
+            >
+              <span className="material-symbols-outlined text-[16px]">info</span>
+              En savoir plus
+            </button>
+          </div>
+        </div>
+
+        {/* Back Face - Homepage Style */}
+        <div className="absolute inset-0 backface-hidden rotate-y-180">
+          <div className="h-full rounded-2xl bg-gradient-to-br from-brand-imperial/5 via-surface-container-lowest to-secondary/5 border border-secondary/30 p-8 flex flex-col items-center justify-between shadow-lg">
+            {/* Back content */}
+            <div className="text-center">
+              <div className="mb-4">
+                <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-brand-imperial/10">
+                  <span className="material-symbols-outlined text-3xl text-brand-imperial">
+                    badge
+                  </span>
+                </div>
+              </div>
+              
+              <h3 className="font-headline-md text-primary text-lg">
+                {member.name}
+              </h3>
+              <p className="font-label-md text-brand-imperial text-sm mt-1">
+                {member.primaryRole}
+              </p>
+              
+              <div className="mt-4 space-y-2 text-left">
+                {member.secondaryRoles.map((role) => (
+                  <div key={role} className="flex items-start gap-2">
+                    <span className="material-symbols-outlined text-brand-imperial text-[16px] mt-0.5">
                       check_circle
                     </span>
-                    <span className="font-body-sm text-on-surface-variant text-xs leading-relaxed">
+                    <span className="font-body-sm text-on-surface-variant text-xs">
                       {role}
                     </span>
                   </div>
                 ))}
               </div>
+
+              {/* Languages on back */}
+              <div className="mt-4 pt-3 border-t border-outline-variant/20">
+                <p className="font-caption text-on-surface-variant text-xs mb-2">Langues parlées</p>
+                <div className="flex flex-wrap justify-center gap-1.5">
+                  {member.languages.map((lang) => (
+                    <span
+                      key={lang}
+                      className="px-3 py-1 bg-brand-imperial/10 text-brand-imperial rounded-full text-xs font-medium"
+                    >
+                      {lang}
+                    </span>
+                  ))}
+                </div>
+              </div>
             </div>
 
-            {/* Social links and actions */}
-            <div className="w-full pt-3 border-t border-outline-variant/30">
-              <div className="flex items-center justify-center gap-3">
+            {/* Social links */}
+            <div className="w-full">
+              <div className="flex items-center justify-center gap-4">
                 <a
                   href={member.socialLinks.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2 rounded-full bg-[#0077B5]/10 text-[#0077B5] hover:bg-[#0077B5] hover:text-white transition-all duration-300 hover:scale-110 hover:shadow-lg"
+                  className="p-2 rounded-full bg-[#0077B5]/10 text-[#0077B5] hover:bg-[#0077B5] hover:text-white transition-all duration-300 hover:scale-110"
                   aria-label="LinkedIn"
                 >
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -266,7 +281,7 @@ function TeamMemberCard({ member, index }: { member: typeof TEAM[0], index: numb
                 </a>
                 <a
                   href={member.socialLinks.email}
-                  className="p-2 rounded-full bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300 hover:scale-110 hover:shadow-lg"
+                  className="p-2 rounded-full bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300 hover:scale-110"
                   aria-label="Email"
                 >
                   <span className="material-symbols-outlined text-[18px]">mail</span>
@@ -274,12 +289,12 @@ function TeamMemberCard({ member, index }: { member: typeof TEAM[0], index: numb
                 <button
                   onClick={() => setIsFlipped(false)}
                   className="p-2 rounded-full bg-surface-container-low text-on-surface-variant hover:bg-brand-imperial/10 hover:text-brand-imperial transition-all duration-300 hover:scale-110"
-                  aria-label="Retourner"
+                  aria-label="Retour"
                 >
                   <span className="material-symbols-outlined text-[18px]">undo</span>
                 </button>
               </div>
-              <p className="text-center text-[10px] text-on-surface-variant/40 mt-2">
+              <p className="text-center text-[10px] text-on-surface-variant/50 mt-3">
                 Cliquez sur une icône pour contacter
               </p>
             </div>
@@ -296,7 +311,7 @@ export default function EquipePage() {
       <Topbar />
       <Navbar />
       
-      {/* Hero Section */}
+      {/* Hero Section - Homepage Style */}
       <section className="relative pt-40 pb-16 md:pt-48 md:pb-24 bg-gradient-to-b from-brand-imperial/5 via-surface-container-low to-transparent overflow-hidden">
         <div className="absolute top-0 right-0 w-1/2 h-full opacity-5">
           <div className="absolute top-20 right-20 w-64 h-64 rounded-full bg-secondary blur-3xl"></div>
@@ -342,7 +357,6 @@ export default function EquipePage() {
                     (e.target as HTMLImageElement).src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='400'%3E%3Crect width='600' height='400' fill='%23e5e7eb'/%3E%3Ctext x='300' y='200' text-anchor='middle' dy='.3em' fill='%236b7280' font-size='24' font-weight='bold'%3EÉquipe AVS%3C/text%3E%3C/svg%3E";
                   }}
                 />
-                {/* Decorative badge on image */}
                 <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-1.5 shadow-lg">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-medium text-on-surface">Équipe d'exception</span>
@@ -357,74 +371,52 @@ export default function EquipePage() {
       {/* Main Content */}
       <section className="max-w-container-max mx-auto px-margin-mobile md:px-gutter py-section-gap-lg">
         
-        {/* Team Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Team Grid - Same as Homepage */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {TEAM.map((member, index) => (
             <TeamMemberCard key={member.name} member={member} index={index} />
           ))}
         </div>
 
-        {/* Interactive hint */}
-        <div className="mt-6 text-center">
+        {/* Interactive hint - Same as Homepage */}
+        <div className="mt-8 text-center">
           <p className="font-body-sm text-on-surface-variant/60 text-sm flex items-center justify-center gap-2">
             <span className="material-symbols-outlined text-[18px]">touch_app</span>
-            Passez la souris sur les cartes pour découvrir l'équipe en détail
+            Passez la souris sur les cartes ou cliquez sur &quot;En savoir plus&quot; pour découvrir l&apos;équipe
           </p>
         </div>
 
-        {/* Statistics Section */}
-        <div className="mt-20 relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-brand-imperial/5 via-secondary/5 to-brand-imperial/5 rounded-3xl blur-3xl"></div>
-          <div className="relative grid grid-cols-1 md:grid-cols-3 gap-8 p-8 md:p-12 rounded-3xl bg-white/70 backdrop-blur-sm border border-outline-variant/30 shadow-lg">
-            {[
-              { number: "7+", label: "Années d'expérience", icon: "📅" },
-              { number: "170+", label: "Apprenants formés", icon: "🎓" },
-              { number: "95%", label: "Engagement vers la réussite", icon: "⭐" },
-            ].map((stat, index) => (
-              <div key={index} className="text-center group">
-                <div className="text-4xl mb-2 group-hover:scale-110 transition-transform duration-300">
-                  {stat.icon}
-                </div>
-                <div className="text-4xl md:text-5xl font-display-lg text-brand-imperial group-hover:text-secondary transition-colors duration-300">
-                  {stat.number}
-                </div>
-                <div className="text-caption text-on-surface-variant mt-2 font-medium uppercase tracking-wider">
-                  {stat.label}
-                </div>
-                {index < 2 && (
-                  <div className="hidden md:block absolute top-1/2 -translate-y-1/2 right-0 w-px h-12 bg-outline-variant/30"></div>
-                )}
+        {/* Trust indicators - Same as Homepage */}
+        <div className="mt-12 pt-8 border-t border-outline-variant/30">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2">
+                <span className="material-symbols-outlined text-brand-imperial">verified</span>
+                <span className="font-label-md text-on-surface-variant text-xs">Experts certifiés</span>
               </div>
-            ))}
+            </div>
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2">
+                <span className="material-symbols-outlined text-brand-imperial">diversity_3</span>
+                <span className="font-label-md text-on-surface-variant text-xs">Équipe multidisciplinaire</span>
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2">
+                <span className="material-symbols-outlined text-brand-imperial">handshake</span>
+                <span className="font-label-md text-on-surface-variant text-xs">Partenaires de confiance</span>
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2">
+                <span className="material-symbols-outlined text-brand-imperial">translate</span>
+                <span className="font-label-md text-on-surface-variant text-xs">Français • Allemand • Anglais</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Team Values Section */}
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="p-6 rounded-2xl bg-surface-container-lowest border border-outline-variant/30 text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-            <div className="text-4xl mb-3">🤝</div>
-            <h3 className="font-headline-md text-primary text-base mb-2">Accompagnement personnalisé</h3>
-            <p className="font-body-sm text-on-surface-variant text-sm">
-              Chaque candidat bénéficie d'un suivi individuel adapté à ses besoins et objectifs.
-            </p>
-          </div>
-          <div className="p-6 rounded-2xl bg-surface-container-lowest border border-outline-variant/30 text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-            <div className="text-4xl mb-3">🌍</div>
-            <h3 className="font-headline-md text-primary text-base mb-2">Expertise internationale</h3>
-            <p className="font-body-sm text-on-surface-variant text-sm">
-              Une équipe multiculturelle avec une connaissance approfondie du marché allemand.
-            </p>
-          </div>
-          <div className="p-6 rounded-2xl bg-surface-container-lowest border border-outline-variant/30 text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-            <div className="text-4xl mb-3">🎯</div>
-            <h3 className="font-headline-md text-primary text-base mb-2">Résultats concrets</h3>
-            <p className="font-body-sm text-on-surface-variant text-sm">
-              Un engagement fort pour la réussite de chaque apprenant avec des résultats mesurables.
-            </p>
-          </div>
-        </div>
-
-        {/* Call to Action */}
+        {/* Call to Action - Same as Homepage but with gradient */}
         <div className="mt-16 rounded-3xl bg-gradient-to-br from-brand-imperial to-brand-imperial/90 p-10 text-center text-white shadow-2xl relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
@@ -447,7 +439,7 @@ export default function EquipePage() {
               </a>
               <a
                 href="/contact"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-secondary text-white rounded-xl font-label-md hover:bg-secondary/90 transition-all duration-300 hover:scale-[1.05] shadow-lg glass-highlight"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-secondary text-white rounded-xl font-label-md hover:bg-secondary/90 transition-all duration-300 hover:scale-[1.05] shadow-lg"
               >
                 Contactez-nous
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

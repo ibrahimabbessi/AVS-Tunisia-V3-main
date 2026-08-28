@@ -1,5 +1,3 @@
-// src/app/candidat/a-propos/success-stories/takwa-ben-slama/page.tsx
-
 "use client";
 
 import Link from "next/link";
@@ -224,32 +222,20 @@ function ImageGallery({ images }: { images: string[] }) {
 // COMPONENT
 // ============================================================
 
-export default function TakwaBenSlamaPage() {
+export default function AminaSammoudaPage() {
   const story = {
-    id: "takwa-ben-slama",
-    name: "Takwa Ben Slama",
-    description: "Ausbildung en Allemagne - Infirmière",
+    id: "amina-sammouda",
+    name: "Amina Sammouda",
+    description: "Pflegefachmann - Diplômée en soins infirmiers en Allemagne",
     badge: "Diplômée 2024",
     date: "2020 - 2024",
     location: "Allemagne",
     category: "Santé",
     rating: 5,
-    fullStory: `Je tiens à exprimer ma profonde gratitude envers l'agence AVS Forma qui m'a accompagnée dans mon projet de partir en Allemagne pour effectuer un Ausbildung.
-
-Leur soutien et leur professionnalisme m'ont été d'une aide inestimable tout au long du processus. Je dois souligner que cette agence s'est révélée hautement fiable. Dès le début, ils m'ont fourni des informations précises et claires concernant les démarches administratives, les exigences et les délais à respecter. Ils ont été présents à chaque étape et m'ont guidé de manière efficace. Cependant, je tiens à souligner que ce processus demande de la patience et une préparation minutieuse de la langue allemande.
-
-En effet, la maîtrise de l'allemand est la clé essentielle pour réussir son intégration en Allemagne. Heureusement, l'agence m'a encouragé à m'investir pleinement dans l'apprentissage de la langue, ce qui s'est avéré décisif dans mon parcours.
-
-Grâce à leur accompagnement et à mes efforts dans l'apprentissage de la langue, j'ai pu réaliser mon rêve et entamer une Ausbildung réussie en Allemagne. Je recommande vivement cette agence à toute personne désireuse de partir étudier ou travailler en Allemagne, à condition d'être prête à investir du temps et des efforts dans la préparation de la langue allemande.
-
-Je me souviens encore des premiers jours où j'appréhendais l'inconnu, mais aujourd'hui, je suis tellement reconnaissante de cette opportunité. J'ai pu m'immerger dans une nouvelle culture, rencontrer des gens formidables et enrichir mon bagage professionnel d'une manière que je n'aurais jamais pu imaginer. Encore une fois, merci infiniment à l'équipe de l'agence pour leur soutien et leur expertise. Leur engagement envers la réussite de leur clientèle est véritablement exemplaire.`,
+    fullStory: `Amina est un véritable modèle de réussite pour la jeunesse tunisienne. Son parcours exemplaire en Allemagne est le fruit d'un travail acharné et d'une détermination sans faille.\n\nSon histoire montre que les rêves peuvent devenir réalité avec les bons conseils, le bon accompagnement et beaucoup de persévérance. Amina a su saisir les opportunités qui se sont présentées à elle et les transformer en succès.\n\nNous sommes fiers d'avoir accompagné Amina dans son parcours et nous continuerons à soutenir d'autres jeunes talents comme elle.`,
     images: [
-      "1WCH5fBu19IAF4aG98-nVrLTFwHMXvPWj",
-      "1PIPnja_ZJSM2ziQT2I4Gi_Ld98XH5oMU",
-      "1SoNGp4AfOP0Wl74U-NY9Bx4PcVUQYWhN",
-      "18kmk-F3iumdjx1ygeY046sIX86sqSCsn",
-      "1MRJAH7MJcYrGsur1WfTpvd7Ta1r5NuRr",
-      "1CO7y1OM1HGu_tdybmZP_4CEptV7-Ba5R",
+      "https://res.cloudinary.com/girgi5fd/image/upload/v1787730377/Copie_de_61.Amina.png",
+      "https://res.cloudinary.com/girgi5fd/image/upload/v1787730372/Copie_de_Amina_Sammouda.png",
     ],
   };
 
@@ -332,7 +318,7 @@ Je me souviens encore des premiers jours où j'appréhendais l'inconnu, mais auj
                 <div className="p-2 bg-brand-imperial/10 rounded-lg">
                   <Quote className="size-5 text-brand-imperial" />
                 </div>
-                <h2 className="font-headline-lg text-on-surface">Mon histoire</h2>
+                <h2 className="font-headline-lg text-on-surface">Son témoignage</h2>
               </div>
               <div className="prose prose-lg max-w-none text-on-surface-variant leading-relaxed whitespace-pre-line">
                 {story.fullStory}

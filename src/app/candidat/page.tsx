@@ -6,31 +6,30 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 /* ------------------------------------------------------------------ */
-/*  Google Drive helper                                                */
-/*  Drive "share" links (…/file/d/ID/view) can't be used directly as   */
-/*  <img src>. This resolves the file ID to Drive's thumbnail endpoint,*/
-/*  which works for anyone-with-the-link files. For production, prefer */
-/*  downloading these into /public and serving them locally — Drive    */
-/*  hotlinking can be slow or rate-limited under real traffic.         */
+/*  Cloudinary helper - Direct URLs                                    */
+/*  All images are now served from Cloudinary CDN for better          */
+/*  performance, reliability, and optimization.                       */
 /* ------------------------------------------------------------------ */
 
-function drive(fileId: string, size: number = 1000) {
-  return `https://drive.google.com/thumbnail?id=${fileId}&sz=w${size}`;
-}
+// Cloudinary base URL
+const CLOUDINARY_BASE = "https://res.cloudinary.com/girgi5fd/image/upload/";
+
+// Helper function to get Cloudinary URL
+const cloudinary = (path: string) => {
+  return `${CLOUDINARY_BASE}${path}`;
+};
 
 /* ------------------------------------------------------------------ */
-/*  Content — swap for useTranslations("Home") / useTranslations("Common") */
-/*  when wiring up next-intl. Kept as plain data here so the section    */
-/*  components stay presentational.                                    */
+/*  Hero Section - Cloudinary Images                                   */
 /* ------------------------------------------------------------------ */
 
 const HERO_SLIDES = [
-  { id: "14Hdm-fXqDMu2qIvLtzH7371Fp_d3eo8w", alt: "AVS Tunisia Group — image d'accueil 1" },
-  { id: "1e3M0KBtF5iuHZhG-cPkmziJAovLMkMLI", alt: "AVS Tunisia Group — image d'accueil 2" },
-  { id: "1e0KTMZkGjQA6sa8swNpPrkXvUvhx2ijX", alt: "AVS Tunisia Group — image d'accueil 3" },
-  { id: "1Yh3Iw_YXi6A9vv4mvVEesHmNi6SEPTu3", alt: "AVS Tunisia Group — image d'accueil 4" },
-  { id: "17R4uCRVvJ_KAhCPBwiKZIDC7OWjZjZgU", alt: "AVS Tunisia Group — image d'accueil 5" },
-  { id: "1SehwbmKl_TPeIoeLfzeSvrOB7uG1Fn9e", alt: "AVS Tunisia Group — image d'accueil 6" },
+  { src: "v1786964943/hero1.jpg", alt: "AVS Tunisia Group — image d'accueil 1" },
+  { src: "v1786964946/hero6.jpg", alt: "AVS Tunisia Group — image d'accueil 2" },
+  { src: "v1786964946/hero2.jpg", alt: "AVS Tunisia Group — image d'accueil 3" },
+  { src: "v1786964947/hero4.jpg", alt: "AVS Tunisia Group — image d'accueil 4" },
+  { src: "v1786964953/hero3.jpg", alt: "AVS Tunisia Group — image d'accueil 5" },
+  { src: "v1786964954/hero5.jpg", alt: "AVS Tunisia Group — image d'accueil 6" },
 ];
 
 const HERO_STATS = [
@@ -38,6 +37,10 @@ const HERO_STATS = [
   { value: "170+", label: "Candidats accompagnés" },
   { value: "12+", label: "Domaines de formation" },
 ];
+
+/* ------------------------------------------------------------------ */
+/*  Services Section                                                   */
+/* ------------------------------------------------------------------ */
 
 const SERVICES = [
   {
@@ -60,22 +63,32 @@ const SERVICES = [
   },
 ];
 
-const AVS_GROUP_LOGO = "1947hpZTKgNQn_6Wau0DtF1W5HG6n3Q0A";
-const AVS_HERGLA_FORMA_LOGO = "16RmAjf7jVG0GiXm6XEsp6_3vNUETENrq";
-const IFT_GLOBAL_LOGO = "1PHZFUUoN8g5PmRrdCp701kTbWcGMbD4B";
+// Cloudinary URLs for logos
+const AVS_GROUP_LOGO = "v1786965482/avs-group-logo.png";
+const AVS_HERGLA_FORMA_LOGO = "v1786965483/avs-hergla-forma-logo.png";
+const IFT_GLOBAL_LOGO = "v1786965485/ift-global-logo.png";
+const AVS_CARE_FORMA_LOGO = "v1786965487/avs-care-form-logo.png";
+
+/* ------------------------------------------------------------------ */
+/*  About Section - Cloudinary Images                                  */
+/* ------------------------------------------------------------------ */
 
 const ABOUT_IMAGES = [
-  { id: "19Y2RTkDWRqIvUSrF-OqQV0wIIgBnZ2Rv", alt: "AVS Tunisia Group — à propos 1" },
-  { id: "1OZs6AGKI7ISRz1na7fT_hX5zrvmHMcdK", alt: "AVS Tunisia Group — à propos 2" },
-  { id: "17Va2ZuMbgzy3Pcfo5vD-gepfCUrGIvM4", alt: "AVS Tunisia Group — à propos 3" },
-  { id: "12f8UOOz5WKcjW-G6dk43INtSogITngGA", alt: "AVS Tunisia Group — à propos 4" },
-  { id: "1rIRDYQOcNsWFGSNp36KkfVTADaPcDWzs", alt: "AVS Tunisia Group — à propos 5" },
+  { src: "v1786965592/img1.jpg", alt: "AVS Tunisia Group — à propos 1" },
+  { src: "v1786965592/img2.jpg", alt: "AVS Tunisia Group — à propos 2" },
+  { src: "v1786965589/img3.jpg", alt: "AVS Tunisia Group — à propos 3" },
+  { src: "v1786965605/img4.jpg", alt: "AVS Tunisia Group — à propos 4" },
+  { src: "v1786965597/img5.jpg", alt: "AVS Tunisia Group — à propos 5" },
 ];
+
+/* ------------------------------------------------------------------ */
+/*  Team Section - Cloudinary Images                                  */
+/* ------------------------------------------------------------------ */
 
 const TEAM = [
   {
     name: "Ikbal Lamine",
-    imageId: "1YhkvkwqE3T2mZp7LB1c9ht6iRMi5yInA",
+    image: "v1786966061/Foto_Ikbal_Lamine.jpg",
     primaryRole: "Fondatrice & PDG",
     secondaryRoles: [
       "Fondatrice & Gérante AVS",
@@ -86,7 +99,7 @@ const TEAM = [
   },
   {
     name: "Ghazala Boussidia",
-    imageId: "1ccGAWOGzU4zIi2zhGWlXnTMeAku1FCxN",
+    image: "v1786966065/Foto_Ghzala_Boussadia.png",
     primaryRole: "Team Leader & Chef de Projet",
     secondaryRoles: [
       "Team Leader",
@@ -96,7 +109,7 @@ const TEAM = [
   },
   {
     name: "Mohamed Ben Said",
-    imageId: "1-jMf_f6ycK8Fvu91-TBi2SLnFB3Jac0V",
+    image: "v1786966062/Foto_Mohamed_Ben_Said.jpg",
     primaryRole: "Directeur Administratif & Financier",
     secondaryRoles: [
       "Directeur Administratif",
@@ -104,62 +117,77 @@ const TEAM = [
       "Formateur IT",
     ],
   },
+  {
+    name: "Zaineb Ben Rajeb",
+    image: "v1786966062/Foto_Zaineb_Ben_Rajeb.jpg",
+    primaryRole: "Responsable Administrative",
+    secondaryRoles: [
+      "Gestion administrative",
+      "Coordination des dossiers",
+      "Suivi des candidatures",
+    ],
+    languages: ["Français", "Arabe", "Anglais"],
+  },
 ];
+
+/* ------------------------------------------------------------------ */
+/*  Testimonials Section - Cloudinary Images                          */
+/* ------------------------------------------------------------------ */
 
 type Testimonial = {
   name: string;
   role: string;
   quote: string;
-  imageId?: string;
+  image?: string;
 };
 
 const TESTIMONIALS: Testimonial[] = [
   {
     name: "Adem",
     role: "Responsable de la planification qualité (Mécanique)",
-    imageId: "1S1Y-aO65hUmDEPCkRJVH0QFFL9vRm-8M",
+    image: "v1786966137/Adem.jpg",
     quote:
       "Je tiens à exprimer ma profonde gratitude envers AVS Forma pour l'excellente expérience vécue avec eux. Leur professionnalisme, leur respect et leur sérieux tout au long du processus témoignent de la confiance que l'on peut leur accorder. Grâce à leur accompagnement rigoureux et à leur soutien constant, j'ai pu décrocher avec succès un poste qualifié dans le domaine de l'ingénierie de la qualité industrielle. Leur expertise et leur engagement m'ont permis d'atteindre ce résultat pleinement satisfaisant et je tiens également à remercier particulièrement Mlle Ghzala pour son professionnalisme, son sérieux et sa transparence, qui ont grandement contribué à la réussite de cette expérience.",
   },
   {
     name: "Ala",
     role: "Logistique",
-    imageId: "1hSf0hAAtVaaLBOe7lOnc26Gnr30wgbap",
+    image: "v1786966138/Ala.jpg",
     quote:
       "Je suis très reconnaissant(e) envers AVS Forma pour l'accompagnement exceptionnel tout au long de mon parcours. Grâce à leurs cours de langue et à leur soutien personnalisé, j'ai pu atteindre le niveau nécessaire pour poursuivre ma carrière en Allemagne et réaliser mon rêve professionnel. L'équipe est toujours à l'écoute et prête à aider, ce qui m'a donné confiance et motivation à chaque étape. Aujourd'hui, je suis fier(e) de pouvoir dire que je travaille dans mon domaine de prédilection, et tout cela n'aurait pas été possible sans AVS Forma.",
   },
   {
     name: "Amel",
     role: "Contrôle qualité (Mécanique)",
-    imageId: "1IaT3Az003sxU364Nw4CHqtRmyqviYBJA",
+    image: "v1786966140/Amel.jpg",
     quote:
       "Venir en Allemagne était un défi, mais aussi une formidable opportunité. Avec l'aide de AVS Forma, j'ai franchi cette étape et intégré une entreprise allemande en tant qu'ingénieure électromécanique. Aujourd'hui, je travaille dans le domaine de l'assurance qualité, une expérience qui me permet de progresser autant sur le plan professionnel que personnel. Je recommande vivement cette aventure à tous ceux qui rêvent d'élargir leurs horizons.",
   },
   {
     name: "Islem",
     role: "Contrôle qualité (Mécanique)",
-    imageId: "1PjCGPG48_h2al3bD-AVmHhiB5oXXn3CA",
+    image: "v1786966141/Islem.jpg",
     quote:
       "Je tiens à exprimer toute ma satisfaction concernant AVS. Dès le premier contact, j'ai été agréablement surpris par leur sérieux, leur professionnalisme et la clarté de leurs explications. L'équipe a toujours été disponible pour répondre à mes questions et m'accompagner dans chaque étape. Grâce à leur soutien, j'ai pu obtenir une opportunité d'emploi en Allemagne dans de très bonnes conditions. Je recommande vivement leurs services à toute personne qui cherche une agence fiable et compétente.",
   },
   {
     name: "Karim",
     role: "Infirmier",
-    imageId: "1-Qavxk1zhVy0MdIEV16XjDZJDI3Y1c9j",
+    image: "v1786966142/Karim.jpg",
     quote:
       "Je tiens à exprimer ma profonde gratitude envers la société AVS Forma pour le traitement professionnel et bien organisé de mes documents. Grâce à votre accompagnement et à votre soutien, je peux désormais concrétiser mon projet d'apprendre l'allemand en Allemagne et avancer sereinement dans mon parcours d'études.",
   },
   {
     name: "Khawla",
     role: "Infirmière",
-    imageId: "1xO_Sj-n3_AgS9eOgxq6FXtMP92XAumuG",
+    image: "v1786966143/Khawla.jpg",
     quote:
       "J'ai eu une excellente expérience avec AVS qui m'a accompagnée dans toutes les démarches pour travailler en Allemagne. Leur professionnalisme et leur soutien m'ont beaucoup aidée à réussir mon intégration.",
   },
   {
     name: "Khouloud",
     role: "Infirmière",
-    imageId: "1-i-i5oVcN1KcVaBAgo11D6SJ3TaA1Ddk",
+    image: "v1786966130/Khouloud.jpg",
     quote:
       "Je tiens à remercier chaleureusement toute l'équipe de AVS pour leur accompagnement exceptionnel tout au long de mon parcours. Grâce à leur professionnalisme et à la qualité de leur enseignement, j'ai pu suivre une formation en langue allemande parfaitement adaptée à mes besoins. Ce que j'ai particulièrement apprécié, c'est leur sérieux et leur engagement à chaque étape. AVS ne s'est pas contentée de m'enseigner la langue, elle m'a également aidé à trouver une formation professionnelle en Allemagne, ce qui représente une opportunité précieuse pour mon avenir. Merci encore à toute l'équipe AVS pour votre travail remarquable, votre disponibilité et votre soutien constant. Je recommande cette agence à toute personne souhaitant apprendre l'allemand et poursuivre un projet professionnel en Allemagne.",
   },
@@ -172,14 +200,14 @@ const TESTIMONIALS: Testimonial[] = [
   {
     name: "Mehdi",
     role: "Contrôle qualité (Mécanique)",
-    imageId: "1RGMOtrOQ7DPh3MJW0HHMn3u5_qsxljel",
+    image: "v1786966133/Mehdi.jpg",
     quote:
       "Je suis très satisfait de mon expérience avec AVS Forma. Le personnel est accueillant, compétent et toujours prêt à répondre à mes questions. J'ai apprécié leur sérieux, leur suivi personnalisé et la qualité de leurs conseils. C'est un partenaire de confiance pour toute personne qui souhaite étudier ou travailler à l'étranger.",
   },
   {
     name: "Mohamed B.",
     role: "Infirmier",
-    imageId: "1MUj7cdUPex7xTrHeJzRiY8CUSig5ZAz-",
+    image: "v1786966131/Mohamed.jpg",
     quote:
       "Je suis très satisfait du service et du soutien offerts par AVS à toutes les étapes que j'ai franchies avec eux, depuis les cours d'allemand que j'ai suivis à l'école de langues AVS jusqu'au service et à l'accueil que j'ai reçus en Allemagne, en passant par l'équipe sympathique. Je suis très satisfait de leur professionnalisme et de leur soutien. Bravo !",
   },
@@ -192,21 +220,21 @@ const TESTIMONIALS: Testimonial[] = [
   {
     name: "Sarra",
     role: "Infirmière",
-    imageId: "1NbQKToLAHb4w7p84EYaITXrb32WazBkc",
+    image: "v1786966134/Sarra.jpg",
     quote:
       "Grâce à l'agence AVS Forma, j'ai pu réaliser mon rêve de venir en Allemagne pour commencer ma formation professionnelle en tant qu'infirmière. Tout s'est passé de manière organisée et conforme au plan. Leur accompagnement, leur disponibilité et leur professionnalisme m'ont énormément aidée dans chaque étape. Je suis très reconnaissante envers AVS Forma pour cette belle opportunité qui marque un nouveau départ dans ma vie. Merci beaucoup !",
   },
   {
     name: "Zied",
     role: "Hauswirtschafter",
-    imageId: "1t560--1l0MCi5MDaHpP9AVmfLYioD195",
+    image: "v1786966135/Zied.jpg",
     quote:
       "Je tiens à exprimer ma profonde gratitude envers l'équipe d'AVS Forma pour son professionnalisme et son accompagnement de grande qualité. Mon expérience avec eux a été très enrichissante, grâce à leur organisation, leur suivi constant et leur disponibilité. Cette collaboration m'a permis de développer mes compétences et de progresser vers l'atteinte de mon objectif. Je tiens à remercier chaleureusement toute l'équipe, et plus particulièrement Mlle Ghzala, pour son aide précieuse et son expertise.",
   },
 ];
 
 /* ------------------------------------------------------------------ */
-/*  Hero                                                                */
+/*  Hero Section Component                                             */
 /* ------------------------------------------------------------------ */
 
 function Hero() {
@@ -266,9 +294,8 @@ function Hero() {
           <div className="relative w-full h-full rounded-xl overflow-hidden">
             {HERO_SLIDES.map((slide, i) => (
               <img
-                key={slide.id}
-                src={drive(slide.id)}
-                data-alt={slide.alt}
+                key={slide.src}
+                src={cloudinary(slide.src)}
                 alt={slide.alt}
                 className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out ${
                   i === index ? "opacity-100" : "opacity-0"
@@ -309,33 +336,32 @@ function Hero() {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Services                                                            */
+/*  Services Section                                                   */
 /* ------------------------------------------------------------------ */
- 
+
 function ServicesSection() {
-  // State to track which logo is flipped
   const [flippedLogo, setFlippedLogo] = useState<number | null>(null);
 
-  // Logo data with flip content - using your drive() function
+  // Logo data with flip content - using Cloudinary URLs
   const LOGOS_WITH_FLIP = [
     {
       id: 0,
       name: "AVS Hergla Forma",
-      logoId: "16RmAjf7jVG0GiXm6XEsp6_3vNUETENrq", // Your AVS Hergla Forma logo ID
+      logoId: AVS_HERGLA_FORMA_LOGO,
       flipImage: "https://www.studying-in-germany.org/wp-content/uploads/2013/01/learn-german-language.jpg",
       flipText: "Apprendre Allemagne"
     },
     {
       id: 1,
       name: "IFT Global",
-      logoId: "1PHZFUUoN8g5PmRrdCp701kTbWcGMbD4B", // Your IFT Global logo ID
+      logoId: IFT_GLOBAL_LOGO,
       flipImage: "https://static.wixstatic.com/media/193d2c_a22dc120727042a3944e798147893d79~mv2.jpg/v1/fill/w_1920,h_1080,al_c,q_90/visa-germany-d-visa.jpg",
       flipText: "Obtenir Visa"
     },
     {
       id: 2,
       name: "AVS Care Forma",
-      logoId: "1Qw03CC-hVXX4DCwYIoKctAxSoQCluJxm", 
+      logoId: AVS_CARE_FORMA_LOGO,
       flipImage: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTD6mYkLfBw-8VlCYqvF2j8q0gX57z7WT5rlDObUS_7BLa0z-XtVZnVyMs&s=10",
       flipText: "Assistant De Vie"
     }
@@ -388,17 +414,16 @@ function ServicesSection() {
         ))}
       </div>
  
-      {/* Group hierarchy: AVS Group as parent with 3 logos in one line - DOUBLED SIZE */}
+      {/* Group hierarchy: AVS Group as parent with logos */}
       <div className="mt-16 pt-10 border-t border-outline-variant">
         <p className="font-caption text-on-surface-variant uppercase tracking-wider text-center mb-8">
           Notre groupe
         </p>
         <div className="glass-panel ambient-shadow rounded-2xl p-8 md:p-12 max-w-4xl mx-auto flex flex-col items-center">
-          {/* AVS Group Logo - Doubled */}
+          {/* AVS Group Logo */}
           <img
-            src={drive(AVS_GROUP_LOGO)}
+            src={cloudinary(AVS_GROUP_LOGO)}
             alt="AVS Group"
-            data-alt="Logo AVS Group"
             className="h-48 md:h-64 object-contain mb-10 transition-transform duration-300 hover:scale-110"
             onError={(e) => {
               (e.target as HTMLImageElement).src =
@@ -426,12 +451,10 @@ function ServicesSection() {
                       <div className="absolute inset-0 backface-hidden">
                         <div className="card-hover h-full w-full rounded-xl border border-outline-variant bg-surface-container-lowest flex items-center justify-center p-8 transition-transform duration-300 hover:scale-105">
                           <img
-                            src={drive(logo.logoId)}
+                            src={cloudinary(logo.logoId)}
                             alt={logo.name}
-                            data-alt={`Logo ${logo.name}`}
                             className="max-h-full max-w-full object-contain"
                             onError={(e) => {
-                              // Fallback to a colored div with text if image fails
                               const parent = (e.target as HTMLImageElement).parentElement;
                               if (parent) {
                                 const fallback = document.createElement('div');
@@ -476,8 +499,9 @@ function ServicesSection() {
     </section>
   );
 }
+
 /* ------------------------------------------------------------------ */
-/*  About                                                               */
+/*  About Section                                                      */
 /* ------------------------------------------------------------------ */
 
 function AboutSection() {
@@ -506,32 +530,27 @@ function AboutSection() {
 
         <div className="grid grid-cols-2 gap-4">
           <img
-            src={drive(ABOUT_IMAGES[0].id)}
-            data-alt={ABOUT_IMAGES[0].alt}
+            src={cloudinary(ABOUT_IMAGES[0].src)}
             alt={ABOUT_IMAGES[0].alt}
             className="rounded-xl h-48 w-full object-cover"
           />
           <img
-            src={drive(ABOUT_IMAGES[1].id)}
-            data-alt={ABOUT_IMAGES[1].alt}
+            src={cloudinary(ABOUT_IMAGES[1].src)}
             alt={ABOUT_IMAGES[1].alt}
             className="rounded-xl h-48 w-full object-cover mt-8"
           />
           <img
-            src={drive(ABOUT_IMAGES[2].id)}
-            data-alt={ABOUT_IMAGES[2].alt}
+            src={cloudinary(ABOUT_IMAGES[2].src)}
             alt={ABOUT_IMAGES[2].alt}
             className="rounded-xl h-56 w-full object-cover col-span-2"
           />
           <img
-            src={drive(ABOUT_IMAGES[3].id)}
-            data-alt={ABOUT_IMAGES[3].alt}
+            src={cloudinary(ABOUT_IMAGES[3].src)}
             alt={ABOUT_IMAGES[3].alt}
             className="rounded-xl h-48 w-full object-cover"
           />
           <img
-            src={drive(ABOUT_IMAGES[4].id)}
-            data-alt={ABOUT_IMAGES[4].alt}
+            src={cloudinary(ABOUT_IMAGES[4].src)}
             alt={ABOUT_IMAGES[4].alt}
             className="rounded-xl h-48 w-full object-cover mt-8"
           />
@@ -542,7 +561,7 @@ function AboutSection() {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Team - Enhanced with flip cards, social links, and modern design   */
+/*  Team Section - Enhanced with flip cards                          */
 /* ------------------------------------------------------------------ */
 
 function TeamSection() {
@@ -550,15 +569,74 @@ function TeamSection() {
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
 
   // Enhanced team data with social links and additional info
-  const enhancedTeam = TEAM.map((member, index) => ({
-    ...member,
-    socialLinks: {
-      linkedin: `https://linkedin.com/in/${member.name.toLowerCase().replace(/\s/g, '-')}`,
-      email: `mailto:${member.name.toLowerCase().replace(/\s/g, '.')}@avstunisia.com`,
+  const enhancedTeam = [
+    {
+      name: "Ikbal Lamine",
+      image: TEAM[0].image,
+      primaryRole: "Fondatrice & PDG",
+      secondaryRoles: [
+        "Fondatrice & Gérante AVS",
+        "Coach International",
+        "Consultante en Formation en Allemagne",
+        "Experte en Médiation",
+      ],
+      socialLinks: {
+        linkedin: "https://linkedin.com/in/ikbal-lamine",
+        email: "mailto:ikbal.lamine@avstunisia.com",
+      },
+      expertise: ["Fondatrice", "Coach International", "Consultante"],
+      yearsOfExperience: "15+",
     },
-    expertise: member.secondaryRoles.slice(0, 2),
-    yearsOfExperience: index === 0 ? "15+" : index === 1 ? "10+" : "8+",
-  }));
+    {
+      name: "Mohamed Ben Said",
+      image: TEAM[2].image,
+      primaryRole: "Team Leader & Chef de Projet",
+      secondaryRoles: [
+        "Team Leader",
+        "Chef de Projet",
+        "Directeur Coordinatrice du Groupe",
+      ],
+      socialLinks: {
+        linkedin: "https://linkedin.com/in/mohamed-ben-said",
+        email: "mailto:mohamed.bensaid@avstunisia.com",
+      },
+      expertise: ["Team Leader", "Chef de Projet", "Coordination"],
+      yearsOfExperience: "8+",
+    },
+    {
+      name: "Ghazala Boussidia",
+      image: TEAM[1].image,
+      primaryRole: "Directeur Administratif & Financier",
+      secondaryRoles: [
+        "Directeur Administratif",
+        "Manager Financier",
+        "Formateur IT",
+      ],
+      socialLinks: {
+        linkedin: "https://linkedin.com/in/ghazala-boussidia",
+        email: "mailto:ghazala.boussidia@avstunisia.com",
+      },
+      expertise: ["Directeur Administratif", "Manager Financier", "Formateur"],
+      yearsOfExperience: "10+",
+    },
+    {
+      name: "Zaineb Ben Rajeb",
+      image: TEAM[3].image,
+      primaryRole: "Responsable Administrative",
+      secondaryRoles: [
+        "Gestion administrative",
+        "Coordination des dossiers",
+        "Suivi des candidatures",
+      ],
+      socialLinks: {
+        linkedin: "https://www.linkedin.com/in/zaineb-ben-rajeb-avstunisia/",
+        email: "mailto:zaineb.benrajeb@avstunisia.com",
+      },
+      expertise: ["Gestion administrative", "Coordination", "Suivi"],
+      yearsOfExperience: "5+",
+      languages: ["Français", "Arabe", "Anglais"],
+    },
+  ];
 
   return (
     <section className="bg-gradient-to-b from-surface-container-lowest via-surface-container-low to-surface-container-lowest py-section-gap-md">
@@ -572,7 +650,7 @@ function TeamSection() {
                 Notre Équipe
               </span>
               <span className="text-xs text-on-surface-variant/60">•</span>
-              <span className="text-xs text-on-surface-variant/60">3 experts</span>
+              <span className="text-xs text-on-surface-variant/60">4 experts</span>
             </div>
             <h2 className="font-headline-lg text-brand-imperial text-balance">
               Une équipe d&apos;experts à votre service
@@ -599,10 +677,9 @@ function TeamSection() {
         </div>
 
         {/* Team Grid with Flip Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {enhancedTeam.map((member, index) => {
             const isFlipped = flippedCard === index;
-            const isHovered = hoveredCard === index;
 
             return (
               <div
@@ -628,10 +705,13 @@ function TeamSection() {
                         <div className="relative inline-block">
                           <div className="absolute inset-0 rounded-full bg-gradient-to-br from-brand-imperial/10 to-secondary/10 blur-xl opacity-50"></div>
                           <img
-                            src={drive(member.imageId)}
+                            src={cloudinary(member.image)}
                             alt={member.name}
-                            data-alt={`Portrait de ${member.name}`}
                             className="relative h-28 w-28 mx-auto rounded-full object-cover border-4 border-white shadow-lg"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src =
+                                "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='112' height='112'%3E%3Crect width='112' height='112' fill='%23e5e7eb'/%3E%3Ctext x='56' y='60' text-anchor='middle' fill='%236b7280' font-size='40'%3E👤%3C/text%3E%3C/svg%3E";
+                            }}
                           />
                           {/* Status indicator */}
                           <div className="absolute bottom-1 right-1 h-4 w-4 rounded-full bg-green-400 border-2 border-white"></div>
@@ -677,6 +757,20 @@ function TeamSection() {
                             {member.yearsOfExperience} ans d'expérience
                           </span>
                         </div>
+
+                        {/* Languages (for Zaineb) */}
+                        {member.languages && (
+                          <div className="mt-2 flex items-center justify-center gap-1.5">
+                            {member.languages.map((lang) => (
+                              <span
+                                key={lang}
+                                className="px-2 py-0.5 bg-surface-container-low rounded-full text-[9px] text-on-surface-variant/70"
+                              >
+                                {lang}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
 
                       {/* Flip button */}
@@ -722,6 +816,23 @@ function TeamSection() {
                             </div>
                           ))}
                         </div>
+
+                        {/* Languages on back (for Zaineb) */}
+                        {member.languages && (
+                          <div className="mt-4 pt-3 border-t border-outline-variant/20">
+                            <p className="font-caption text-on-surface-variant text-xs mb-2">Langues parlées</p>
+                            <div className="flex flex-wrap justify-center gap-1.5">
+                              {member.languages.map((lang) => (
+                                <span
+                                  key={lang}
+                                  className="px-3 py-1 bg-brand-imperial/10 text-brand-imperial rounded-full text-xs font-medium"
+                                >
+                                  {lang}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
 
                       {/* Social links */}
@@ -808,8 +919,7 @@ function TeamSection() {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Testimonials — Enhanced with marquee-style scrolling cards        */
-/*  featuring multiple testimonials in a continuous loop             */
+/*  Testimonials Section                                               */
 /* ------------------------------------------------------------------ */
 
 function Stars() {
@@ -844,9 +954,9 @@ function TestimonialsSection() {
       >
         <div className="flex items-start gap-3">
           <div className="relative shrink-0">
-            {testimonial.imageId ? (
+            {testimonial.image ? (
               <img
-                src={drive(testimonial.imageId, 200)}
+                src={cloudinary(testimonial.image)}
                 alt={testimonial.name}
                 className="h-12 w-12 rounded-full object-cover border-2 border-white shadow-md"
                 onError={(e) => {
@@ -984,9 +1094,9 @@ function TestimonialsSection() {
             </button>
 
             <div className="flex items-center gap-4 mb-6 pr-8">
-              {TESTIMONIALS[selectedIndex].imageId ? (
+              {TESTIMONIALS[selectedIndex].image ? (
                 <img
-                  src={drive(TESTIMONIALS[selectedIndex].imageId as string, 200)}
+                  src={cloudinary(TESTIMONIALS[selectedIndex].image)}
                   alt={TESTIMONIALS[selectedIndex].name}
                   className="h-16 w-16 rounded-full object-cover border-2 border-white shadow-md"
                   onError={(e) => {
@@ -1083,7 +1193,7 @@ function TestimonialsSection() {
 }
 
 /* ------------------------------------------------------------------ */
-/*  CTA                                                                 */
+/*  CTA Section                                                        */
 /* ------------------------------------------------------------------ */
 
 function CTASection() {
