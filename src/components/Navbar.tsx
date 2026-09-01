@@ -187,15 +187,16 @@ export default function Navbar() {
   ];
 
   const aProposItems: DropdownItem[] = [
+    { name: "Success Stories", href: "/a-propos/success-stories" },
     { name: "Équipe", href: "/a-propos/equipe" },
     { name: "Projets Pilotes", href: "/a-propos/projets-pilotes" },
     { name: "Presse", href: "/a-propos/presse" },
-    { name: "Galerie Vidéos", href: "/a-propos/galerie-videos" },
-    { name: "Success Stories", href: "/a-propos/success-stories" },
+    { name: "Vidéos", href: "/a-propos/videos" }, 
+    { name: "Gallerie", href: "/a-propos/galerie" },
   ];
 
   const herglaFormaItems: DropdownItem[] = [
-    { 
+    {   
       name: "Contenu des cours d'allemand", 
       href: "/hergla-forma/contenu-cours-allemand",
       hasSubmenu: true,

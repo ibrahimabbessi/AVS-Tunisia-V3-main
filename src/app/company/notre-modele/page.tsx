@@ -1,16 +1,18 @@
-// app/company/unser-modell/page.tsx
+// app/company/notre-modele/page.tsx
 "use client";
 
 import { FileText, Users, GraduationCap, Briefcase, CheckCircle2, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
-export default function UnserModellPage() {
+export default function NotreModelePage() {
   const processSteps = [
     {
       step: 1,
       icon: FileText,
       title: "Analyse des besoins",
       description: "Nous réalisons une analyse détaillée de vos besoins pour comprendre précisément quelles qualifications et combien de candidats vous recherchez.",
+      image: "https://res.cloudinary.com/girgi5fd/image/upload/v1788162727/pic_1.png",
       details: [
         "Analyse de vos postes ouverts",
         "Définition des qualifications requises",
@@ -23,6 +25,7 @@ export default function UnserModellPage() {
       icon: Users,
       title: "Recrutement & Présélection",
       description: "Nous identifions et sélectionnons les candidats les plus prometteurs en fonction de vos critères spécifiques.",
+      image: "https://res.cloudinary.com/girgi5fd/image/upload/v1788162727/pic_2.png",
       details: [
         "Recherche active via notre réseau",
         "Entretiens et évaluations",
@@ -35,6 +38,7 @@ export default function UnserModellPage() {
       icon: GraduationCap,
       title: "Formation linguistique & Qualification",
       description: "Nos candidats suivent un programme linguistique intensif et certifié chez AVS Hergla Forma.",
+      image: "https://res.cloudinary.com/girgi5fd/image/upload/v1788162727/pic_3.png",
       details: [
         "Cours d'allemand de A1 à B2 (norme CECR)",
         "Formation linguistique spécialisée",
@@ -47,6 +51,7 @@ export default function UnserModellPage() {
       icon: Briefcase,
       title: "Placement & Accompagnement",
       description: "IFT Global gère l'ensemble des démarches administratives et accompagne l'intégration en Allemagne.",
+      image: "https://res.cloudinary.com/girgi5fd/image/upload/v1788162726/pic_4.png",
       details: [
         "Élaboration et signature des contrats",
         "Assistance pour les procédures de visa et d'autorisation",
@@ -95,7 +100,8 @@ export default function UnserModellPage() {
                   </div>
                 </div>
 
-                <div className="flex-1">
+                {/* Left side: 4 sentences of each step */}
+                <div className="flex-1 space-y-2">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="p-2 bg-brand-imperial/10 rounded-lg">
                       <step.icon className="h-5 w-5 text-brand-imperial" />
@@ -105,14 +111,30 @@ export default function UnserModellPage() {
                   
                   <p className="font-body-lg text-on-surface-variant mb-4">{step.description}</p>
                   
+                  {/* Hover effect on each sentence */}
                   <ul className="space-y-2">
                     {step.details.map((detail) => (
-                      <li key={detail} className="flex items-start gap-2 font-body-md text-sm">
-                        <CheckCircle2 className="h-4 w-4 text-brand-sapphire mt-0.5 flex-shrink-0" />
-                        <span className="text-on-surface-variant">{detail}</span>
+                      <li 
+                        key={detail} 
+                        className="flex items-start gap-2 font-body-md text-sm transition-all duration-300 hover:scale-105 hover:translate-x-2 hover:text-brand-imperial cursor-default group"
+                      >
+                        <CheckCircle2 className="h-4 w-4 text-brand-sapphire mt-0.5 flex-shrink-0 transition-all duration-300 group-hover:text-brand-imperial group-hover:scale-110" />
+                        <span className="text-on-surface-variant transition-all duration-300 group-hover:text-brand-imperial group-hover:font-medium">{detail}</span>
                       </li>
                     ))}
                   </ul>
+                </div>
+
+                {/* Right side: Image (reduced size x2) */}
+                <div className="flex-shrink-0 w-1/3 rounded-lg overflow-hidden border border-outline-variant/20">
+                  <Image
+                    src={step.image}
+                    alt={`Illustration étape ${step.step} : ${step.title}`}
+                    width={400}
+                    height={200}
+                    className="w-full h-auto object-cover"
+                    priority={step.step === 1}
+                  />
                 </div>
               </div>
             </div>

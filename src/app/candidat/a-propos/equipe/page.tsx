@@ -71,7 +71,7 @@ const TEAM = [
   },
   {
     name: "Zaineb Ben Rajeb",
-    image: "v1786966062/Foto_Zaineb_Ben_Rajeb.jpg",
+    image: "v1788167919/Zaineb_Ben_Rajeb_2.jpg",
     primaryRole: "Responsable Administrative",
     secondaryRoles: [
       "Gestion administrative",

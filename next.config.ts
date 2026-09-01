@@ -15,6 +15,18 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        port: '',
+        pathname: '/**', // Allows all paths on Cloudinary
+      },
+            {
+        protocol: 'https',
+        hostname: 'www.dynamique-mag.com',
+        port: '',
+        pathname: '/wp-content/uploads/**',
+      },
     ],
   },
 };

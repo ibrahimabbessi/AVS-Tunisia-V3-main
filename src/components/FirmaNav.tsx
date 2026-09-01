@@ -158,20 +158,29 @@ export default function FirmaNav() {
     },
     { 
       name: "Notre Modèle", 
-      href: "/unser-modell", 
+      href: "/notre-modele", 
       description: "Comment fonctionne la collaboration"
     },
     { 
       name: "Nos Succès", 
-      href: "/unsere-erfolge", 
+      href: "/nos-succes", 
       description: "Des partenariats réussis"
     },
     { 
       name: "Opportunités", 
-      href: "/chancen-anforderungen", 
+      href: "/opportunites", 
       description: "Ce qui vous attend"
     },
-
+    { 
+      name: "Cadre Juridique & Sécurité", 
+      href: "/cadre-juridique-securite", 
+      description: "Conformité et protection des données"
+    },
+    { 
+      name: "Coûts & Investissement", 
+      href: "/couts-investissement", 
+      description: "Transparence financière"
+    },
   ];
 
   const languages = [
@@ -289,10 +298,10 @@ export default function FirmaNav() {
             */}
             {/* CTA Button */}
             <Link
-              href={createPath("/kontakt-beratung")}
+              href={createPath("/contact")}
               className="font-label-md text-label-md bg-brand-imperial text-white hover:bg-brand-imperial/90 px-5 py-2.5 rounded-lg transition-all duration-300 hover:scale-[1.02] glass-highlight text-[10px]"
             >
-              Contact & Conseil
+              Contact
             </Link>
           </div>
 
@@ -378,11 +387,11 @@ export default function FirmaNav() {
                 Connexion
               </Link>
               <Link
-                href={createPath("/kontakt-beratung")}
+                href={createPath("/contact")}
                 onClick={() => setIsOpen(false)}
                 className="text-center font-label-md text-label-md bg-brand-imperial text-white hover:bg-brand-imperial/90 py-2.5 rounded-lg transition-all text-xs"
               >
-                Contact & Conseil
+                Contact
               </Link>
             </div>
           </div>
