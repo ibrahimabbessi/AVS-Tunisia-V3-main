@@ -238,13 +238,11 @@ export default function CoutsInvestissementPage() {
                               }
                             >
                               {feature.name}
-                              {typeof feature.included === "string" &&
-                                feature.included !== true &&
-                                feature.included !== false && (
-                                  <span className="text-secondary font-medium ml-1">
-                                    ({feature.included})
-                                  </span>
-                                )}
+                              {typeof feature.included === "string" && (
+                                <span className="text-secondary font-medium ml-1">
+                                  ({feature.included})
+                                </span>
+                              )}
                             </span>
                           </li>
                         ))}

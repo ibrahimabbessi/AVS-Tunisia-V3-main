@@ -42,7 +42,7 @@ interface PhotoGalerie {
   src: string;
   titre: string;
   categorie: string;
-  public_id: string;
+  public_id?: string;
   secure_url?: string;
 }
 
@@ -124,7 +124,7 @@ export default function GalleryPage() {
           src: imageUrl,
           titre: titre || 'Image',
           categorie: idDossier,
-          public_id: resource.public_id,
+          public_id: resource.public_id || '', // Provide fallback
           secure_url: resource.secure_url,
         };
       });
@@ -411,7 +411,7 @@ export default function GalleryPage() {
                     src: imageUrl,
                     titre: titre || 'Image',
                     categorie: dossierSelectionne,
-                    public_id: resource.public_id,
+                    public_id: resource.public_id || '', // Provide fallback
                     secure_url: resource.secure_url,
                   })}
                   className="group relative rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 cursor-pointer aspect-square hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
