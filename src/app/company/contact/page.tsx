@@ -6,6 +6,99 @@ import { useState, useEffect } from "react";
 import FirmaNav from "@/components/FirmaNav";
 import Footer from "@/components/Footer";
 
+// Function to calculate Ramadan dates for any year
+function getRamadanDates(year: number): { start: Date; end: Date } | null {
+  // Ramadan moves back approximately 10-11 days each year in the Gregorian calendar
+  
+  // Known reference points:
+  // Ramadan 2025: ~March 1, 2025
+  // Ramadan 2026: ~February 18, 2026
+  // Ramadan 2027: ~February 8, 2027
+  // Ramadan 2028: ~January 28, 2028
+  // Ramadan 2029: ~January 16, 2029
+  
+  const exactDates: Record<number, { start: [number, number, number]; end: [number, number, number] }> = {
+    2025: { start: [2025, 2, 1], end: [2025, 3, 30] },
+    2026: { start: [2026, 1, 18], end: [2026, 2, 18] },
+    2027: { start: [2027, 1, 8], end: [2027, 2, 9] },
+    2028: { start: [2028, 0, 28], end: [2028, 1, 27] },
+    2029: { start: [2029, 0, 16], end: [2029, 1, 14] },
+    2030: { start: [2030, 0, 5], end: [2030, 1, 4] },
+    2031: { start: [2030, 11, 26], end: [2031, 0, 24] },
+  };
+  
+  if (exactDates[year]) {
+    const exact = exactDates[year];
+    return {
+      start: new Date(exact.start[0], exact.start[1], exact.start[2]),
+      end: new Date(exact.end[0], exact.end[1], exact.end[2])
+    };
+  }
+  
+  // For years beyond exact data, use estimation
+  const baseYear = 2025;
+  const baseStart = new Date(2025, 2, 1);
+  const yearDiff = year - baseYear;
+  const daysShift = Math.round(yearDiff * 10.875);
+  
+  const estimatedStart = new Date(baseStart);
+  estimatedStart.setDate(estimatedStart.getDate() - daysShift);
+  
+  const estimatedEnd = new Date(estimatedStart);
+  estimatedEnd.setDate(estimatedEnd.getDate() + 30);
+  
+  if (year < 2025 || year > 2035) {
+    return null;
+  }
+  
+  return {
+    start: estimatedStart,
+    end: estimatedEnd
+  };
+}
+
+// Function to check if current date is during Ramadan
+function isCurrentlyRamadan(): { isRamadan: boolean; startDate: Date | null; endDate: Date | null } {
+  const now = new Date();
+  const year = now.getFullYear();
+  
+  // Check current year
+  const ramadanThisYear = getRamadanDates(year);
+  if (ramadanThisYear) {
+    if (now >= ramadanThisYear.start && now <= ramadanThisYear.end) {
+      return { isRamadan: true, startDate: ramadanThisYear.start, endDate: ramadanThisYear.end };
+    }
+  }
+  
+  // Check next year
+  const ramadanNextYear = getRamadanDates(year + 1);
+  if (ramadanNextYear) {
+    if (now >= ramadanNextYear.start && now <= ramadanNextYear.end) {
+      return { isRamadan: true, startDate: ramadanNextYear.start, endDate: ramadanNextYear.end };
+    }
+  }
+  
+  // Check previous year
+  const ramadanPrevYear = getRamadanDates(year - 1);
+  if (ramadanPrevYear) {
+    if (now >= ramadanPrevYear.start && now <= ramadanPrevYear.end) {
+      return { isRamadan: true, startDate: ramadanPrevYear.start, endDate: ramadanPrevYear.end };
+    }
+  }
+  
+  return { isRamadan: false, startDate: null, endDate: null };
+}
+
+// Helper to format date nicely
+function formatDate(date: Date): string {
+  const options: Intl.DateTimeFormatOptions = { 
+    day: 'numeric', 
+    month: 'long', 
+    year: 'numeric' 
+  };
+  return date.toLocaleDateString('fr-FR', options);
+}
+
 export default function KontaktBeratungPage() {
   const [formData, setFormData] = useState({
     name: "",
@@ -19,16 +112,32 @@ export default function KontaktBeratungPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSummer, setIsSummer] = useState(false);
+  const [isRamadan, setIsRamadan] = useState(false);
+  const [ramadanStart, setRamadanStart] = useState<Date | null>(null);
+  const [ramadanEnd, setRamadanEnd] = useState<Date | null>(null);
 
   useEffect(() => {
-    const checkSummer = () => {
+    const checkSchedules = () => {
       const now = new Date();
       const month = now.getMonth();
-      setIsSummer(month === 6 || month === 7);
+      const isSummerActive = month === 6 || month === 7;
+      
+      // Check Ramadan using dynamic function
+      const ramadanCheck = isCurrentlyRamadan();
+      setIsRamadan(ramadanCheck.isRamadan);
+      setRamadanStart(ramadanCheck.startDate);
+      setRamadanEnd(ramadanCheck.endDate);
+      
+      // If Ramadan is active, summer should be inactive (priority to Ramadan)
+      if (ramadanCheck.isRamadan && isSummerActive) {
+        setIsSummer(false);
+      } else {
+        setIsSummer(isSummerActive);
+      }
     };
     
-    checkSummer();
-    const interval = setInterval(checkSummer, 3600000);
+    checkSchedules();
+    const interval = setInterval(checkSchedules, 3600000);
     return () => clearInterval(interval);
   }, []);
 
@@ -38,6 +147,14 @@ export default function KontaktBeratungPage() {
     await new Promise(resolve => setTimeout(resolve, 1500));
     setIsSubmitting(false);
     setIsSubmitted(true);
+  };
+
+  // Helper to format date range for display
+  const getRamadanDateRange = (): string => {
+    if (ramadanStart && ramadanEnd) {
+      return `${formatDate(ramadanStart)} - ${formatDate(ramadanEnd)}`;
+    }
+    return "";
   };
 
   const contactInfo = [
@@ -206,7 +323,12 @@ export default function KontaktBeratungPage() {
           <div>
             <h3 className="font-headline-md text-brand-imperial mb-4 flex items-center gap-2">
               <span className="text-2xl">🕐</span> Nous sommes disponibles
-              {isSummer && (
+              {isRamadan && (
+                <span className="ml-3 inline-flex items-center px-3 py-1 bg-emerald-400/20 text-emerald-700 border border-emerald-400/30 rounded-full text-xs font-bold animate-pulse">
+                  🌙 Horaire Ramadan
+                </span>
+              )}
+              {isSummer && !isRamadan && (
                 <span className="ml-3 inline-flex items-center px-3 py-1 bg-yellow-400/20 text-yellow-700 border border-yellow-400/30 rounded-full text-xs font-bold animate-pulse">
                   ☀️ Horaire d'été
                 </span>
@@ -214,10 +336,10 @@ export default function KontaktBeratungPage() {
             </h3>
             <div className="space-y-4">
               {/* Regular Schedule */}
-              <div className={`p-4 rounded-xl border ${isSummer ? 'bg-gray-50/50 border-gray-200/50' : 'bg-brand-ice/10 border-brand-imperial/10'}`}>
+              <div className={`p-4 rounded-xl border ${(isSummer || isRamadan) ? 'bg-gray-50/50 border-gray-200/50' : 'bg-brand-ice/10 border-brand-imperial/10'}`}>
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-sm font-semibold text-on-surface-variant">📅 Horaire régulier</span>
-                  {!isSummer && (
+                  {!isSummer && !isRamadan && (
                     <span className="ml-auto inline-flex items-center px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-bold">
                       ✓ Actif
                     </span>
@@ -236,12 +358,12 @@ export default function KontaktBeratungPage() {
               </div>
 
               {/* Summer Schedule */}
-              <div className={`p-4 rounded-xl border ${isSummer ? 'bg-yellow-50/70 border-yellow-400/40 shadow-md' : 'bg-gray-50/30 border-gray-200/30'}`}>
+              <div className={`p-4 rounded-xl border ${isSummer && !isRamadan ? 'bg-yellow-50/70 border-yellow-400/40 shadow-md' : 'bg-gray-50/30 border-gray-200/30'}`}>
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-sm font-semibold flex items-center gap-1">
                     <span>☀️</span> Horaire d'été
                   </span>
-                  {isSummer ? (
+                  {isSummer && !isRamadan ? (
                     <span className="ml-auto inline-flex items-center px-2 py-0.5 bg-yellow-400/80 text-yellow-900 rounded-full text-xs font-bold animate-pulse">
                       ✓ Actif (Juillet - Août)
                     </span>
@@ -253,22 +375,22 @@ export default function KontaktBeratungPage() {
                 </div>
                 <div className="space-y-2">
                   <p className="font-body-md text-on-surface-variant flex items-center gap-3">
-                    <span className={`px-3 py-1 rounded-full text-xs font-label-md ${isSummer ? 'bg-yellow-500 text-white' : 'bg-gray-300 text-gray-500'}`}>
+                    <span className={`px-3 py-1 rounded-full text-xs font-label-md ${isSummer && !isRamadan ? 'bg-yellow-500 text-white' : 'bg-gray-300 text-gray-500'}`}>
                       Lun - Ven
                     </span>
-                    <span className={isSummer ? 'font-semibold text-yellow-800' : 'text-gray-400'}>
+                    <span className={isSummer && !isRamadan ? 'font-semibold text-yellow-800' : 'text-gray-400'}>
                       08h00 - 14h00
                     </span>
                   </p>
                   <p className="font-body-md text-on-surface-variant flex items-center gap-3">
-                    <span className={`px-3 py-1 rounded-full text-xs font-label-md ${isSummer ? 'bg-yellow-500 text-white' : 'bg-gray-300 text-gray-500'}`}>
+                    <span className={`px-3 py-1 rounded-full text-xs font-label-md ${isSummer && !isRamadan ? 'bg-yellow-500 text-white' : 'bg-gray-300 text-gray-500'}`}>
                       Samedi
                     </span>
-                    <span className={isSummer ? 'font-semibold text-yellow-800' : 'text-gray-400'}>
+                    <span className={isSummer && !isRamadan ? 'font-semibold text-yellow-800' : 'text-gray-400'}>
                       08h00 - 12h00
                     </span>
                   </p>
-                  {isSummer && (
+                  {isSummer && !isRamadan && (
                     <div className="mt-2 p-2 bg-yellow-200/50 border border-yellow-300/50 rounded-lg">
                       <p className="font-body-md text-xs text-yellow-800 flex items-center gap-2">
                         <span>📌</span>
@@ -278,15 +400,61 @@ export default function KontaktBeratungPage() {
                   )}
                 </div>
               </div>
+
+              {/* Ramadan Schedule */}
+              <div className={`p-4 rounded-xl border ${isRamadan ? 'bg-emerald-50/70 border-emerald-400/40 shadow-md' : 'bg-gray-50/30 border-gray-200/30'}`}>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-sm font-semibold flex items-center gap-1">
+                    <span>🌙</span> Horaire Ramadan
+                  </span>
+                  {isRamadan ? (
+                    <span className="ml-auto inline-flex items-center px-2 py-0.5 bg-emerald-400/80 text-emerald-900 rounded-full text-xs font-bold animate-pulse">
+                      ✓ Actif
+                    </span>
+                  ) : (
+                    <span className="ml-auto inline-flex items-center px-2 py-0.5 bg-gray-200 text-gray-500 rounded-full text-xs">
+                      {ramadanStart && ramadanEnd ? getRamadanDateRange() : "Période variable"}
+                    </span>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <p className="font-body-md text-on-surface-variant flex items-center gap-3">
+                    <span className={`px-3 py-1 rounded-full text-xs font-label-md ${isRamadan ? 'bg-emerald-500 text-white' : 'bg-gray-300 text-gray-500'}`}>
+                      Lun - Ven
+                    </span>
+                    <span className={isRamadan ? 'font-semibold text-emerald-800' : 'text-gray-400'}>
+                      08h00 - 14h00
+                    </span>
+                  </p>
+                  <p className="font-body-md text-on-surface-variant flex items-center gap-3">
+                    <span className={`px-3 py-1 rounded-full text-xs font-label-md ${isRamadan ? 'bg-emerald-500 text-white' : 'bg-gray-300 text-gray-500'}`}>
+                      Samedi
+                    </span>
+                    <span className={isRamadan ? 'font-semibold text-emerald-800' : 'text-gray-400'}>
+                      08h00 - 12h00
+                    </span>
+                  </p>
+                  {isRamadan && ramadanStart && ramadanEnd && (
+                    <div className="mt-2 p-2 bg-emerald-200/50 border border-emerald-300/50 rounded-lg">
+                      <p className="font-body-md text-xs text-emerald-800 flex items-center gap-2">
+                        <span>📌</span>
+                        <span>Horaire du Ramadan {ramadanStart.getFullYear()} : {getRamadanDateRange()}</span>
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
           <div className="relative h-[200px] lg:h-[250px] rounded-2xl overflow-hidden shadow-lg">
             <img
-              src={isSummer 
+              src={isRamadan 
+                ? "https://media.istockphoto.com/id/2018101881/fr/photo/ramadan-kareem-photographie-lanterne-en-forme-de-croissant-de-lune-sur-la-plage.jpg?s=612x612&w=0&k=20&c=YbOav-WSFePd-CtKQQu7jADs-o1adyh34T37XzZPTrA="
+                : isSummer
                 ? "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                 : "https://images.unsplash.com/photo-1633526543814-9718c8922b7a?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
               }
-              alt={isSummer ? "Summer schedule - Plage" : "Calendar - Disponibilité"}
+              alt={isRamadan ? "Ramadan Kareem - Horaire Ramadan" : isSummer ? "Summer schedule - Plage" : "Calendar - Disponibilité"}
               className="w-full h-full object-cover"
               onError={(e) => {
                 (e.target as HTMLImageElement).src =
@@ -294,13 +462,19 @@ export default function KontaktBeratungPage() {
               }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-brand-imperial/10 to-transparent"></div>
-            {isSummer && (
+            {isRamadan ? (
+              <div className="absolute top-4 right-4 bg-emerald-400/90 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg">
+                <span className="text-sm font-bold text-emerald-900 flex items-center gap-2">
+                  <span>🌙</span> Ramadan {ramadanStart?.getFullYear() || ""}
+                </span>
+              </div>
+            ) : isSummer ? (
               <div className="absolute top-4 right-4 bg-yellow-400/90 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg">
                 <span className="text-sm font-bold text-yellow-900 flex items-center gap-2">
                   <span>☀️</span> Été
                 </span>
               </div>
-            )}
+            ) : null}
           </div>
         </div>
 

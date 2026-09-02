@@ -2,7 +2,7 @@
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import {
   Search,
   FolderOpen,
@@ -17,8 +17,9 @@ import {
   ZoomOut,
   Download,
   Heart,
+  ChevronDown,
 } from "lucide-react";
-import { GalleryLightboxModal } from "@/components/GalleryLightboxModal"; // Import the extracted component
+import { GalleryLightboxModal } from "@/components/GalleryLightboxModal";
 
 // ============================================
 // TYPES
@@ -44,38 +45,245 @@ interface PhotoGalerie {
   categorie: string;
   public_id?: string;
   secure_url?: string;
+  thumbnail?: string;
+  optimized?: string;
 }
 
 // ============================================
-// DOSSIERS CONFIGURATION - FIXED TO MATCH CLOUDINARY FOLDERS
+// DOSSIERS CONFIGURATION
 // ============================================
 const DOSSIERS_GALERIE = [
-  { id: "activities", label: "Activités", icone: "⚽", idDossier: "activites" }, // Changed from "activites"
+  { id: "activities", label: "Activités", icone: "⚽", idDossier: "activites" },
   { id: "destinations", label: "Destinations", icone: "✈️", idDossier: "destination" },
-  { id: "partners", label: "Partenaires", icone: "🤝", idDossier: "par" }, // Using "par" as folder
-  { id: "interviews", label: "Interviews", icone: "🎙️", idDossier: "int" }, // Using "int" as folder
+  { id: "partners", label: "Partenaires", icone: "🤝", idDossier: "par" },
+  { id: "interviews", label: "Interviews", icone: "🎙️", idDossier: "int" },
   { id: "visa", label: "Visa", icone: "🛂", idDossier: "visa" },
-  // Removed "success-stories" since it doesn't exist
+  { id: "contract", label: "Contrats", icone: "📄", idDossier: "contrat" },
 ];
 
+const ITEMS_PER_PAGE = 24;
+const CLOUDINARY_CLOUD_NAME = "girgi5fd";
+
 // ============================================
-// MAIN PAGE COMPONENT
+// IMAGE CACHE UTILITY
+// ============================================
+const ImageCache = {
+  set: (folderId: string, images: CloudinaryResource[]) => {
+    try {
+      sessionStorage.setItem(`gallery_${folderId}`, JSON.stringify({
+        data: images,
+        timestamp: Date.now()
+      }));
+    } catch (e) {}
+  },
+  
+  get: (folderId: string): CloudinaryResource[] | null => {
+    try {
+      const cached = sessionStorage.getItem(`gallery_${folderId}`);
+      if (!cached) return null;
+      
+      const { data, timestamp } = JSON.parse(cached);
+      if (Date.now() - timestamp > 10 * 60 * 1000) {
+        sessionStorage.removeItem(`gallery_${folderId}`);
+        return null;
+      }
+      
+      return data;
+    } catch (e) {
+      return null;
+    }
+  },
+  
+  clear: () => {
+    try {
+      Object.keys(sessionStorage).forEach(key => {
+        if (key.startsWith('gallery_')) {
+          sessionStorage.removeItem(key);
+        }
+      });
+    } catch (e) {}
+  }
+};
+
+// ============================================
+// IMAGE OPTIMIZATION UTILITIES
+// ============================================
+const getOptimizedUrl = (publicId: string, width: number, quality: number = 80) => {
+  return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/c_fill,w_${width},q_${quality},fl_progressive/${publicId}`;
+};
+
+const getSrcSet = (publicId: string) => {
+  const sizes = [200, 400, 800, 1200];
+  return sizes.map(size => 
+    `${getOptimizedUrl(publicId, size)} ${size}w`
+  ).join(', ');
+};
+
+// ============================================
+// SKELETON LOADING COMPONENT
+// ============================================
+const ImageSkeleton = () => (
+  <div className="aspect-square rounded-2xl bg-slate-200 dark:bg-slate-800 animate-pulse relative overflow-hidden">
+    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer bg-[length:200%_100%]" />
+  </div>
+);
+
+// ============================================
+// OPTIMIZED IMAGE COMPONENT
+// ============================================
+const OptimizedImage = ({ 
+  resource, 
+  onClick, 
+  isPriority = false,
+  folderLabel,
+}: { 
+  resource: CloudinaryResource; 
+  onClick: () => void;
+  isPriority?: boolean;
+  folderLabel?: string;
+}) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [error, setError] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+  
+  const publicId = resource.public_id;
+  const parts = publicId.split('/');
+  const filename = parts[parts.length - 1] || publicId;
+  const titre = filename.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
+  
+  const thumbnailUrl = getOptimizedUrl(publicId, 400);
+  const fullUrl = resource.secure_url || getOptimizedUrl(publicId, 1200);
+  
+  useEffect(() => {
+    if (isPriority && imgRef.current) {
+      const img = new Image();
+      img.src = fullUrl;
+    }
+  }, [fullUrl, isPriority]);
+  
+  return (
+    <div
+      onClick={onClick}
+      className="group relative rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 cursor-pointer aspect-square hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
+    >
+      {!isLoaded && <ImageSkeleton />}
+      
+      <img
+        ref={imgRef}
+        src={thumbnailUrl}
+        srcSet={isPriority ? getSrcSet(publicId) : undefined}
+        sizes={isPriority ? "(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw" : undefined}
+        alt={titre || 'Image'}
+        className={`w-full h-full object-cover group-hover:scale-110 transition-all duration-500 ${
+          isLoaded ? 'opacity-100' : 'opacity-0'
+        }`}
+        loading={isPriority ? 'eager' : 'lazy'}
+        decoding="async"
+        onLoad={() => setIsLoaded(true)}
+        onError={(e) => {
+          setError(true);
+          const fallbackUrl = getOptimizedUrl(publicId, 400);
+          (e.target as HTMLImageElement).src = fallbackUrl;
+          
+          setTimeout(() => {
+            (e.target as HTMLImageElement).src = "/images/placeholder.jpg";
+          }, 1000);
+        }}
+      />
+      
+      {error && (
+        <div className="absolute inset-0 flex items-center justify-center bg-slate-200 dark:bg-slate-700">
+          <div className="text-center">
+            <div className="text-4xl mb-2">🖼️</div>
+            <p className="text-xs text-slate-500">Image non disponible</p>
+          </div>
+        </div>
+      )}
+      
+      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
+        <div className="w-full">
+          <p className="text-white text-xs font-bold truncate">
+            {titre}
+          </p>
+          <span className="text-white/60 text-[10px]">
+            {folderLabel}
+          </span>
+        </div>
+      </div>
+
+      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+        <div className="p-2.5 rounded-full bg-white/30 backdrop-blur-md">
+          <Maximize2 className="w-5 h-5 text-white" />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ============================================
+// LOAD MORE BUTTON COMPONENT
+// ============================================
+const LoadMoreButton = ({ 
+  onClick, 
+  isLoading, 
+  hasMore 
+}: { 
+  onClick: () => void; 
+  isLoading: boolean; 
+  hasMore: boolean;
+}) => {
+  if (!hasMore) return null;
+  
+  return (
+    <div className="flex justify-center mt-8">
+      <button
+        onClick={onClick}
+        disabled={isLoading}
+        className="px-8 py-3 rounded-2xl bg-secondary text-white font-bold text-sm hover:bg-secondary/80 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+      >
+        {isLoading ? (
+          <>
+            <Loader2 className="w-4 h-4 animate-spin" />
+            Chargement...
+          </>
+        ) : (
+          <>
+            Voir plus
+            <ChevronDown className="w-4 h-4" />
+          </>
+        )}
+      </button>
+    </div>
+  );
+};
+
+// ============================================
+// MAIN PAGE COMPONENT - FIXED
 // ============================================
 export default function GalleryPage() {
-  const [dossierSelectionne, setDossierSelectionne] = useState<string>("activities"); // Changed default
+  const [dossierSelectionne, setDossierSelectionne] = useState<string>("activities");
   const [imagesDossiers, setImagesDossiers] = useState<{ [key: string]: CloudinaryResource[] }>({});
   const [chargement, setChargement] = useState<boolean>(false);
+  const [chargementPlus, setChargementPlus] = useState<boolean>(false);
   const [erreur, setErreur] = useState<string | null>(null);
   const [recherche, setRecherche] = useState<string>("");
   const [selectedPhoto, setSelectedPhoto] = useState<PhotoGalerie | null>(null);
-  const [allPhotos, setAllPhotos] = useState<PhotoGalerie[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [visibleImages, setVisibleImages] = useState<CloudinaryResource[]>([]);
+  
+  // Use refs to prevent infinite loops
+  const loadingRef = useRef<{ [key: string]: boolean }>({});
+  const isInitialLoadRef = useRef(true);
 
-  // Fetch Cloudinary images for a folder
-  const fetchDossierCloudinary = async (idDossier: string): Promise<CloudinaryResource[]> => {
+  // Fetch Cloudinary images for a folder with pagination
+  const fetchDossierCloudinary = async (idDossier: string, pageNum: number = 1): Promise<CloudinaryResource[]> => {
     try {
-      console.log(`🔄 Chargement du dossier: ${idDossier}`);
-      const response = await fetch(`/api/cloudinary/folder?folderId=${encodeURIComponent(idDossier)}`);
+      console.log(`🔄 Chargement du dossier: ${idDossier}, page: ${pageNum}`);
+      const response = await fetch(
+        `/api/cloudinary/folder?folderId=${encodeURIComponent(idDossier)}&page=${pageNum}&limit=${ITEMS_PER_PAGE}`
+      );
       
       if (!response.ok) {
         const errorData = await response.json();
@@ -98,70 +306,147 @@ export default function GalleryPage() {
     }
   };
 
-  // Load images for a folder
-  const chargerImagesDossier = useCallback(async (idDossier: string) => {
-    setChargement(true);
+  // Load images for a folder with caching - FIXED: removed allPhotos dependency
+  const chargerImagesDossier = useCallback(async (idDossier: string, pageNum: number = 1, append: boolean = false) => {
+    // Prevent concurrent loading of the same folder
+    const loadingKey = `${idDossier}-${pageNum}`;
+    if (loadingRef.current[loadingKey]) {
+      console.log(`⏳ Already loading ${loadingKey}, skipping...`);
+      return;
+    }
+    loadingRef.current[loadingKey] = true;
+
+    if (pageNum === 1) {
+      setChargement(true);
+      setPage(1);
+    } else {
+      setChargementPlus(true);
+    }
     setErreur(null);
     
     try {
-      const resources = await fetchDossierCloudinary(idDossier);
+      // Check cache for first page only
+      if (pageNum === 1) {
+        const cached = ImageCache.get(idDossier);
+        if (cached && cached.length > 0) {
+          console.log(`📦 Cache trouvé pour ${idDossier}: ${cached.length} images`);
+          
+          // Update all states atomically
+          setImagesDossiers(prev => ({
+            ...prev,
+            [idDossier]: cached
+          }));
+          
+          setVisibleImages(cached);
+          setHasMore(cached.length === ITEMS_PER_PAGE);
+          setIsLoading(false);
+          setChargement(false);
+          loadingRef.current[loadingKey] = false;
+          return;
+        }
+      }
       
-      setImagesDossiers(prev => ({
-        ...prev,
-        [idDossier]: resources
-      }));
+      const resources = await fetchDossierCloudinary(idDossier, pageNum);
       
-      // Update all photos list with real Cloudinary URLs
-      const toutesLesPhotos = resources.map((resource: CloudinaryResource) => {
-        const imageUrl = resource.secure_url || 
-          `https://res.cloudinary.com/girgi5fd/image/upload/${resource.public_id}`;
+      if (resources.length === 0 && pageNum === 1) {
+        setHasMore(false);
+        setVisibleImages([]);
+        setImagesDossiers(prev => ({
+          ...prev,
+          [idDossier]: []
+        }));
+        setIsLoading(false);
+        setChargement(false);
+        loadingRef.current[loadingKey] = false;
+        return;
+      }
+      
+      // Update images
+      setImagesDossiers(prev => {
+        const existing = prev[idDossier] || [];
+        const updated = append ? [...existing, ...resources] : resources;
         
-        const parts = resource.public_id.split('/');
-        const filename = parts[parts.length - 1] || resource.public_id;
-        const titre = filename.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
+        if (pageNum === 1) {
+          ImageCache.set(idDossier, updated);
+        }
         
         return {
-          src: imageUrl,
-          titre: titre || 'Image',
-          categorie: idDossier,
-          public_id: resource.public_id || '', // Provide fallback
-          secure_url: resource.secure_url,
+          ...prev,
+          [idDossier]: updated
         };
       });
       
-      setAllPhotos(toutesLesPhotos);
+      // Update visible images
+      setVisibleImages(prev => append ? [...prev, ...resources] : resources);
+      setHasMore(resources.length === ITEMS_PER_PAGE);
+      setPage(pageNum);
       
     } catch (err) {
       setErreur(err instanceof Error ? err.message : "Impossible de charger les images");
     } finally {
       setChargement(false);
+      setChargementPlus(false);
       setIsLoading(false);
+      loadingRef.current[loadingKey] = false;
     }
-  }, []);
+  }, []); // ⚠️ EMPTY dependency array - this function never changes!
 
-  // Load initial folder
+  // Load more images
+  const loadMore = useCallback(() => {
+    if (!hasMore || chargementPlus || chargement) return;
+    const dossier = DOSSIERS_GALERIE.find(d => d.id === dossierSelectionne);
+    if (dossier) {
+      chargerImagesDossier(dossier.idDossier, page + 1, true);
+    }
+  }, [hasMore, chargementPlus, chargement, dossierSelectionne, page, chargerImagesDossier]);
+
+  // Load initial folder - FIXED: dependencies are stable now
   useEffect(() => {
     const dossierInitial = DOSSIERS_GALERIE.find(d => d.id === dossierSelectionne);
     if (dossierInitial) {
+      // Reset pagination state when folder changes
+      setPage(1);
+      setHasMore(true);
+      setVisibleImages([]);
       chargerImagesDossier(dossierInitial.idDossier);
     }
-  }, [dossierSelectionne, chargerImagesDossier]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dossierSelectionne]); // ⚠️ Only depends on dossierSelectionne
 
+  // Get current folder data
   const dossierCourant = DOSSIERS_GALERIE.find(d => d.id === dossierSelectionne);
   const images = dossierCourant ? imagesDossiers[dossierCourant.idDossier] || [] : [];
 
   // Filter images by search
-  const imagesFiltrees = images.filter((resource) => {
-    if (!recherche) return true;
-    const filename = resource.public_id.split('/').pop()?.toLowerCase() || '';
-    return filename.includes(recherche.toLowerCase());
-  });
+  const imagesFiltrees = useMemo(() => {
+    if (!recherche) return visibleImages;
+    return visibleImages.filter((resource) => {
+      const filename = resource.public_id.split('/').pop()?.toLowerCase() || '';
+      return filename.includes(recherche.toLowerCase());
+    });
+  }, [visibleImages, recherche]);
 
-  // Get all photos for lightbox with proper URLs
-  const allPhotosForLightbox = allPhotos.filter(p => {
-    if (!recherche) return true;
-    return p.titre.toLowerCase().includes(recherche.toLowerCase());
-  });
+  // Get all photos for lightbox - FIXED: computed from imagesDossiers
+  const allPhotosForLightbox = useMemo(() => {
+    const allPhotos: PhotoGalerie[] = [];
+    Object.entries(imagesDossiers).forEach(([categorie, resources]) => {
+      resources?.forEach((resource) => {
+        const filename = resource.public_id.split('/').pop()?.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ') || 'Image';
+        if (!recherche || filename.toLowerCase().includes(recherche.toLowerCase())) {
+          allPhotos.push({
+            src: resource.secure_url || getOptimizedUrl(resource.public_id, 1200),
+            titre: filename,
+            categorie: categorie,
+            public_id: resource.public_id,
+            secure_url: resource.secure_url,
+            thumbnail: getOptimizedUrl(resource.public_id, 400),
+            optimized: getOptimizedUrl(resource.public_id, 800),
+          });
+        }
+      });
+    });
+    return allPhotos;
+  }, [imagesDossiers, recherche]);
 
   // Navigate to next/prev photo in lightbox
   const navigatePhoto = useCallback((photo: PhotoGalerie) => {
@@ -169,26 +454,32 @@ export default function GalleryPage() {
   }, []);
 
   // Calculate total images across all folders
-  const totalImages = Object.values(imagesDossiers).reduce(
-    (acc, arr) => acc + (arr?.length || 0), 
-    0
-  );
+  const totalImages = useMemo(() => {
+    return Object.values(imagesDossiers).reduce(
+      (acc, arr) => acc + (arr?.length || 0), 
+      0
+    );
+  }, [imagesDossiers]);
 
-  // Preload all folders in background
+  // Preload next page when scrolling near bottom
   useEffect(() => {
-    const preloadAllFolders = async () => {
-      for (const dossier of DOSSIERS_GALERIE) {
-        if (!imagesDossiers[dossier.idDossier]) {
-          await chargerImagesDossier(dossier.idDossier);
-        }
+    const handleScroll = () => {
+      if (!hasMore || chargementPlus || chargement) return;
+      
+      const scrollPosition = window.innerHeight + window.scrollY;
+      const threshold = document.documentElement.scrollHeight - 500;
+      
+      if (scrollPosition >= threshold) {
+        loadMore();
       }
     };
-    
-    if (!isLoading) {
-      preloadAllFolders();
-    }
-  }, [isLoading, chargerImagesDossier, imagesDossiers]);
 
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [hasMore, chargementPlus, chargement, loadMore]);
+
+  // Reset pagination when folder changes - already handled in useEffect above
+  
   if (isLoading && chargement) {
     return (
       <>
@@ -208,7 +499,6 @@ export default function GalleryPage() {
     <>
       <Navbar />
 
-      {/* Lightbox Modal - Using extracted component */}
       {selectedPhoto && (
         <GalleryLightboxModal
           photo={selectedPhoto}
@@ -218,7 +508,6 @@ export default function GalleryPage() {
         />
       )}
 
-      {/* Hero Section */}
       <section className="relative pt-32 pb-8 md:pt-40 md:pb-8 bg-gradient-to-b from-brand-imperial/5 via-surface-container-low to-transparent overflow-hidden">
         <div className="absolute top-0 right-0 w-1/2 h-full opacity-5">
           <div className="absolute top-20 right-20 w-64 h-64 rounded-full bg-secondary blur-3xl"></div>
@@ -251,6 +540,7 @@ export default function GalleryPage() {
                   src="https://images.unsplash.com/photo-1554907984-1d022f2c1a5c?w=800&q=80"
                   alt="Galerie Photo"
                   className="w-full h-auto object-cover hover:scale-105 transition-transform duration-700"
+                  loading="lazy"
                   onError={(e) => {
                     (e.target as HTMLImageElement).src =
                       "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='400'%3E%3Crect width='600' height='400' fill='%23e5e7eb'/%3E%3Ctext x='300' y='200' text-anchor='middle' dy='.3em' fill='%236b7280' font-size='24' font-weight='bold'%3E📸 Galerie%3C/text%3E%3C/svg%3E";
@@ -270,9 +560,7 @@ export default function GalleryPage() {
         </div>
       </section>
 
-      {/* Main Gallery Section */}
       <section className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8">
-        {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center p-4 rounded-2xl bg-surface-container-low border border-outline-variant/30">
             <div className="text-2xl mb-1">📷</div>
@@ -308,7 +596,6 @@ export default function GalleryPage() {
           </div>
         </div>
 
-        {/* Folder filters */}
         <div className="flex flex-wrap items-center gap-3 pb-2">
           {DOSSIERS_GALERIE.map((dossier) => {
             const estActif = dossierSelectionne === dossier.id;
@@ -317,7 +604,10 @@ export default function GalleryPage() {
             return (
               <button
                 key={dossier.id}
-                onClick={() => setDossierSelectionne(dossier.id)}
+                onClick={() => {
+                  setDossierSelectionne(dossier.id);
+                  setRecherche("");
+                }}
                 className={`px-5 py-2.5 rounded-2xl text-sm font-black whitespace-nowrap transition-all flex items-center space-x-2 ${
                   estActif
                     ? "bg-secondary text-white shadow-md shadow-secondary/30 scale-105"
@@ -338,7 +628,6 @@ export default function GalleryPage() {
           })}
         </div>
 
-        {/* Search bar */}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
@@ -348,15 +637,21 @@ export default function GalleryPage() {
             placeholder="Rechercher des images..."
             className="w-full pl-10 pr-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-secondary focus:border-transparent"
           />
+          {recherche && (
+            <button
+              onClick={() => setRecherche("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+            >
+              <X className="w-4 h-4 text-slate-400" />
+            </button>
+          )}
         </div>
 
-        {/* Photo grid */}
         {chargement ? (
-          <div className="flex flex-col items-center justify-center py-20 space-y-4">
-            <Loader2 className="w-12 h-12 text-secondary animate-spin" />
-            <p className="text-sm font-bold text-slate-600 dark:text-slate-400">
-              Chargement des images...
-            </p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {Array(12).fill(0).map((_, i) => (
+              <ImageSkeleton key={`skeleton-${i}`} />
+            ))}
           </div>
         ) : erreur ? (
           <div className="flex flex-col items-center justify-center py-20 space-y-4">
@@ -395,69 +690,68 @@ export default function GalleryPage() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {imagesFiltrees.map((resource, index) => {
-              const imageUrl = resource.secure_url || 
-                `https://res.cloudinary.com/girgi5fd/image/upload/${resource.public_id}`;
-              
-              const parts = resource.public_id.split('/');
-              const filename = parts[parts.length - 1] || resource.public_id;
-              const titre = filename.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
-              
-              return (
-                <div
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+              {imagesFiltrees.map((resource, index) => (
+                <OptimizedImage
                   key={`${resource.public_id}-${index}`}
+                  resource={resource}
+                  isPriority={index < 5}
+                  folderLabel={dossierCourant?.label}
                   onClick={() => setSelectedPhoto({
-                    src: imageUrl,
-                    titre: titre || 'Image',
+                    src: resource.secure_url || getOptimizedUrl(resource.public_id, 1200),
+                    titre: resource.public_id.split('/').pop()?.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ') || 'Image',
                     categorie: dossierSelectionne,
-                    public_id: resource.public_id || '', // Provide fallback
+                    public_id: resource.public_id,
                     secure_url: resource.secure_url,
                   })}
-                  className="group relative rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 cursor-pointer aspect-square hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
-                >
-                  <img
-                    src={imageUrl}
-                    alt={titre || 'Image'}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    loading="lazy"
-                    onError={(e) => {
-                      console.error(`Erreur de chargement: ${imageUrl}`);
-                      const fallbackUrl = `https://res.cloudinary.com/girgi5fd/image/upload/c_fill,w_400,h_400/${resource.public_id}`;
-                      (e.target as HTMLImageElement).src = fallbackUrl;
-                      
-                      setTimeout(() => {
-                        (e.target as HTMLImageElement).src = "/images/placeholder.jpg";
-                      }, 1000);
-                    }}
-                  />
-                  
-                  {/* Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
-                    <div className="w-full">
-                      <p className="text-white text-xs font-bold truncate">
-                        {titre}
-                      </p>
-                      <span className="text-white/60 text-[10px]">
-                        {DOSSIERS_GALERIE.find(d => d.id === dossierSelectionne)?.label}
-                      </span>
-                    </div>
-                  </div>
+                />
+              ))}
+            </div>
 
-                  {/* Zoom icon */}
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                    <div className="p-2.5 rounded-full bg-white/30 backdrop-blur-md">
-                      <Maximize2 className="w-5 h-5 text-white" />
-                    </div>
-                  </div>
+            {chargementPlus && (
+              <div className="flex justify-center py-8">
+                <div className="flex items-center gap-3">
+                  <Loader2 className="w-6 h-6 text-secondary animate-spin" />
+                  <span className="text-sm text-slate-500">Chargement de plus d'images...</span>
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            )}
+
+            {hasMore && !chargementPlus && imagesFiltrees.length > 0 && (
+              <LoadMoreButton 
+                onClick={loadMore}
+                isLoading={chargementPlus}
+                hasMore={hasMore}
+              />
+            )}
+
+            {!hasMore && imagesFiltrees.length > 0 && (
+              <div className="text-center py-8">
+                <p className="text-sm text-slate-500">
+                  Vous avez vu toutes les images de ce dossier 🎉
+                </p>
+              </div>
+            )}
+          </>
         )}
       </section>
 
       <Footer />
+
+      <style jsx global>{`
+        @keyframes shimmer {
+          0% {
+            background-position: -200% 0;
+          }
+          100% {
+            background-position: 200% 0;
+          }
+        }
+        .animate-shimmer {
+          animation: shimmer 1.5s infinite;
+        }
+      `}</style>
     </>
   );
 }
