@@ -176,11 +176,13 @@ export default function FirmaNav() {
       href: "/cadre-juridique-securite", 
       description: "Conformité et protection des données"
     },
+    /*
     { 
       name: "Coûts & Investissement", 
       href: "/couts-investissement", 
       description: "Transparence financière"
     },
+    */
   ];
 
   const languages = [
@@ -379,6 +381,7 @@ export default function FirmaNav() {
             </div>
 
             <div className="flex flex-col space-y-2 pt-2 border-t border-outline-variant/30">
+              {/*
               <Link
                 href={createPath("/connexion")}
                 onClick={() => setIsOpen(false)}
@@ -386,6 +389,7 @@ export default function FirmaNav() {
               >
                 Connexion
               </Link>
+              */}
               <Link
                 href={createPath("/contact")}
                 onClick={() => setIsOpen(false)}

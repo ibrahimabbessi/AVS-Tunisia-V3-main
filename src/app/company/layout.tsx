@@ -58,34 +58,7 @@ export default function CompanyLayout({ children }: CompanyLayoutProps) {
         */}
       </div>
 
-      {/* Breadcrumb Navigation */}
-      <div className="bg-surface-container-lowest border-b border-outline-variant/30">
-        <div className="max-w-7xl mx-auto px-4 py-3">
-          <div className="flex items-center gap-2 font-body-md text-sm">
-            {breadcrumbItems.map((item, index) => (
-              <div key={item.href} className="flex items-center gap-2">
-                <Link
-                  href={item.href}
-                  className={`hover:text-secondary transition-colors ${
-                    index === breadcrumbItems.length - 1 ? "text-secondary font-semibold" : "text-on-surface-variant"
-                  }`}
-                >
-                  {item.name}
-                </Link>
-                {index < breadcrumbItems.length - 1 && (
-                  <ChevronRight className="h-3 w-3 text-outline" />
-                )}
-              </div>
-            ))}
-            {pathname !== "/company" && (
-              <>
-                <ChevronRight className="h-3 w-3 text-outline" />
-                <span className="text-secondary font-semibold">{getCurrentPageName()}</span>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
+
 
       {/* Main Content - No sidebar */}
       <div className="max-w-7xl mx-auto px-4 py-12">

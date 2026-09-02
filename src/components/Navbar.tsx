@@ -18,6 +18,7 @@ type DropdownItem = {
   name: string;
   href: string;
   hasSubmenu?: boolean;
+  icon?: string; // Add icon URL for dropdown items
 };
 
 type NavLink = {
@@ -25,6 +26,7 @@ type NavLink = {
   href: string;
   hasDropdown?: boolean;
   dropdownKey?: string;
+  icon?: string; // Add icon URL for nav links
 };
 
 type SocialLink = {
@@ -176,13 +178,35 @@ export default function Navbar() {
     return `${BASE_PATH}${path}`;
   };
 
-  // ============ NAVIGATION DATA ============
+  // ============ NAVIGATION DATA WITH ICONS ============
   const navLinks: NavLink[] = [
     { name: "Accueil", href: "/" },
-    { name: "À Propos", href: "/a-propos", hasDropdown: true, dropdownKey: "aPropos" },
-    { name: "Hergla Forma", href: "/hergla-forma", hasDropdown: true, dropdownKey: "herglaForma" },
-    { name: "IFT Global", href: "/ift-global", hasDropdown: true, dropdownKey: "iftGlobal" },
-    { name: "Care Forma", href: "/care-forma" },
+    { 
+      name: "À Propos", 
+      href: "/a-propos", 
+      hasDropdown: true, 
+      dropdownKey: "aPropos",
+      icon: "https://res.cloudinary.com/girgi5fd/image/upload/v1786969782/avs-group-logo.png"
+    },
+    { 
+      name: "Hergla Forma", 
+      href: "/hergla-forma", 
+      hasDropdown: true, 
+      dropdownKey: "herglaForma",
+      icon: "https://res.cloudinary.com/girgi5fd/image/upload/v1786969779/avs-hergla-forma-logo.png"
+    },
+    { 
+      name: "IFT Global", 
+      href: "/ift-global", 
+      hasDropdown: true, 
+      dropdownKey: "iftGlobal",
+      icon: "https://res.cloudinary.com/girgi5fd/image/upload/v1786969780/ift-global-logo.png"
+    },
+    { 
+      name: "Care Forma", 
+      href: "/care-forma",
+      icon: "https://res.cloudinary.com/girgi5fd/image/upload/v1786969787/avs-care-form-logo.png"
+    },
     { name: "Contact", href: "/contact" },
   ];
 
@@ -225,6 +249,67 @@ export default function Navbar() {
     { code: "en", label: "English", flag: "🇬🇧" },
     { code: "de", label: "Deutsch", flag: "🇩🇪" },
   ];
+
+  // Helper function to render nav link with icon
+  const renderNavLink = (link: NavLink, isActive: boolean) => {
+    const linkHref = createPath(link.href);
+    
+    return (
+      <Link
+        href={linkHref}
+        className={`flex items-center gap-2 transition-all duration-300 px-3 py-2 rounded-md text-xs ${
+          isActive
+            ? "text-secondary border-b-2 border-secondary font-bold"
+            : "text-on-surface-variant hover:text-secondary hover:bg-surface-container-low"
+        }`}
+      >
+        {link.icon && (
+          <img 
+            src={link.icon} 
+            alt={link.name} 
+            className="w-5 h-5 object-contain rounded"
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = 'none';
+            }}
+          />
+        )}
+        {link.name}
+      </Link>
+    );
+  };
+
+  // Helper function to render dropdown item with icon
+  const renderDropdownItem = (item: DropdownItem, isActive: boolean) => {
+    const itemHref = createPath(item.href);
+    
+    return (
+      <Link
+        key={item.href}
+        href={itemHref}
+        className={`flex items-center gap-2 px-3.5 py-2 text-xs transition-colors hover:bg-secondary/10 hover:text-secondary ${
+          isActive ? "bg-secondary/10 text-secondary font-medium" : "text-on-surface"
+        }`}
+        onClick={() => {
+          setIsAProposOpen(false);
+          setIsHerglaFormaOpen(false);
+          setIsIftGlobalOpen(false);
+          setIsLanguageSubmenuOpen(false);
+        }}
+      >
+        {item.icon && (
+          <img 
+            src={item.icon} 
+            alt={item.name} 
+            className="w-4 h-4 object-contain rounded"
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = 'none';
+            }}
+          />
+        )}
+        {item.name}
+      </Link>
+    );
+  };
 
   // ============ RENDER ============
   return (
@@ -271,16 +356,7 @@ export default function Navbar() {
                     }}
                   >
                     <div className="flex items-center">
-                      <Link
-                        href={linkHref}
-                        className={`transition-all duration-300 px-3 py-2 rounded-md text-xs ${
-                          isActive
-                            ? "text-secondary border-b-2 border-secondary font-bold"
-                            : "text-on-surface-variant hover:text-secondary hover:bg-surface-container-low"
-                        }`}
-                      >
-                        {link.name}
-                      </Link>
+                      {renderNavLink(link, isActive)}
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -319,7 +395,19 @@ export default function Navbar() {
                                     isItemActive ? "bg-secondary/10 text-secondary font-medium" : "text-on-surface"
                                   }`}
                                 >
-                                  <span>{item.name}</span>
+                                  <span className="flex items-center gap-2">
+                                    {item.icon && (
+                                      <img 
+                                        src={item.icon} 
+                                        alt={item.name} 
+                                        className="w-4 h-4 object-contain rounded"
+                                        onError={(e) => {
+                                          (e.target as HTMLImageElement).style.display = 'none';
+                                        }}
+                                      />
+                                    )}
+                                    {item.name}
+                                  </span>
                                   <svg 
                                     className={`w-3.5 h-3.5 transition-transform duration-200 ${isLanguageSubmenuOpen ? 'rotate-90' : ''}`}
                                     fill="none" 
@@ -356,18 +444,7 @@ export default function Navbar() {
                             );
                           }
                           
-                          return (
-                            <Link
-                              key={item.href}
-                              href={itemHref}
-                              className={`block px-3.5 py-2 text-xs transition-colors hover:bg-secondary/10 hover:text-secondary ${
-                                isItemActive ? "bg-secondary/10 text-secondary font-medium" : "text-on-surface"
-                              }`}
-                              onClick={() => setIsDropdownOpen(false)}
-                            >
-                              {item.name}
-                            </Link>
-                          );
+                          return renderDropdownItem(item, isItemActive);
                         })}
                       </div>
                     )}
@@ -377,16 +454,7 @@ export default function Navbar() {
               
               return (
                 <li key={link.href} className="h-full flex items-center">
-                  <Link
-                    href={linkHref}
-                    className={`transition-all duration-300 px-3 py-2 rounded-md text-xs ${
-                      isActive
-                        ? "text-secondary border-b-2 border-secondary font-bold"
-                        : "text-on-surface-variant hover:text-secondary hover:bg-surface-container-low"
-                    }`}
-                  >
-                    {link.name}
-                  </Link>
+                  {renderNavLink(link, isActive)}
                 </li>
               );
             })}
@@ -429,14 +497,6 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Connexion Button 
-            <Link
-              href={createPath("/connexion")}
-              className="font-label-md text-label-md bg-transparent border-[1.5px] border-secondary text-secondary hover:bg-secondary/5 px-5 py-2 rounded-lg transition-colors duration-300 text-[10px]"
-            >
-              Connexion
-            </Link>
-*/}
             {/* Candidature Button */}
             <Link
               href={createPath("/candidature")}
@@ -496,12 +556,22 @@ export default function Navbar() {
                           <Link
                             href={linkHref}
                             onClick={() => setIsOpen(false)}
-                            className={`flex-1 block px-4 py-2.5 rounded-lg transition-all text-xs ${
+                            className={`flex-1 flex items-center gap-2 px-4 py-2.5 rounded-lg transition-all text-xs ${
                               isActive
                                 ? "bg-secondary/10 text-secondary font-bold"
                                 : "text-on-surface hover:bg-surface-container-low"
                             }`}
                           >
+                            {link.icon && (
+                              <img 
+                                src={link.icon} 
+                                alt={link.name} 
+                                className="w-5 h-5 object-contain rounded"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).style.display = 'none';
+                                }}
+                              />
+                            )}
                             {link.name}
                           </Link>
                           <button
@@ -538,7 +608,19 @@ export default function Navbar() {
                                           : "text-on-surface hover:bg-surface-container-low"
                                       }`}
                                     >
-                                      <span>{item.name}</span>
+                                      <span className="flex items-center gap-2">
+                                        {item.icon && (
+                                          <img 
+                                            src={item.icon} 
+                                            alt={item.name} 
+                                            className="w-4 h-4 object-contain rounded"
+                                            onError={(e) => {
+                                              (e.target as HTMLImageElement).style.display = 'none';
+                                            }}
+                                          />
+                                        )}
+                                        {item.name}
+                                      </span>
                                       <svg 
                                         className={`w-3.5 h-3.5 transition-transform duration-200 ${isLanguageSubmenuOpen ? 'rotate-90' : ''}`}
                                         fill="none" 
@@ -584,12 +666,22 @@ export default function Navbar() {
                                     setIsOpen(false);
                                     setIsDropdownOpen(false);
                                   }}
-                                  className={`block px-4 py-2 rounded-lg text-xs transition-all ${
+                                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs transition-all ${
                                     isItemActive
                                       ? "bg-secondary/10 text-secondary font-medium"
                                       : "text-on-surface hover:bg-surface-container-low"
                                   }`}
                                 >
+                                  {item.icon && (
+                                    <img 
+                                      src={item.icon} 
+                                      alt={item.name} 
+                                      className="w-4 h-4 object-contain rounded"
+                                      onError={(e) => {
+                                        (e.target as HTMLImageElement).style.display = 'none';
+                                      }}
+                                    />
+                                  )}
                                   {item.name}
                                 </Link>
                               );
@@ -606,12 +698,22 @@ export default function Navbar() {
                     <Link
                       href={linkHref}
                       onClick={() => setIsOpen(false)}
-                      className={`block px-4 py-2.5 rounded-lg transition-all text-xs ${
+                      className={`flex items-center gap-2 px-4 py-2.5 rounded-lg transition-all text-xs ${
                         isActive
                           ? "bg-secondary/10 text-secondary font-bold"
                           : "text-on-surface hover:bg-surface-container-low"
                       }`}
                     >
+                      {link.icon && (
+                        <img 
+                          src={link.icon} 
+                          alt={link.name} 
+                          className="w-5 h-5 object-contain rounded"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = 'none';
+                          }}
+                        />
+                      )}
                       {link.name}
                     </Link>
                   </li>
@@ -638,8 +740,6 @@ export default function Navbar() {
             </div>
 
             <div className="flex flex-col space-y-2 pt-2 border-t border-outline-variant/30">
-              
-              
               <Link
                 href={createPath("/connexion")}
                 onClick={() => setIsOpen(false)}

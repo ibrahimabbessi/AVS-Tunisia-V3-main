@@ -29,37 +29,43 @@ export default function CareFormaPage() {
     return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='267'%3E%3Crect width='200' height='267' fill='%23e5e7eb'/%3E%3Crect x='20' y='20' width='160' height='160' fill='%23d1d5db' rx='8'/%3E%3Ctext x='50%25' y='65%25' text-anchor='middle' dy='.3em' fill='%236b7280' font-size='16' font-weight='bold'%3E📄%3C/text%3E%3Ctext x='50%25' y='80%25' text-anchor='middle' dy='.3em' fill='%239ca3af' font-size='12'%3E${encodeURIComponent(label)}%3C/text%3E%3C/svg%3E`;
   };
 
-  // Qualifications and skills for assistant de vie
+  // Qualifications and skills for assistant de vie with images
   const qualifications = [
     {
       icon: "❤️",
       title: "Empathie et Compassion",
       description: "Capacité à comprendre et partager les émotions des personnes âgées ou en situation de handicap.",
+      image: "https://cdn-s-www.leprogres.fr/images/CDBE28AE-548F-4959-B02E-0AA7D0EC1513/NW_raw/un-comportement-empathique-de-la-part-d-un-soignant-peut-reduire-la-sensation-de-douleur-de-12-illustration-stock-adobe-com-1564604610.jpg",
     },
     {
       icon: "🤝",
       title: "Patience et Écoute",
       description: "Savoir écouter activement et faire preuve de patience dans les situations difficiles.",
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRh9t6bwrsNd01qBTt_NDzZdWyQIXdQy8pTtaJQgePH4a2hSa47nDy2Px3x&s=10",
     },
     {
       icon: "📋",
       title: "Organisation",
       description: "Gérer efficacement les tâches quotidiennes et les emplois du temps des bénéficiaires.",
+      image: "https://www.blogdemaritan.com/wp-content/uploads/2022/09/les-taches-dun-infirmier-a-domicile.jpg",
     },
     {
       icon: "🧠",
       title: "Sens des Responsabilités",
       description: "Assurer la sécurité et le bien-être des personnes sous votre responsabilité.",
+      image: "https://www.macsf.fr/var/macsf/storage/images-versioned/images/2/0/2/4/944202-38-fre-FR/IDE-615x555.jpg",
     },
     {
       icon: "💬",
       title: "Communication",
       description: "Établir une communication claire avec les bénéficiaires, leurs familles et les équipes médicales.",
+      image: "https://www.cmpa-acpm.ca/static-assets/images/meta/good-practices/21-team-communication-opengraph.jpg",
     },
     {
       icon: "🏃",
       title: "Adaptabilité",
       description: "S'adapter aux différents besoins et situations des bénéficiaires.",
+      image: "https://previews.123rf.com/images/leaf/leaf1107/leaf110700245/10033248-doctor-and-nurse-running-in-hallway-of-hospital.jpg",
     },
   ];
 
@@ -135,6 +141,13 @@ export default function CareFormaPage() {
     },
   ];
 
+  // Care-Forma images
+  const careFormaImages = [
+    "https://mrdeutschakademie.com/files/photos/1/bannieres/photojpgAlJaQo5EWw6lh3chWeTw-converted.webp",
+    "https://www.capretraite.fr/wp-content/uploads/2026/08/EHPAD-avec-section-personnes-handicapees-vieillissantes-les-specificites-a-verifier-2-1024x683.jpg",
+    "https://lanes-germany.com/content-images/fachsprache-medizin-bei-lanes.png",
+  ];
+
   return (
     <>
       <Navbar />
@@ -159,30 +172,42 @@ export default function CareFormaPage() {
                 et immersion linguistique.
               </p>
             </div>
+            {/* Image à droite du titre Formation d'Assistant de Vie */}
             <div className="flex-1 max-w-md">
-              <div className="bg-gradient-to-br from-brand-imperial to-brand-imperial/90 rounded-2xl p-6 text-white shadow-lg">
-                <div className="text-center">
-                  <span className="text-5xl">🏥</span>
-                  <h3 className="font-headline-lg text-white mt-4">Assistant de Vie</h3>
-                  <p className="text-white/80 text-sm mt-2">
-                    Formation professionnelle en Allemagne
-                  </p>
-                  <div className="mt-4 flex justify-center gap-4">
-                    <div className="text-center">
-                      <span className="block text-2xl font-bold">18-30</span>
-                      <span className="text-xs text-white/70">Âge requis</span>
-                    </div>
-                    <div className="text-center">
-                      <span className="block text-2xl font-bold">B1/B2</span>
-                      <span className="text-xs text-white/70">Niveau d'allemand</span>
-                    </div>
-                    <div className="text-center">
-                      <span className="block text-2xl font-bold">24</span>
-                      <span className="text-xs text-white/70">Mois</span>
-                    </div>
-                  </div>
-                </div>
+              <div className="rounded-2xl overflow-hidden shadow-lg border border-outline-variant/30">
+                <img
+                  src="https://www.irfasud.fr/app/uploads/2019/09/assistante-de-vie-aux-familles-2-1024x683.jpg"
+                  alt="Assistant de Vie"
+                  className="w-full h-auto object-cover hover:scale-105 transition-transform duration-500"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='267'%3E%3Crect width='400' height='267' fill='%23e5e7eb'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%236b7280' font-size='20'%3E🏥 Assistant de Vie%3C/text%3E%3C/svg%3E";
+                  }}
+                />
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* NEW SECTION: Assistant de Vie - Formation professionnelle en Allemagne */}
+      <section className="py-12 md:py-16 bg-blue-50">
+        <div className="max-w-container-max mx-auto px-margin-mobile md:px-gutter">
+          <div className="text-center mb-8">
+            <h2 className="font-headline-md text-brand-imperial">Assistant de Vie</h2>
+            <p className="font-body-lg text-on-surface-variant">Formation professionnelle en Allemagne</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
+            <div className="bg-white rounded-2xl p-6 shadow-md text-center hover:shadow-lg transition-shadow duration-300">
+              <span className="block text-4xl font-bold text-brand-imperial">18-30</span>
+              <span className="text-sm text-on-surface-variant font-medium">Âge requis</span>
+            </div>
+            <div className="bg-white rounded-2xl p-6 shadow-md text-center hover:shadow-lg transition-shadow duration-300">
+              <span className="block text-4xl font-bold text-brand-imperial">B1/B2</span>
+              <span className="text-sm text-on-surface-variant font-medium">Niveau d'allemand</span>
+            </div>
+            <div className="bg-white rounded-2xl p-6 shadow-md text-center hover:shadow-lg transition-shadow duration-300">
+              <span className="block text-4xl font-bold text-brand-imperial">24</span>
+              <span className="text-sm text-on-surface-variant font-medium">Mois</span>
             </div>
           </div>
         </div>
@@ -203,6 +228,23 @@ export default function CareFormaPage() {
             à accompagner les personnes âgées, en situation de handicap ou en convalescence dans leur vie 
             quotidienne.
           </p>
+          
+          {/* 3 images pour Care-Forma */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
+            {careFormaImages.map((img, index) => (
+              <div key={index} className="rounded-xl overflow-hidden shadow-md border border-outline-variant/20">
+                <img
+                  src={img}
+                  alt={`Care-Forma illustration ${index + 1}`}
+                  className="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200'%3E%3Crect width='400' height='200' fill='%23e5e7eb'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%236b7280' font-size='16'%3E📸 Image ${index + 1}%3C/text%3E%3C/svg%3E`;
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
             {formationDetails.map((detail, index) => (
               <div key={index} className="bg-surface-container-low rounded-xl p-4 border border-outline-variant/20">
@@ -257,13 +299,23 @@ export default function CareFormaPage() {
             {qualifications.map((qual, index) => (
               <div
                 key={index}
-                className="card-hover rounded-xl bg-surface-container-lowest p-5 border border-outline-variant/30 transition-all duration-300 hover:border-brand-imperial/30"
+                className="card-hover rounded-xl bg-surface-container-lowest p-5 border border-outline-variant/30 transition-all duration-300 hover:border-brand-imperial/30 overflow-hidden group"
               >
                 <div className="flex items-center gap-3 mb-2">
                   <span className="text-2xl">{qual.icon}</span>
                   <h3 className="font-headline-sm text-primary text-sm font-semibold">{qual.title}</h3>
                 </div>
-                <p className="font-body-md text-on-surface-variant text-sm">{qual.description}</p>
+                <p className="font-body-md text-on-surface-variant text-sm mb-3">{qual.description}</p>
+                <div className="rounded-lg overflow-hidden shadow-sm">
+                  <img
+                    src={qual.image}
+                    alt={qual.title}
+                    className="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='150'%3E%3Crect width='400' height='150' fill='%23e5e7eb'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%236b7280' font-size='16'%3E${encodeURIComponent(qual.icon)} ${qual.title}%3C/text%3E%3C/svg%3E`;
+                    }}
+                  />
+                </div>
               </div>
             ))}
           </div>
@@ -315,8 +367,6 @@ export default function CareFormaPage() {
             ))}
           </div>
         </div>
-
-
 
         {/* FAQ Section */}
         <div className="mb-12 rounded-2xl bg-surface-container-lowest border border-outline-variant/30 p-6 md:p-8 shadow-sm">
