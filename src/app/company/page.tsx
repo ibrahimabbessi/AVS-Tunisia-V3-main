@@ -687,7 +687,7 @@ export default function CompanyPage() {
             Contactez-nous dès aujourd'hui pour un entretien de conseil sans engagement.
           </p>
           <Link
-            href="/company/kontakt-beratung"
+            href="/company/contact"
             className="inline-flex items-center gap-2 bg-brand-imperial text-white px-8 py-3 rounded-lg font-semibold hover:bg-brand-imperial/90 transition-colors btn-primary glass-highlight"
           >
             Prendre contact maintenant

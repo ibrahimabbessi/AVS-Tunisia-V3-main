@@ -177,7 +177,7 @@ const processSteps = [
                   <ChevronDown className="h-4 w-4" />
                 </a>
                 <Link
-                  href="/company/kontakt-beratung"
+                  href="/company/contact"
                   className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-lg font-semibold border border-white/30 hover:bg-white/30 transition-all"
                 >
                   Postuler maintenant
@@ -379,14 +379,14 @@ const processSteps = [
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
-              href="/company/kontakt-beratung"
+              href="/company/contact"
               className="inline-flex items-center gap-2 bg-[#0a2a88] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#0a2a88]/90 transition-all hover:scale-105 shadow-lg"
             >
               Demander maintenant
               <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
-              href="/company/uber-uns"
+              href="/company"
               className="inline-flex items-center gap-2 bg-gray-100 text-gray-700 px-8 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-all"
             >
               En savoir plus

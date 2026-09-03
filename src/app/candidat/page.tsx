@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Topbar from "@/components/Topbar";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Link from "next/link";
 
 /* ------------------------------------------------------------------ */
 /*  Cloudinary helper - Direct URLs                                    */
@@ -276,12 +277,12 @@ function Hero() {
             réussie au sein des meilleures entreprises allemandes.
           </p>
           <div className="flex flex-wrap gap-4 pt-4">
-            <button className="px-6 py-3 bg-brand-imperial text-white rounded-lg font-label-md hover:scale-105 transition-transform duration-200 ambient-shadow border-t border-white/40 flex items-center gap-2">
-              Explorer les Opportunités
+            <button  className="px-6 py-3 bg-brand-imperial text-white rounded-lg font-label-md hover:scale-105 transition-transform duration-200 ambient-shadow border-t border-white/40 flex items-center gap-2">
+              <Link href="/candidat/ift-global/notre-demarche">Explorer les Opportunités</Link>
               <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
             </button>
             <button className="px-6 py-3 border-2 border-brand-sapphire text-brand-sapphire rounded-lg font-label-md hover:bg-brand-sapphire/5 transition-colors">
-              Candidater
+              <Link href="/candidat/candidature">Candidature</Link>
             </button>
           </div>
         </div>
@@ -389,29 +390,41 @@ function ServicesSection() {
       </div>
  
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {SERVICES.map((service) => (
-          <div
-            key={service.title}
-            className="card-hover group border border-outline-variant rounded-2xl p-8 bg-surface-container-lowest"
-          >
-            <div className="h-14 w-14 rounded-xl bg-brand-imperial flex items-center justify-center mb-6 transition-transform duration-300 group-hover:scale-110">
-              <span className="material-symbols-outlined text-white">
-                {service.icon}
-              </span>
-            </div>
-            <h3 className="font-headline-md text-primary mb-3">{service.title}</h3>
-            <p className="font-body-md text-on-surface-variant mb-6">
-              {service.description}
-            </p>
-            <a
-              href="#"
-              className="font-label-md text-secondary inline-flex items-center gap-1 hover:gap-2 transition-all"
+        {SERVICES.map((service, index) => {
+          // Assign links based on service title
+          let linkHref = "#";
+          if (service.title === "Formation") {
+            linkHref = "/candidat/ift-global/formations-professionnelles";
+          } else if (service.title === "Conseil") {
+            linkHref = "/candidat/contact";
+          } else if (service.title === "Recrutement") {
+            linkHref = "/candidat/ift-global/offre-emploi";
+          }
+
+          return (
+            <div
+              key={service.title}
+              className="card-hover group border border-outline-variant rounded-2xl p-8 bg-surface-container-lowest"
             >
-              En savoir plus
-              <span className="material-symbols-outlined text-sm">arrow_forward</span>
-            </a>
-          </div>
-        ))}
+              <div className="h-14 w-14 rounded-xl bg-brand-imperial flex items-center justify-center mb-6 transition-transform duration-300 group-hover:scale-110">
+                <span className="material-symbols-outlined text-white">
+                  {service.icon}
+                </span>
+              </div>
+              <h3 className="font-headline-md text-primary mb-3">{service.title}</h3>
+              <p className="font-body-md text-on-surface-variant mb-6">
+                {service.description}
+              </p>
+              <Link
+                href={linkHref}
+                className="font-label-md text-secondary inline-flex items-center gap-1 hover:gap-2 transition-all"
+              >
+                En savoir plus
+                <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              </Link>
+            </div>
+          );
+        })}
       </div>
  
       {/* Group hierarchy: AVS Group as parent with logos */}
@@ -1002,7 +1015,7 @@ function TestimonialsSection() {
           </div>
           <div className="flex items-center gap-1">
             <span className="material-symbols-outlined text-[14px]">chat_bubble</span>
-            <span>{Math.floor(Math.random() * 20) + 1}</span>
+            <span>{(index % TESTIMONIALS.length) + 1}</span>
           </div>
         </div>
       </div>

@@ -350,17 +350,6 @@ export default function CadreJuridiqueSecuritePage() {
               </Link>
             </div>
           </div>
-
-          {/* Back Navigation */}
-          <div className="mt-4">
-            <Link
-              href="/candidat/company"
-              className="inline-flex items-center gap-2 text-brand-imperial font-medium hover:gap-3 transition-all duration-300"
-            >
-              <ArrowLeft className="size-4" />
-              Retour à l&apos;espace entreprise
-            </Link>
-          </div>
         </div>
       </section>
 

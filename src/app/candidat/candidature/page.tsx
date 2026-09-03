@@ -1,10 +1,11 @@
-// src/app/candidature/page.tsx
+// src/app/candidature/page.tsx (Updated with Popup)
 "use client";
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useState, useEffect, useRef } from "react";
-import Link from "next/link";
+import { ResumeCV } from "./components/ResumeCV";
+import { Candidate } from "./types";
 
 export default function CandidaturePage() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -30,6 +31,11 @@ export default function CandidaturePage() {
     rejectionAccept: false,
     feesNonRefundable: false,
   });
+
+  // ResumeCV state
+  const [resumeComplete, setResumeComplete] = useState(false);
+  const [candidateData, setCandidateData] = useState<Candidate | null>(null);
+  const [isResumePopupOpen, setIsResumePopupOpen] = useState(false);
 
   // Auto-animation for steps
   useEffect(() => {
@@ -74,12 +80,17 @@ export default function CandidaturePage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", { ...formData, files, agreements });
+    console.log("Form submitted:", { 
+      ...formData, 
+      files, 
+      agreements,
+      candidateData 
+    });
     alert("Votre candidature a été envoyée avec succès !");
   };
 
   const nextStep = () => {
-    if (currentStep < 4) setCurrentStep(currentStep + 1);
+    if (currentStep < 5) setCurrentStep(currentStep + 1);
   };
 
   const prevStep = () => {
@@ -89,7 +100,15 @@ export default function CandidaturePage() {
   // Check if all agreements are checked
   const allAgreementsChecked = Object.values(agreements).every(value => value === true);
 
-  // Steps for the application process with images - 4x size - swapped 2 & 3
+  // Handle ResumeCV completion
+  const handleResumeComplete = (data: Candidate) => {
+    setCandidateData(data);
+    setResumeComplete(true);
+    setIsResumePopupOpen(false);
+    console.log("Resume/CV data complete:", data);
+  };
+
+  // Steps for the application process with images
   const applicationSteps = [
     { 
       id: 1, 
@@ -157,7 +176,7 @@ export default function CandidaturePage() {
               </p>
             </div>
 
-            {/* Steps - Process in order with images - 4x size with auto-animation */}
+            {/* Steps - Process in order with images */}
             <div className="mb-8 rounded-2xl bg-surface-container-lowest p-6 shadow-sm border border-outline-variant/30">
               <h2 className="font-headline-md text-brand-imperial mb-4">Étapes à suivre :</h2>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -171,9 +190,6 @@ export default function CandidaturePage() {
                           ? 'border-secondary/70 shadow-lg scale-[1.02] bg-secondary/5' 
                           : 'hover:border-secondary/50'
                       }`}
-                      style={{
-                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-                      }}
                     >
                       <div className={`flex-shrink-0 w-48 h-48 rounded-lg overflow-hidden border border-outline-variant/30 transition-all duration-300 ${
                         isActive ? 'shadow-xl ring-2 ring-secondary/40' : ''
@@ -214,28 +230,35 @@ export default function CandidaturePage() {
                 <div className="absolute top-1/2 left-0 w-full h-[2px] bg-surface-variant -z-10 -translate-y-1/2"></div>
                 <div 
                   className="absolute top-1/2 left-0 h-[2px] bg-brand-imperial -z-10 -translate-y-1/2 transition-all duration-500"
-                  style={{ width: `${((currentStep - 1) / 3) * 100}%` }}
+                  style={{ width: `${((currentStep - 1) / 4) * 100}%` }}
                 ></div>
                 <div className="flex justify-between items-center relative z-0">
                   {[
                     { num: 1, label: "Personal Info" },
                     { num: 2, label: "Documents" },
                     { num: 3, label: "Sector" },
-                    { num: 4, label: "Upload" },
+                    { num: 4, label: "CV Complet" },
+                    { num: 5, label: "Upload" },
                   ].map((step) => (
                     <div 
                       key={step.num}
                       className={`flex flex-col items-center cursor-pointer ${
                         currentStep === step.num ? "step-active" : "step-inactive"
                       }`}
-                      onClick={() => setCurrentStep(step.num)}
+                      onClick={() => {
+                        if (step.num <= currentStep || step.num === 1) {
+                          setCurrentStep(step.num);
+                        }
+                      }}
                     >
                       <div className={`w-10 h-10 rounded-full border-2 flex items-center justify-center mb-2 transition-colors duration-300 shadow-sm font-label-md text-label-md ${
                         currentStep === step.num 
                           ? "bg-brand-imperial text-white border-brand-imperial"
+                          : currentStep > step.num
+                          ? "bg-secondary text-white border-secondary"
                           : "bg-white border-outline-variant text-on-surface-variant hover:border-brand-imperial"
                       }`}>
-                        {step.num}
+                        {currentStep > step.num ? "✓" : step.num}
                       </div>
                       <span className={`font-label-md text-caption md:text-label-md text-center ${
                         currentStep === step.num ? "text-brand-imperial font-bold" : "text-on-surface-variant"
@@ -385,7 +408,6 @@ export default function CandidaturePage() {
                       Documents
                     </h2>
                     
-                    {/* Document to download */}
                     <div className="rounded-xl bg-brand-ice/20 p-4 border border-brand-imperial/10">
                       <p className="mb-2 font-body-md text-sm font-medium text-brand-imperial">
                         Téléchargez le questionnaire à remplir :
@@ -403,7 +425,6 @@ export default function CandidaturePage() {
                       </p>
                     </div>
 
-                    {/* Documents to send - with image gallery - show half initially, expand on hover */}
                     <div>
                       <p className="mb-3 font-body-md text-sm font-medium text-on-surface-variant">
                         Documents à fournir (exemples) :
@@ -439,7 +460,6 @@ export default function CandidaturePage() {
                                       "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='267'%3E%3Crect width='200' height='267' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%239ca3af' font-size='14'%3E" + doc.label + "%3C/text%3E%3C/svg%3E";
                                   }}
                                 />
-                                {/* Overlay that hides the bottom portion of the image when not hovered */}
                                 <div 
                                   className="absolute bottom-0 left-0 right-0 transition-all duration-500"
                                   style={{
@@ -556,8 +576,107 @@ export default function CandidaturePage() {
                   </div>
                 )}
 
-                {/* Step 4: Upload */}
+                {/* Step 4: Resume/CV Complete Form - With Popup Button */}
                 {currentStep === 4 && (
+                  <div className="space-y-6 animate-fade-in">
+                    <h2 className="font-headline-md text-headline-md text-brand-imperial border-b border-outline-variant/30 pb-2">
+                      Questionnaire Complet
+                    </h2>
+                    <p className="font-body-md text-sm text-on-surface-variant/70">
+                      Remplissez le questionnaire complet en ligne. Cela remplace le PDF que vous deviez télécharger.
+                    </p>
+                    
+                    <div className="flex flex-col items-center justify-center p-8 bg-surface-container-low rounded-xl border-2 border-dashed border-outline-variant/30">
+                      <div className="text-6xl mb-4">📋</div>
+                      <h3 className="font-headline-md text-brand-imperial text-lg mb-2">
+                        Bewerberfragebogen
+                      </h3>
+                      <p className="text-sm text-on-surface-variant/60 text-center max-w-md mb-6">
+                        {resumeComplete 
+                          ? '✅ Questionnaire déjà rempli. Vous pouvez le modifier si nécessaire.'
+                          : 'Klicken Sie auf den Button, um den Fragebogen auszufüllen.'}
+                      </p>
+                      
+                      <div className="flex flex-wrap gap-4 justify-center">
+                        <button
+                          type="button"
+                          onClick={() => setIsResumePopupOpen(true)}
+                          className={`px-6 py-3 rounded-lg font-label-md text-label-md transition-all duration-300 flex items-center gap-2 ${
+                            resumeComplete
+                              ? 'bg-secondary/10 text-secondary hover:bg-secondary/20 border border-secondary/30'
+                              : 'bg-brand-imperial hover:bg-brand-imperial/90 text-white shadow-sm hover:shadow-md'
+                          }`}
+                        >
+                          {resumeComplete ? (
+                            <>
+                              <span>✏️</span>
+                              Questionnaire bearbeiten
+                            </>
+                          ) : (
+                            <>
+                              <span>📝</span>
+                              Questionnaire ausfüllen
+                            </>
+                          )}
+                        </button>
+                        
+                        {resumeComplete && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              // Show summary or preview
+                              console.log('Preview data:', candidateData);
+                            }}
+                            className="px-6 py-3 rounded-lg font-label-md text-label-md bg-surface-container-low hover:bg-surface-container text-on-surface-variant border border-outline-variant/30 transition-all duration-300 flex items-center gap-2"
+                          >
+                            <span>👁️</span>
+                            Vorschau
+                          </button>
+                        )}
+                      </div>
+                      
+                      {resumeComplete && (
+                        <div className="mt-4 p-3 bg-secondary/10 border border-secondary/30 rounded-lg w-full max-w-md">
+                          <p className="text-secondary font-medium text-sm flex items-center gap-2">
+                            <span>✅</span>
+                            Questionnaire complété avec succès!
+                          </p>
+                          <p className="text-xs text-on-surface-variant/60 mt-1">
+                            {candidateData?.personal.firstName} {candidateData?.personal.lastName} • 
+                            {candidateData?.career.desiredProfession || ' Kein Beruf angegeben'}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex justify-between pt-6 mt-8 border-t border-outline-variant/30">
+                      <button
+                        type="button"
+                        onClick={prevStep}
+                        className="bg-transparent hover:bg-surface-container-low text-on-surface-variant font-label-md text-label-md py-3 px-8 rounded-lg transition-all duration-300 flex items-center"
+                      >
+                        <span className="mr-2">←</span>
+                        Retour
+                      </button>
+                      <button
+                        type="button"
+                        onClick={nextStep}
+                        disabled={!resumeComplete}
+                        className={`font-label-md text-label-md py-3 px-8 rounded-lg shadow-sm transition-all duration-300 flex items-center ${
+                          resumeComplete
+                            ? 'bg-brand-imperial hover:bg-brand-imperial/90 text-white hover:shadow-md cursor-pointer'
+                            : 'bg-surface-container-low text-on-surface-variant/40 cursor-not-allowed border border-outline-variant/30'
+                        }`}
+                      >
+                        Étape suivante
+                        <span className="ml-2">→</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 5: Upload */}
+                {currentStep === 5 && (
                   <div className="space-y-6 animate-fade-in">
                     <h2 className="font-headline-md text-headline-md text-brand-imperial border-b border-outline-variant/30 pb-2">
                       Upload Documents
@@ -622,7 +741,6 @@ export default function CandidaturePage() {
                         </label>
                       </div>
                       
-                      {/* Progress indicator for agreements */}
                       <div className="mt-4 pt-4 border-t border-outline-variant/20">
                         <div className="flex items-center justify-between">
                           <span className="font-body-md text-xs text-on-surface-variant/60">
@@ -643,7 +761,7 @@ export default function CandidaturePage() {
                       </div>
                     </div>
 
-                    {/* Upload Section - Disabled until all agreements checked */}
+                    {/* Upload Section */}
                     <div className={`relative transition-all duration-500 ${!allAgreementsChecked ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
                       {!allAgreementsChecked && (
                         <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-10 rounded-xl flex items-center justify-center">
@@ -687,7 +805,6 @@ export default function CandidaturePage() {
                       </div>
                     </div>
 
-                    {/* File list */}
                     {files.length > 0 && (
                       <div className="mt-4 space-y-2">
                         {files.map((file, index) => (
@@ -726,9 +843,9 @@ export default function CandidaturePage() {
                       </button>
                       <button
                         type="submit"
-                        disabled={!allAgreementsChecked}
+                        disabled={!allAgreementsChecked || !resumeComplete}
                         className={`font-label-md text-label-md py-3 px-8 rounded-lg shadow-sm transition-all duration-300 flex items-center ${
-                          allAgreementsChecked
+                          allAgreementsChecked && resumeComplete
                             ? 'bg-brand-imperial hover:bg-brand-imperial/90 text-white hover:shadow-md cursor-pointer'
                             : 'bg-surface-container-low text-on-surface-variant/40 cursor-not-allowed border border-outline-variant/30'
                         }`}
@@ -752,9 +869,24 @@ export default function CandidaturePage() {
           .animate-fade-in {
             animation: fadeIn 0.4s ease-out forwards;
           }
+          .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+          }
+          .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+          }
         ` }} />
       </div>
       <Footer />
+
+      {/* ResumeCV Popup */}
+      <ResumeCV
+        isOpen={isResumePopupOpen}
+        onClose={() => setIsResumePopupOpen(false)}
+        onComplete={handleResumeComplete}
+        initialData={candidateData || undefined}
+      />
     </>
   );
 }

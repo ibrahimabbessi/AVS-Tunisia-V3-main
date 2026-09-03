@@ -473,7 +473,7 @@ export default function NosSuccesPage() {
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           <Link
-            href="/company/kontakt-beratung"
+            href="/company/contact"
             className="inline-flex items-center gap-2 bg-brand-imperial text-white px-8 py-3 rounded-lg font-semibold hover:bg-brand-imperial/90 transition-colors btn-primary glass-highlight"
           >
             Devenir partenaire
