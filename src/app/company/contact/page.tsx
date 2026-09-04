@@ -1,7 +1,7 @@
 // app/company/kontakt-beratung/page.tsx
 "use client";
 
-import { Mail, Phone, MapPin, Clock, Send, User, Building, MessageSquare, CheckCircle2 } from "lucide-react";
+import { Mail, Phone, MapPin, Clock, Send, User, Building, MessageSquare, CheckCircle2, Users, Briefcase, Globe, Calendar, Target, FileText } from "lucide-react";
 import { useState, useEffect } from "react";
 import FirmaNav from "@/components/FirmaNav";
 import Footer from "@/components/Footer";
@@ -101,12 +101,29 @@ function formatDate(date: Date): string {
 
 export default function KontaktBeratungPage() {
   const [formData, setFormData] = useState({
+    // Contact Person
     name: "",
-    company: "",
+    title: "",
     email: "",
     phone: "",
+    
+    // Company
+    company: "",
+    companySector: "",
+    companySize: "",
+    companyWebsite: "",
+    
+    // Recruitment Need
+    recruitmentType: "skilled",
+    positionsCount: "",
+    jobTitles: "",
+    languageLevel: "b1",
+    requiredExperience: "",
+    urgentTimeline: "flexible",
+    
+    // Message
+    interest: "recruitment",
     message: "",
-    interest: "recruitment"
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -526,10 +543,10 @@ export default function KontaktBeratungPage() {
             </div>
           </div>
 
-          {/* Contact Form */}
+          {/* Contact Form - ENHANCED B2B VERSION */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-              <h3 className="text-xl font-bold text-gray-900 mb-6">Demande de conseil</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-6">Demande de recrutement</h3>
               
               {isSubmitted ? (
                 <div className="text-center py-12">
@@ -543,91 +560,304 @@ export default function KontaktBeratungPage() {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Votre nom *
-                      </label>
-                      <div className="relative">
-                        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                        <input
-                          type="text"
-                          required
-                          value={formData.name}
-                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                          className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0a2a88]/20 focus:border-[#0a2a88] outline-none transition-all"
-                          placeholder="Votre nom complet"
-                        />
+                  {/* Contact Person Section */}
+                  <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <h4 className="font-semibold text-brand-imperial mb-3 flex items-center gap-2">
+                      <User className="h-4 w-4" /> Votre contact
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Nom complet *
+                        </label>
+                        <div className="relative">
+                          <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                          <input
+                            type="text"
+                            required
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0a2a88]/20 focus:border-[#0a2a88] outline-none transition-all"
+                            placeholder="Votre nom complet"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Fonction / Titre
+                        </label>
+                        <div className="relative">
+                          <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                          <input
+                            type="text"
+                            value={formData.title}
+                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                            className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0a2a88]/20 focus:border-[#0a2a88] outline-none transition-all"
+                            placeholder="Ex: Directeur RH, CEO, Responsable recrutement"
+                          />
+                        </div>
                       </div>
                     </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Entreprise *
-                      </label>
-                      <div className="relative">
-                        <Building className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                        <input
-                          type="text"
-                          required
-                          value={formData.company}
-                          onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                          className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0a2a88]/20 focus:border-[#0a2a88] outline-none transition-all"
-                          placeholder="Nom de votre entreprise"
-                        />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Adresse e-mail professionnelle *
+                        </label>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                          <input
+                            type="email"
+                            required
+                            value={formData.email}
+                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0a2a88]/20 focus:border-[#0a2a88] outline-none transition-all"
+                            placeholder="votre@entreprise.com"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Numéro de téléphone *
+                        </label>
+                        <div className="relative">
+                          <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                          <input
+                            type="tel"
+                            required
+                            value={formData.phone}
+                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                            className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0a2a88]/20 focus:border-[#0a2a88] outline-none transition-all"
+                            placeholder="+49 123 456789"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Adresse e-mail *
-                      </label>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                        <input
-                          type="email"
-                          required
-                          value={formData.email}
-                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                          className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0a2a88]/20 focus:border-[#0a2a88] outline-none transition-all"
-                          placeholder="votre@email.fr"
-                        />
+                  {/* Company Information Section */}
+                  <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <h4 className="font-semibold text-brand-imperial mb-3 flex items-center gap-2">
+                      <Building className="h-4 w-4" /> Informations entreprise
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Nom de l'entreprise *
+                        </label>
+                        <div className="relative">
+                          <Building className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                          <input
+                            type="text"
+                            required
+                            value={formData.company}
+                            onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                            className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0a2a88]/20 focus:border-[#0a2a88] outline-none transition-all"
+                            placeholder="Nom de votre entreprise"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Site web
+                        </label>
+                        <div className="relative">
+                          <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                          <input
+                            type="url"
+                            value={formData.companyWebsite}
+                            onChange={(e) => setFormData({ ...formData, companyWebsite: e.target.value })}
+                            className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0a2a88]/20 focus:border-[#0a2a88] outline-none transition-all"
+                            placeholder="https://www.votre-entreprise.com"
+                          />
+                        </div>
                       </div>
                     </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Numéro de téléphone
-                      </label>
-                      <div className="relative">
-                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                        <input
-                          type="tel"
-                          value={formData.phone}
-                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                          className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0a2a88]/20 focus:border-[#0a2a88] outline-none transition-all"
-                          placeholder="Votre numéro de téléphone"
-                        />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Secteur d'activité *
+                        </label>
+                        <select
+                          value={formData.companySector}
+                          onChange={(e) => setFormData({ ...formData, companySector: e.target.value })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0a2a88]/20 focus:border-[#0a2a88] outline-none transition-all"
+                          required
+                        >
+                          <option value="">Sélectionnez...</option>
+                          <option value="automotive">🚗 Automobile</option>
+                          <option value="it">💻 Informatique / IT</option>
+                          <option value="healthcare">🏥 Santé / Médical</option>
+                          <option value="engineering">⚙️ Ingénierie</option>
+                          <option value="logistics">🚚 Logistique</option>
+                          <option value="pharma">💊 Pharmaceutique</option>
+                          <option value="hospitality">🏨 Hôtellerie / Restauration</option>
+                          <option value="construction">🏗️ BTP / Construction</option>
+                          <option value="retail">🛍️ Commerce / Distribution</option>
+                          <option value="finance">💰 Finance / Assurance</option>
+                          <option value="education">📚 Éducation / Formation</option>
+                          <option value="energy">⚡ Énergie / Environnement</option>
+                          <option value="other">📌 Autre</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Taille de l'entreprise
+                        </label>
+                        <select
+                          value={formData.companySize}
+                          onChange={(e) => setFormData({ ...formData, companySize: e.target.value })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0a2a88]/20 focus:border-[#0a2a88] outline-none transition-all"
+                        >
+                          <option value="">Sélectionnez...</option>
+                          <option value="1-10">1-10 employés</option>
+                          <option value="11-50">11-50 employés</option>
+                          <option value="51-200">51-200 employés</option>
+                          <option value="201-1000">201-1 000 employés</option>
+                          <option value="1000+">Plus de 1 000 employés</option>
+                        </select>
                       </div>
                     </div>
                   </div>
 
+                  {/* Recruitment Needs Section */}
+                  <div className="bg-surface-container-low p-4 rounded-xl border border-brand-imperial/10">
+                    <h4 className="font-semibold text-brand-imperial mb-3 flex items-center gap-2">
+                      <Users className="h-4 w-4" /> Besoins en recrutement
+                    </h4>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Type de recrutement *
+                      </label>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                        {[
+                          { value: "skilled", label: "👨‍💼 Talents qualifiés", desc: "Professionnels expérimentés" },
+                          { value: "ausbildung", label: "👨‍🎓 Formation (Ausbildung)", desc: "Jeunes en formation" },
+                          { value: "both", label: "📋 Les deux", desc: "Mixte" }
+                        ].map((type) => (
+                          <button
+                            key={type.value}
+                            type="button"
+                            onClick={() => setFormData({ ...formData, recruitmentType: type.value })}
+                            className={`p-3 rounded-xl border-2 text-left transition-all ${
+                              formData.recruitmentType === type.value 
+                                ? 'border-brand-imperial bg-brand-imperial/5 ring-2 ring-brand-imperial/20' 
+                                : 'border-gray-200 hover:border-brand-imperial/50'
+                            }`}
+                          >
+                            <div className="font-semibold text-sm">{type.label}</div>
+                            <div className="text-xs text-gray-500">{type.desc}</div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Nombre de postes à pourvoir *
+                        </label>
+                        <div className="relative">
+                          <Target className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                          <input
+                            type="number"
+                            required
+                            min="1"
+                            value={formData.positionsCount}
+                            onChange={(e) => setFormData({ ...formData, positionsCount: e.target.value })}
+                            className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0a2a88]/20 focus:border-[#0a2a88] outline-none transition-all"
+                            placeholder="Ex: 5"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Niveau d'allemand requis *
+                        </label>
+                        <select
+                          value={formData.languageLevel}
+                          onChange={(e) => setFormData({ ...formData, languageLevel: e.target.value })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0a2a88]/20 focus:border-[#0a2a88] outline-none transition-all"
+                          required
+                        >
+                          <option value="a1">A1 - Débutant</option>
+                          <option value="a2">A2 - Élémentaire</option>
+                          <option value="b1">B1 - Intermédiaire</option>
+                          <option value="b2">B2 - Intermédiaire avancé</option>
+                          <option value="c1">C1 - Avancé</option>
+                          <option value="c2">C2 - Courant / Bilingue</option>
+                          <option value="not-required">Non requis</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Intitulés des postes recherchés *
+                      </label>
+                      <div className="relative">
+                        <FileText className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                        <textarea
+                          required
+                          rows={2}
+                          value={formData.jobTitles}
+                          onChange={(e) => setFormData({ ...formData, jobTitles: e.target.value })}
+                          className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0a2a88]/20 focus:border-[#0a2a88] outline-none transition-all resize-none"
+                          placeholder="Ex: Développeur Full-stack (3 postes), Infirmier (2 postes), Mécanicien automobile (5 postes)..."
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Expérience requise
+                        </label>
+                        <select
+                          value={formData.requiredExperience}
+                          onChange={(e) => setFormData({ ...formData, requiredExperience: e.target.value })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0a2a88]/20 focus:border-[#0a2a88] outline-none transition-all"
+                        >
+                          <option value="">Non spécifié</option>
+                          <option value="entry">Débutant (0-2 ans)</option>
+                          <option value="mid">Intermédiaire (2-5 ans)</option>
+                          <option value="senior">Senior (5-10 ans)</option>
+                          <option value="expert">Expert (10+ ans)</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Urgence du recrutement
+                        </label>
+                        <select
+                          value={formData.urgentTimeline}
+                          onChange={(e) => setFormData({ ...formData, urgentTimeline: e.target.value })}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0a2a88]/20 focus:border-[#0a2a88] outline-none transition-all"
+                        >
+                          <option value="flexible">📅 Flexible (6+ mois)</option>
+                          <option value="3months">⏳ Dans 3 mois</option>
+                          <option value="immediate">🔴 Immédiat (urgence)</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Interest & Message Section */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Je suis intéressé par *
+                      Type de collaboration *
                     </label>
                     <select
                       value={formData.interest}
                       onChange={(e) => setFormData({ ...formData, interest: e.target.value })}
                       className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0a2a88]/20 focus:border-[#0a2a88] outline-none transition-all"
                     >
-                      <option value="recruitment">Recrutement de talents</option>
-                      <option value="partnership">Partenariat général</option>
-                      <option value="training">Formation linguistique</option>
-                      <option value="consulting">Entretien de conseil</option>
-                      <option value="other">Autre</option>
+                      <option value="recruitment">🤝 Recrutement de talents</option>
+                      <option value="recruitment_ausbildung">👨‍🎓 Recrutement pour l'Ausbildung</option>
+                      <option value="bulk_recruitment">🏢 Recrutement en masse (+10 postes)</option>
+                      <option value="partnership">🤝 Partenariat stratégique</option>
+                      <option value="consulting">💡 Conseil en recrutement international</option>
+                      <option value="other">📝 Autre</option>
                     </select>
                   </div>
 
@@ -643,7 +873,7 @@ export default function KontaktBeratungPage() {
                         value={formData.message}
                         onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                         className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0a2a88]/20 focus:border-[#0a2a88] outline-none transition-all resize-none"
-                        placeholder="Décrivez votre demande ou vos questions..."
+                        placeholder="Décrivez vos besoins en détail : profils recherchés, conditions de travail, avantages proposés, délais, etc."
                       />
                     </div>
                   </div>
@@ -661,7 +891,7 @@ export default function KontaktBeratungPage() {
                     ) : (
                       <>
                         <Send className="h-4 w-4" />
-                        Envoyer la demande
+                        Envoyer la demande de recrutement
                       </>
                     )}
                   </button>

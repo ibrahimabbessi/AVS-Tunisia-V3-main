@@ -5,6 +5,7 @@ import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Link from "next/link";
+import Image from "next/image";
 
 type FormData = {
   firstName: string;
@@ -56,39 +57,100 @@ export default function ELearningPage() {
   };
 
   const formationCategories = [
-    { id: "technique", label: "Formation Technique", icon: "💻" },
-    { id: "soft-skills", label: "Soft Skills", icon: "👥" },
-    { id: "graphic-design", label: "Graphic Design", icon: "🎨" },
-    { id: "marketing-digital", label: "Marketing Digital", icon: "📢" },
-    { id: "autres", label: "Autres", icon: "💼" },
+    { 
+      id: "technique", 
+      label: "Formation Technique", 
+      icon: "💻",
+      image: "https://www.subtop.fr/wp-content/uploads/2020/10/subtop-formation-et-assitance-technique-477.jpg",
+      description: "Maîtrisez les compétences techniques essentielles"
+    },
+    { 
+      id: "soft-skills", 
+      label: "Soft Skills", 
+      icon: "👥",
+      image: "https://www.freelance-informatique.fr/images/actualites/softskills-simple-effetmode-veritablenecessite.jpg",
+      description: "Développez vos compétences relationnelles"
+    },
+    { 
+      id: "graphic-design", 
+      label: "Graphic Design", 
+      icon: "🎨",
+      image: "https://www.shutterstock.com/blog/wp-content/uploads/sites/5/2024/01/9_types_graphic_design.jpg",
+      description: "Créez des designs percutants et professionnels"
+    },
+    { 
+      id: "marketing-digital", 
+      label: "Marketing Digital", 
+      icon: "📢",
+      image: "https://www.comundi.fr/mag-des-competences/wp-content/uploads/2024/06/Formation-marketing-digital-en-ligne.jpg",
+      description: "Optimisez votre stratégie digitale"
+    },
+    { 
+      id: "autres", 
+      label: "Autres", 
+      icon: "💼",
+      image: "https://www.dynamique-mag.com/wp-content/uploads/cdee74f7f036a64f894a6b3c3d2d7c03.jpg",
+      description: "Découvrez nos autres formations sur mesure"
+    },
   ];
 
   return (
     <>
       <Navbar />
       
-      {/* Hero Section */}
-      <section className="relative pt-32 pb-16 md:pt-40 md:pb-24 bg-gradient-to-b from-brand-imperial/5 via-surface-container-low to-transparent">
+      {/* Hero Section with Image */}
+      <section className="relative pt-32 pb-16 md:pt-40 md:pb-24 bg-gradient-to-b from-brand-imperial/5 via-surface-container-low to-transparent overflow-hidden">
         <div className="max-w-container-max mx-auto px-margin-mobile md:px-gutter">
-          <div className="max-w-4xl">
-            <div className="flex flex-wrap items-center gap-3 mb-4">
-              <span className="inline-flex items-center px-4 py-1.5 bg-brand-imperial/10 text-brand-imperial uppercase tracking-wider rounded-full font-label-md text-xs font-bold border border-brand-imperial/20 backdrop-blur-sm">
-                Hergla Forma
-              </span>
-              <span className="px-3 py-1 bg-secondary/10 text-secondary rounded-full font-label-md text-xs font-bold border border-secondary/20">
+          <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
+            {/* Left Content */}
+            <div className="max-w-4xl lg:max-w-2xl flex-1">
+              <div className="flex flex-wrap items-center gap-3 mb-4">
+                <span className="inline-flex items-center px-4 py-1.5 bg-brand-imperial/10 text-brand-imperial uppercase tracking-wider rounded-full font-label-md text-xs font-bold border border-brand-imperial/20 backdrop-blur-sm">
+                  Hergla Forma
+                </span>
+                <span className="px-3 py-1 bg-secondary/10 text-secondary rounded-full font-label-md text-xs font-bold border border-secondary/20">
+                  E-learning
+                </span>
+              </div>
+              <h1 className="font-display-lg-mobile md:font-display-lg text-brand-imperial mt-6 leading-tight">
                 E-learning
-              </span>
+              </h1>
+              <div className="w-20 h-1 bg-secondary rounded-full mt-6"></div>
+              <p className="font-body-lg text-on-surface-variant mt-6 leading-relaxed max-w-3xl">
+                Notre offre E-learning
+              </p>
+              <p className="font-body-md text-on-surface-variant mt-2 leading-relaxed max-w-3xl">
+                AVS Hergla Forma vous offre la possibilité de se former en mode E-learning à travers sa plateforme.
+              </p>
             </div>
-            <h1 className="font-display-lg-mobile md:font-display-lg text-brand-imperial mt-6 leading-tight">
-              E-learning
-            </h1>
-            <div className="w-20 h-1 bg-secondary rounded-full mt-6"></div>
-            <p className="font-body-lg text-on-surface-variant mt-6 leading-relaxed max-w-3xl">
-              Notre offre E-learning
-            </p>
-            <p className="font-body-md text-on-surface-variant mt-2 leading-relaxed max-w-3xl">
-              AVS Hergla Forma vous offre la possibilité de se former en mode E-learning à travers sa plateforme.
-            </p>
+
+            {/* Right Image */}
+            <div className="flex-1 w-full max-w-2xl lg:max-w-3xl">
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20 backdrop-blur-sm">
+                <div className="relative w-full h-[300px] md:h-[400px]">
+                  <Image
+                    src="https://onlinelearning2017.ca/wp-content/uploads/2021/09/Why-Discussion-Forums-Are-Helpful-In-Training.jpg"
+                    alt="Étudiant en formation en ligne avec son groupe"
+                    fill
+                    className="object-cover hover:scale-105 transition-transform duration-700"
+                    priority
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  />
+                  {/* Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-brand-imperial/20 to-transparent"></div>
+                </div>
+                {/* Floating Badge */}
+                <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm rounded-xl px-4 py-2 shadow-lg border border-white/20">
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">🎓</span>
+                    <div>
+                      <p className="text-xs font-semibold text-brand-imperial">Formation 100% en ligne</p>
+                      <p className="text-xs text-on-surface-variant/60">Accès 24/7 depuis votre appareil</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -148,9 +210,9 @@ export default function ELearningPage() {
           </p>
         </div>
 
-        {/* Formation Categories */}
+        {/* Formation Categories with Images */}
         <div className="mb-10">
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 rounded-xl bg-brand-imperial/10 flex items-center justify-center text-xl">
               📚
             </div>
@@ -158,16 +220,48 @@ export default function ELearningPage() {
               Nos formations
             </h2>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {formationCategories.map((category) => (
               <div
                 key={category.id}
-                className="card-hover flex items-center gap-3 rounded-xl bg-surface-container-lowest px-4 py-3 border border-outline-variant/30 shadow-sm transition-all duration-300"
+                className="group relative overflow-hidden rounded-2xl bg-surface-container-lowest border border-outline-variant/30 shadow-sm transition-all duration-500 hover:shadow-xl hover:-translate-y-1"
               >
-                <span className="text-xl">{category.icon}</span>
-                <span className="font-body-md text-on-surface-variant text-sm font-medium">
-                  {category.label}
-                </span>
+                {/* Image Container */}
+                <div className="relative w-full h-48 overflow-hidden">
+                  <Image
+                    src={category.image}
+                    alt={category.label}
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-500"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  />
+                  {/* Overlay gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                  
+                  {/* Icon badge */}
+                  <div className="absolute top-3 left-3 w-10 h-10 rounded-xl bg-white/95 backdrop-blur-sm flex items-center justify-center text-2xl shadow-lg">
+                    {category.icon}
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="p-4">
+                  <h3 className="font-headline-md text-brand-imperial text-lg mb-1">
+                    {category.label}
+                  </h3>
+                  <p className="font-body-md text-on-surface-variant text-sm opacity-80">
+                    {category.description}
+                  </p>
+                  
+                  {/* Learn more link */}
+                  <div className="mt-3 flex items-center gap-2 text-secondary font-label-md text-sm group-hover:gap-3 transition-all duration-300">
+                    <span>En savoir plus</span>
+                    <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
