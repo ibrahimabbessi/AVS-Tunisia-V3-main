@@ -86,19 +86,21 @@ export default function HerglaFormaPage() {
     },
   ];
 
-  const galleryImages = Array.from({ length: 8 }, (_, i) => ({
-    id: i + 1,
-    src: `https://images.unsplash.com/photo-${[
-      "1524178232363-1fb2b075b655",
-      "1571260899304-425eee4c7efc",
-      "1523240795612-9a054b0db644",
-      "1522202174988-5b60d8c9f6f9",
-      "1521737852567-6949b3e8d8a3",
-      "1517487888296-1c6b4c3fda8f",
-      "1522202174988-5b60d8c9f6f9",
-      "1521737852567-6949b3e8d8a3",
-    ][i] || "1524178232363-1fb2b075b655"}?q=80&w=400&auto=format&fit=crop`,
-  }));
+  // Only keep the first 3 images for the gallery
+  const galleryImages = [
+    {
+      id: 1,
+      src: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=400&auto=format&fit=crop",
+    },
+    {
+      id: 2,
+      src: "https://images.unsplash.com/photo-1571260899304-425eee4c7efc?q=80&w=400&auto=format&fit=crop",
+    },
+    {
+      id: 3,
+      src: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=400&auto=format&fit=crop",
+    },
+  ];
 
   return (
     <>
@@ -229,12 +231,13 @@ export default function HerglaFormaPage() {
           </div>
         </div>
 
-        {/* Gallery Section */}
+        {/* Gallery Section - Updated: 3 images + 1 link slot */}
         <div className="mb-16">
           <h2 className="font-headline-lg text-brand-imperial mb-6 text-center">
             Notre galerie
           </h2>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {/* Display first 3 images */}
             {galleryImages.map((img, index) => (
               <div
                 key={index}
@@ -251,6 +254,24 @@ export default function HerglaFormaPage() {
                 />
               </div>
             ))}
+            
+            {/* Fourth slot - "Découvrir notre galerie" link */}
+            <Link
+              href="/candidat/a-propos/galerie"
+              className="relative aspect-square overflow-hidden rounded-xl bg-gradient-to-br from-brand-imperial to-brand-imperial/80 transition-all hover:shadow-md hover:scale-105 flex flex-col items-center justify-center p-4 text-center group"
+            >
+              <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <span className="text-4xl mb-3 group-hover:scale-110 transition-transform duration-300">🖼️</span>
+              <span className="font-headline-sm text-white font-bold leading-tight">
+                Découvrir notre galerie
+              </span>
+              <span className="text-white/80 text-sm mt-1 flex items-center gap-1">
+                Voir plus
+                <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </span>
+            </Link>
           </div>
         </div>
 

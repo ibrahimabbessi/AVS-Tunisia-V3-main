@@ -536,7 +536,9 @@ function AboutSection() {
             du parcours.
           </p>
           <button className="px-6 py-3 bg-brand-imperial text-white rounded-lg font-label-md hover:scale-105 transition-transform duration-200 ambient-shadow border-t border-white/40 flex items-center gap-2 w-fit">
+            <Link href="/candidat/ift-global/notre-demarche">
             Découvrir notre histoire
+            </Link>
             <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
           </button>
         </div>
@@ -1229,7 +1231,7 @@ function CTASection() {
             la trajectoire qu&apos;elle mérite.
           </p>
           <button className="px-8 py-4 rounded-lg bg-white text-brand-imperial font-label-md hover:scale-[1.02] transition-transform inline-flex items-center gap-2">
-            Nous contacter
+            <Link href="/candidat/contact">Nous contacter</Link>
             <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
           </button>
         </div>

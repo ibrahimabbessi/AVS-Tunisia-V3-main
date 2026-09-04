@@ -100,7 +100,7 @@ export default function Page() {
                   <p className="font-body-lg text-white/90 md:text-xl">{slide.subtitle}</p>
                   <div className="mt-6">
                     <Link
-                      href="/contact"
+                      href="/candidat/contact"
                       className="inline-flex items-center gap-2 px-8 py-3.5 bg-white text-brand-imperial rounded-xl font-label-md hover:bg-white/90 transition-all duration-300 hover:scale-[1.02] shadow-lg"
                     >
                       Contactez-nous
@@ -348,7 +348,7 @@ export default function Page() {
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
-              href="/contact"
+              href="/candidat/contact"
               className="inline-flex items-center gap-2 px-8 py-3.5 bg-white text-brand-imperial rounded-xl font-label-md hover:bg-white/90 transition-all duration-300 hover:scale-[1.02] shadow-lg"
             >
               Contactez-nous
@@ -357,7 +357,7 @@ export default function Page() {
               </svg>
             </Link>
             <Link
-              href="/candidature"
+              href="/candidat/candidature"
               className="inline-flex items-center gap-2 px-8 py-3.5 bg-secondary text-white rounded-xl font-label-md hover:bg-secondary/90 transition-all duration-300 hover:scale-[1.02] shadow-lg glass-highlight"
             >
               Postuler maintenant
