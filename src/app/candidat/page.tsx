@@ -129,6 +129,28 @@ const TEAM = [
     ],
     languages: ["Français", "Arabe", "Anglais"],
   },
+  // NEW MEMBERS
+  {
+    name: "Oussama Abbassi",
+    image: "v1788891722/oussama_profile_pic.jpg",
+    primaryRole: "Photographe & Community Manager",
+    secondaryRoles: [
+      "Photographe",
+      "Community Manager",
+      "Graphic Designer",
+      "Video Editor",
+    ],
+  },
+  {
+    name: "Ibrahim Abbessi",
+    image: "v1788891722/ibrahim_profile_pic.jpg",
+    primaryRole: "Software Engineer & Full-Stack Developer",
+    secondaryRoles: [
+      "Software Engineer",
+      "Full-Stack Developer",
+      "Solutions Engineer",
+    ],
+  },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -603,24 +625,24 @@ function TeamSection() {
       yearsOfExperience: "15+",
     },
     {
-      name: "Mohamed Ben Said",
-      image: TEAM[2].image,
+      name: "Ghazala Boussidia",
+      image: TEAM[1].image,
       primaryRole: "Team Leader & Chef de Projet",
       secondaryRoles: [
         "Team Leader",
         "Chef de Projet",
-        "Directeur Coordinatrice du Groupe",
+        "Directrice Coordinatrice du Groupe",
       ],
       socialLinks: {
-        linkedin: "https://linkedin.com/in/mohamed-ben-said",
-        email: "mailto:mohamed.bensaid@avstunisia.com",
+        linkedin: "https://linkedin.com/in/ghazala-boussidia",
+        email: "mailto:ghazala.boussidia@avstunisia.com",
       },
       expertise: ["Team Leader", "Chef de Projet", "Coordination"],
-      yearsOfExperience: "8+",
+      yearsOfExperience: "10+",
     },
     {
-      name: "Ghazala Boussidia",
-      image: TEAM[1].image,
+      name: "Mohamed Ben Said",
+      image: TEAM[2].image,
       primaryRole: "Directeur Administratif & Financier",
       secondaryRoles: [
         "Directeur Administratif",
@@ -628,11 +650,11 @@ function TeamSection() {
         "Formateur IT",
       ],
       socialLinks: {
-        linkedin: "https://linkedin.com/in/ghazala-boussidia",
-        email: "mailto:ghazala.boussidia@avstunisia.com",
+        linkedin: "https://linkedin.com/in/mohamed-ben-said",
+        email: "mailto:mohamed.bensaid@avstunisia.com",
       },
       expertise: ["Directeur Administratif", "Manager Financier", "Formateur"],
-      yearsOfExperience: "10+",
+      yearsOfExperience: "8+",
     },
     {
       name: "Zaineb Ben Rajeb",
@@ -651,6 +673,40 @@ function TeamSection() {
       yearsOfExperience: "5+",
       languages: ["Français", "Arabe", "Anglais"],
     },
+    // NEW MEMBERS
+    {
+      name: "Oussama Abbassi",
+      image: TEAM[4].image,
+      primaryRole: "Photographe & Community Manager",
+      secondaryRoles: [
+        "Photographe",
+        "Community Manager",
+        "Graphic Designer",
+        "Video Editor",
+      ],
+      socialLinks: {
+        linkedin: "https://linkedin.com/in/oussama-abbassi",
+        email: "mailto:oussemaabbassi399@gmail.com",
+      },
+      expertise: ["Photographie", "Community Management", "Design Graphique", "Montage Vidéo"],
+      yearsOfExperience: "8 ans",
+    },
+    {
+      name: "Ibrahim Abbessi",
+      image: TEAM[5].image,
+      primaryRole: "Software Engineer & Full-Stack Developer",
+      secondaryRoles: [
+        "Software Engineer",
+        "Full-Stack Developer",
+        "Solutions Engineer",
+      ],
+      socialLinks: {
+        linkedin: "https://linkedin.com/in/ibrahim-abbessi",
+        email: "mailto:abbessiibrahim@gmail.com",
+      },
+      expertise: ["Software Engineering", "Full-Stack Development", "Solutions Engineering"],
+      yearsOfExperience: "2 ans",
+    },
   ];
 
   return (
@@ -665,7 +721,7 @@ function TeamSection() {
                 Notre Équipe
               </span>
               <span className="text-xs text-on-surface-variant/60">•</span>
-              <span className="text-xs text-on-surface-variant/60">4 experts</span>
+              <span className="text-xs text-on-surface-variant/60">6 experts</span>
             </div>
             <h2 className="font-headline-lg text-brand-imperial text-balance">
               Une équipe d&apos;experts à votre service
@@ -691,8 +747,8 @@ function TeamSection() {
           </div>
         </div>
 
-        {/* Team Grid with Flip Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        {/* Team Grid with Flip Cards - Max 3 per row */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {enhancedTeam.map((member, index) => {
             const isFlipped = flippedCard === index;
 
