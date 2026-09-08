@@ -6,43 +6,30 @@ import Footer from "@/components/Footer";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
-// Function to calculate Ramadan dates for any year
+// ============================================================
+// TYPES
+// ============================================================
+type FormData = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  interest: string;
+  message: string;
+};
+
+// ============================================================
+// RAMADAN CALCULATION FUNCTIONS
+// ============================================================
 function getRamadanDates(year: number): { start: Date; end: Date } | null {
-  // Ramadan moves back approximately 10-11 days each year in the Gregorian calendar
-  // This is an astronomical approximation based on known Ramadan dates
-  
-  // Known reference points:
-  // Ramadan 2025: ~March 1, 2025
-  // Ramadan 2026: ~February 18, 2026
-  // Ramadan 2027: ~February 8, 2027
-  // Ramadan 2028: ~January 28, 2028
-  // Ramadan 2029: ~January 16, 2029
-  
-  // Calculate approximate start date using a formula
-  // Base year: 2025, Ramadan starts around March 1
-  const baseYear = 2025;
-  const baseStart = new Date(2025, 2, 1); // March 1, 2025
-  
-  // Each year, Ramadan starts about 10-11 days earlier
-  const yearDiff = year - baseYear;
-  const daysShift = Math.round(yearDiff * 10.875); // Average shift
-  
-  const estimatedStart = new Date(baseStart);
-  estimatedStart.setDate(estimatedStart.getDate() - daysShift);
-  
-  // Ramadan lasts 29-30 days, we'll use 30 days as approximation
-  const estimatedEnd = new Date(estimatedStart);
-  estimatedEnd.setDate(estimatedEnd.getDate() + 30);
-  
-  // For exact known years, use precise dates
   const exactDates: Record<number, { start: [number, number, number]; end: [number, number, number] }> = {
-    2025: { start: [2025, 2, 1], end: [2025, 3, 30] }, // March 1 - March 30, 2025
-    2026: { start: [2026, 1, 18], end: [2026, 2, 18] }, // February 18 - March 18, 2026
-    2027: { start: [2027, 1, 8], end: [2027, 2, 9] }, // February 8 - March 9, 2027
-    2028: { start: [2028, 0, 28], end: [2028, 1, 27] }, // January 28 - February 27, 2028
-    2029: { start: [2029, 0, 16], end: [2029, 1, 14] }, // January 16 - February 14, 2029
-    2030: { start: [2030, 0, 5], end: [2030, 1, 4] }, // January 5 - February 4, 2030
-    2031: { start: [2030, 11, 26], end: [2031, 0, 24] }, // December 26, 2030 - January 24, 2031
+    2025: { start: [2025, 2, 1], end: [2025, 3, 30] },
+    2026: { start: [2026, 1, 18], end: [2026, 2, 18] },
+    2027: { start: [2027, 1, 8], end: [2027, 2, 9] },
+    2028: { start: [2028, 0, 28], end: [2028, 1, 27] },
+    2029: { start: [2029, 0, 16], end: [2029, 1, 14] },
+    2030: { start: [2030, 0, 5], end: [2030, 1, 4] },
+    2031: { start: [2030, 11, 26], end: [2031, 0, 24] },
   };
   
   if (exactDates[year]) {
@@ -53,8 +40,17 @@ function getRamadanDates(year: number): { start: Date; end: Date } | null {
     };
   }
   
-  // For years beyond our exact data, use the estimation
-  // Make sure we don't go before 2025 or too far ahead
+  const baseYear = 2025;
+  const baseStart = new Date(2025, 2, 1);
+  const yearDiff = year - baseYear;
+  const daysShift = Math.round(yearDiff * 10.875);
+  
+  const estimatedStart = new Date(baseStart);
+  estimatedStart.setDate(estimatedStart.getDate() - daysShift);
+  
+  const estimatedEnd = new Date(estimatedStart);
+  estimatedEnd.setDate(estimatedEnd.getDate() + 30);
+  
   if (year < 2025 || year > 2035) {
     return null;
   }
@@ -65,12 +61,10 @@ function getRamadanDates(year: number): { start: Date; end: Date } | null {
   };
 }
 
-// Function to check if current date is during Ramadan
 function isCurrentlyRamadan(): { isRamadan: boolean; startDate: Date | null; endDate: Date | null } {
   const now = new Date();
   const year = now.getFullYear();
   
-  // Check current year
   const ramadanThisYear = getRamadanDates(year);
   if (ramadanThisYear) {
     if (now >= ramadanThisYear.start && now <= ramadanThisYear.end) {
@@ -78,7 +72,6 @@ function isCurrentlyRamadan(): { isRamadan: boolean; startDate: Date | null; end
     }
   }
   
-  // Check next year (in case Ramadan spans across years)
   const ramadanNextYear = getRamadanDates(year + 1);
   if (ramadanNextYear) {
     if (now >= ramadanNextYear.start && now <= ramadanNextYear.end) {
@@ -86,7 +79,6 @@ function isCurrentlyRamadan(): { isRamadan: boolean; startDate: Date | null; end
     }
   }
   
-  // Check previous year
   const ramadanPrevYear = getRamadanDates(year - 1);
   if (ramadanPrevYear) {
     if (now >= ramadanPrevYear.start && now <= ramadanPrevYear.end) {
@@ -97,7 +89,6 @@ function isCurrentlyRamadan(): { isRamadan: boolean; startDate: Date | null; end
   return { isRamadan: false, startDate: null, endDate: null };
 }
 
-// Helper to format date nicely
 function formatDate(date: Date): string {
   const options: Intl.DateTimeFormatOptions = { 
     day: 'numeric', 
@@ -107,43 +98,53 @@ function formatDate(date: Date): string {
   return date.toLocaleDateString('fr-FR', options);
 }
 
+// ============================================================
+// MAIN COMPONENT
+// ============================================================
 export default function ContactPage() {
-  const [activeTab, setActiveTab] = useState<"candidate">("candidate");
+  const [formData, setFormData] = useState<FormData>({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    interest: "",
+    message: "",
+  });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  
   const [isSummer, setIsSummer] = useState(false);
   const [isRamadan, setIsRamadan] = useState(false);
   const [ramadanStart, setRamadanStart] = useState<Date | null>(null);
   const [ramadanEnd, setRamadanEnd] = useState<Date | null>(null);
 
+  // ============================================================
+  // SCHEDULE DETECTION
+  // ============================================================
   useEffect(() => {
     const checkSchedules = () => {
       const now = new Date();
-      const year = now.getFullYear();
-      const month = now.getMonth(); // 0 = January
-      const day = now.getDate();
-
-      // Check Summer (July = 6, August = 7)
+      const month = now.getMonth();
       const isSummerActive = month === 6 || month === 7;
       setIsSummer(isSummerActive);
 
-      // Check Ramadan using the dynamic function
       const ramadanCheck = isCurrentlyRamadan();
       setIsRamadan(ramadanCheck.isRamadan);
       setRamadanStart(ramadanCheck.startDate);
       setRamadanEnd(ramadanCheck.endDate);
 
-      // If Ramadan is active, summer should be inactive (priority to Ramadan)
       if (ramadanCheck.isRamadan && isSummerActive) {
         setIsSummer(false);
       }
     };
     
     checkSchedules();
-    // Update every hour to be safe
     const interval = setInterval(checkSchedules, 3600000);
     return () => clearInterval(interval);
   }, []);
 
-  // Helper to format date range for display
   const getRamadanDateRange = (): string => {
     if (ramadanStart && ramadanEnd) {
       return `${formatDate(ramadanStart)} - ${formatDate(ramadanEnd)}`;
@@ -151,11 +152,92 @@ export default function ContactPage() {
     return "";
   };
 
+  // ============================================================
+  // FORM HANDLERS
+  // ============================================================
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitError(null);
+    setSubmitSuccess(false);
+
+    try {
+      console.log("Sending candidate consultation data:", formData);
+
+      const response = await fetch("/api/send-candidate-consultation", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        console.error("Error response:", text);
+
+        try {
+          const errorData = JSON.parse(text);
+          throw new Error(errorData.message || errorData.error || "Failed to send");
+        } catch (parseError) {
+          throw new Error(`Server error: ${text.substring(0, 100)}`);
+        }
+      }
+
+      const result = await response.json();
+      console.log("Candidate consultation sent:", result);
+
+      setSubmitSuccess(true);
+
+      // Reset form after 3 seconds
+      setTimeout(() => {
+        setFormData({
+          firstName: "",
+          lastName: "",
+          email: "",
+          phone: "",
+          interest: "",
+          message: "",
+        });
+        setSubmitSuccess(false);
+      }, 3000);
+
+    } catch (error) {
+      console.error("Form submission error:", error);
+      setSubmitError(error instanceof Error ? error.message : "Failed to send message");
+      alert(`Erreur: ${error instanceof Error ? error.message : "Échec de l'envoi"}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // ============================================================
+  // INTEREST OPTIONS
+  // ============================================================
+  const interestOptions = [
+    { value: "training", label: "📚 Training Programs" },
+    { value: "employment", label: "💼 International Employment" },
+    { value: "visa", label: "🛂 Visa & Immigration Support" },
+    { value: "relocation", label: "🏠 Relocation Assistance" },
+    { value: "career", label: "📈 Career Development" },
+    { value: "general", label: "📝 General Inquiry" },
+  ];
+
+  // ============================================================
+  // RENDER
+  // ============================================================
   return (
     <>
       <Navbar />
       
-      {/* Hero Section with Image */}
+      {/* Hero Section - FIXED SPACING */}
       <section className="relative pt-32 pb-8 md:pt-40 md:pb-12 bg-gradient-to-b from-brand-imperial/5 via-surface-container-low to-transparent">
         <div className="max-w-container-max mx-auto px-margin-mobile md:px-gutter">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -189,7 +271,7 @@ export default function ContactPage() {
       </section>
 
       {/* Contact Cards with Maps */}
-      <section className="max-w-container-max mx-auto px-margin-mobile md:px-gutter py-section-gap-sm">
+      <section className="max-w-container-max mx-auto px-margin-mobile md:px-gutter pt-4 pb-section-gap-lg">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {/* AVS Hergla Forma */}
           <div className="card-hover rounded-2xl bg-surface-container-lowest border border-outline-variant/30 shadow-sm transition-all duration-300 overflow-hidden">
@@ -268,8 +350,6 @@ export default function ContactPage() {
           </div>
         </div>
 
-
-
         {/* Help Text */}
         <div className="bg-gradient-to-br from-brand-ice/10 to-brand-imperial/5 rounded-2xl p-6 md:p-8 mb-12 border border-brand-imperial/10">
           <div className="flex items-start gap-4">
@@ -303,7 +383,7 @@ export default function ContactPage() {
               )}
             </h3>
             <div className="space-y-4">
-              {/* Regular Schedule - Always visible */}
+              {/* Regular Schedule */}
               <div className={`p-4 rounded-xl border ${(isSummer || isRamadan) ? 'bg-gray-50/50 border-gray-200/50' : 'bg-brand-ice/10 border-brand-imperial/10'}`}>
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-sm font-semibold text-on-surface-variant">📅 Horaire régulier</span>
@@ -325,7 +405,7 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              {/* Summer Schedule - Active in July & August */}
+              {/* Summer Schedule */}
               <div className={`p-4 rounded-xl border ${isSummer && !isRamadan ? 'bg-yellow-50/70 border-yellow-400/40 shadow-md' : 'bg-gray-50/30 border-gray-200/30'}`}>
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-sm font-semibold flex items-center gap-1">
@@ -369,7 +449,7 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              {/* Ramadan Schedule - Dynamic based on calculated dates */}
+              {/* Ramadan Schedule */}
               <div className={`p-4 rounded-xl border ${isRamadan ? 'bg-emerald-50/70 border-emerald-400/40 shadow-md' : 'bg-gray-50/30 border-gray-200/30'}`}>
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-sm font-semibold flex items-center gap-1">
@@ -448,7 +528,9 @@ export default function ContactPage() {
 
         <hr className="border-outline-variant/30 my-8" />
 
-        {/* Form - Only For Candidates */}
+        {/* ============================================================
+            CANDIDATE CONSULTATION FORM - UPDATED WITH EMAILJS
+        ============================================================ */}
         <div className="glass-panel rounded-2xl p-6 md:p-10 border border-outline-variant/30 max-w-4xl mx-auto mb-12">
           <div className="flex border-b border-outline-variant/30 mb-8">
             <button
@@ -458,68 +540,135 @@ export default function ContactPage() {
             </button>
           </div>
 
-          {/* Candidate Form */}
+          {/* Candidate Form - WITH EMAILJS INTEGRATION */}
           <div>
-            <form className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {submitSuccess ? (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <h4 className="text-xl font-bold text-gray-900 mb-2">Message envoyé !</h4>
+                <p className="text-gray-600">
+                  Votre demande de consultation a été transmise avec succès. 
+                  Notre équipe vous contactera dans les plus brefs délais.
+                </p>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block font-label-md text-label-md text-brand-imperial mb-2">
+                      First Name <span className="text-error">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full rounded-lg border border-outline-variant/30 bg-surface-container-lowest px-4 py-3 text-sm transition-colors focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20"
+                      placeholder="John"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-label-md text-label-md text-brand-imperial mb-2">
+                      Last Name <span className="text-error">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full rounded-lg border border-outline-variant/30 bg-surface-container-lowest px-4 py-3 text-sm transition-colors focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20"
+                      placeholder="Doe"
+                    />
+                  </div>
+                </div>
+
                 <div>
                   <label className="block font-label-md text-label-md text-brand-imperial mb-2">
-                    First Name <span className="text-error">*</span>
+                    Email Address <span className="text-error">*</span>
                   </label>
                   <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    required
                     className="w-full rounded-lg border border-outline-variant/30 bg-surface-container-lowest px-4 py-3 text-sm transition-colors focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20"
-                    placeholder="John"
-                    type="text"
+                    placeholder="john.doe@example.com"
                   />
                 </div>
+
                 <div>
                   <label className="block font-label-md text-label-md text-brand-imperial mb-2">
-                    Last Name <span className="text-error">*</span>
+                    Phone Number <span className="text-error">*</span>
                   </label>
                   <input
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    required
                     className="w-full rounded-lg border border-outline-variant/30 bg-surface-container-lowest px-4 py-3 text-sm transition-colors focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20"
-                    placeholder="Doe"
-                    type="text"
+                    placeholder="+216 99 999 999"
                   />
                 </div>
-              </div>
-              <div>
-                <label className="block font-label-md text-label-md text-brand-imperial mb-2">
-                  Email Address <span className="text-error">*</span>
-                </label>
-                <input
-                  className="w-full rounded-lg border border-outline-variant/30 bg-surface-container-lowest px-4 py-3 text-sm transition-colors focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20"
-                  placeholder="john.doe@example.com"
-                  type="email"
-                />
-              </div>
-              <div>
-                <label className="block font-label-md text-label-md text-brand-imperial mb-2">
-                  Area of Interest
-                </label>
-                <select className="w-full rounded-lg border border-outline-variant/30 bg-surface-container-lowest px-4 py-3 text-sm transition-colors focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20 text-on-surface-variant">
-                  <option>Training Programs</option>
-                  <option>International Employment</option>
-                  <option>General Inquiry</option>
-                </select>
-              </div>
-              <div>
-                <label className="block font-label-md text-label-md text-brand-imperial mb-2">
-                  Message
-                </label>
-                <textarea
-                  className="w-full rounded-lg border border-outline-variant/30 bg-surface-container-lowest px-4 py-3 text-sm transition-colors focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20"
-                  placeholder="How can we help your career?"
-                  rows={4}
-                ></textarea>
-              </div>
-              <button
-                className="bg-brand-imperial text-white font-label-md text-label-md px-8 py-3 rounded-lg hover:bg-brand-imperial/90 transition-all duration-300 hover:scale-[1.02] w-full md:w-auto shadow-lg"
-                type="submit"
-              >
-                Send Message
-              </button>
-            </form>
+
+                <div>
+                  <label className="block font-label-md text-label-md text-brand-imperial mb-2">
+                    Area of Interest <span className="text-error">*</span>
+                  </label>
+                  <select
+                    name="interest"
+                    value={formData.interest}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full rounded-lg border border-outline-variant/30 bg-surface-container-lowest px-4 py-3 text-sm transition-colors focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20 text-on-surface-variant"
+                  >
+                    <option value="">Select your area of interest</option>
+                    {interestOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-label-md text-label-md text-brand-imperial mb-2">
+                    Message <span className="text-error">*</span>
+                  </label>
+                  <textarea
+                    name="message"
+                    value={formData.message}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full rounded-lg border border-outline-variant/30 bg-surface-container-lowest px-4 py-3 text-sm transition-colors focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20"
+                    placeholder="How can we help with your career journey?"
+                    rows={4}
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="bg-brand-imperial text-white font-label-md text-label-md px-8 py-3 rounded-lg hover:bg-brand-imperial/90 transition-all duration-300 hover:scale-[1.02] w-full md:w-auto shadow-lg disabled:opacity-70 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    "Send Message"
+                  )}
+                </button>
+              </form>
+            )}
           </div>
         </div>
 
@@ -568,16 +717,6 @@ export default function ContactPage() {
               <span>🎵</span> TikTok
             </a>
           </div>
-        </div>
-
-        <hr className="border-outline-variant/30 my-8" />
-
-        {/* Submit Button */}
-        <div className="text-center">
-          <button className="bg-gradient-to-r from-brand-imperial to-brand-imperial/90 text-white font-label-md text-label-md px-12 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] inline-flex items-center gap-3">
-            Envoyer
-            <span className="text-lg">→</span>
-          </button>
         </div>
       </section>
 

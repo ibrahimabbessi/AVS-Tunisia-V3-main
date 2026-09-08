@@ -1,4 +1,4 @@
-// app/company/kontakt-beratung/page.tsx
+// app/company/contact/page.tsx
 "use client";
 
 import { Mail, Phone, MapPin, Clock, Send, User, Building, MessageSquare, CheckCircle2, Users, Briefcase, Globe, Calendar, Target, FileText } from "lucide-react";
@@ -132,6 +132,7 @@ export default function KontaktBeratungPage() {
   const [isRamadan, setIsRamadan] = useState(false);
   const [ramadanStart, setRamadanStart] = useState<Date | null>(null);
   const [ramadanEnd, setRamadanEnd] = useState<Date | null>(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const checkSchedules = () => {
@@ -158,12 +159,50 @@ export default function KontaktBeratungPage() {
     return () => clearInterval(interval);
   }, []);
 
+  // The handleSubmit function in the contact page remains the same
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsSubmitting(false);
-    setIsSubmitted(true);
+    setError(''); // Clear previous errors
+    
+    try {
+      console.log('Sending form data:', formData); // Debug log
+      
+      const response = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      // Check if response is OK
+      if (!response.ok) {
+        const text = await response.text();
+        console.error('Error response:', text);
+        
+        // Try to parse as JSON
+        try {
+          const errorData = JSON.parse(text);
+          throw new Error(errorData.message || errorData.error || 'Failed to send email');
+        } catch (parseError) {
+          // If not JSON, use text
+          throw new Error(`Server error: ${text.substring(0, 100)}`);
+        }
+      }
+
+      const result = await response.json();
+      console.log('Email sent:', result);
+
+      setIsSubmitted(true);
+    } catch (error) {
+      console.error('Form submission error:', error);
+      setError(error instanceof Error ? error.message : 'Failed to send message');
+      // Don't hide the error from the user
+      alert(`Erreur: ${error instanceof Error ? error.message : 'Failed to send message'}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Helper to format date range for display

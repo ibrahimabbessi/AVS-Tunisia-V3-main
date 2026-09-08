@@ -37,6 +37,7 @@ type CourseCard = {
   level?: string;
 };
 
+// REMOVED: "professionnel" course card
 const courseData: CourseCard[] = [
   {
     id: "intensif",
@@ -86,22 +87,7 @@ const courseData: CourseCard[] = [
     ],
     hours: "40h (soir) / 60h (jour) par sous-niveau",
   },
-  {
-    id: "professionnel",
-    title: "Cours d'allemand Professionnel",
-    icon: "💼",
-    description: "Développement linguistique pour l'intégration professionnelle",
-    content:
-      "Développement linguistique pour favoriser l'intégration et l'adaptation au milieu professionnel. Vous souhaitez travailler à l'étranger en Allemagne dans votre domaine professionnel ? Si vous prévoyez de faire cette démarche en allemand, il est nécessaire de prouver que vous possédez les connaissances linguistiques requises pour exercer votre métier. Réservez dès maintenant notre cours intensif de préparation à la vie professionnelle !",
-    images: [
-      "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      "https://images.unsplash.com/photo-1740635341299-3b8e3490f546?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      "https://plus.unsplash.com/premium_photo-1663050763436-818382a24bb8?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    ],
-    level: "Avancé - vocabulaire spécifique",
-    hours: "40h",
-    price: 400,
-  },
+  // ❌ REMOVED: Cours d'allemand Professionnel (id: "professionnel")
   {
     id: "conversation",
     title: "Cours d'expression & conversation",
@@ -169,7 +155,7 @@ function ImageSlider({ images }: { images: string[] }) {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % images.length);
-    }, 10000); // Changed from 3000 to 10000 (10 seconds)
+    }, 10000);
 
     return () => clearInterval(interval);
   }, [images.length]);
@@ -194,7 +180,6 @@ function ImageSlider({ images }: { images: string[] }) {
           />
         </div>
       ))}
-      {/* Dot indicators */}
       <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
         {images.map((_, index) => (
           <button
@@ -239,6 +224,10 @@ function SubLevelPricing({ subLevels }: { subLevels: SubLevel[] }) {
 
 export default function FormationLangue() {
   const [selectedCourse, setSelectedCourse] = useState<CourseCard | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  
   const [formData, setFormData] = useState<FormData>({
     firstName: "",
     lastName: "",
@@ -258,30 +247,78 @@ export default function FormationLangue() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", { ...formData, course: selectedCourse?.title });
-    alert("Votre demande a été envoyée avec succès !");
-    setSelectedCourse(null);
-    setFormData({
-      firstName: "",
-      lastName: "",
-      birthDate: "",
-      phone: "",
-      email: "",
-      city: "",
-      level: "",
-      message: "",
-      courseType: "",
-    });
+    setIsSubmitting(true);
+    setSubmitError(null);
+    setSubmitSuccess(false);
+
+    try {
+      // Prepare data with course info
+      const submissionData = {
+        ...formData,
+        courseTitle: selectedCourse?.title || "",
+        courseId: selectedCourse?.id || "",
+      };
+
+      console.log("Sending formation langue data:", submissionData);
+
+      const response = await fetch("/api/send-formation-langue-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(submissionData),
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        console.error("Error response:", text);
+
+        try {
+          const errorData = JSON.parse(text);
+          throw new Error(errorData.message || errorData.error || "Failed to send");
+        } catch (parseError) {
+          throw new Error(`Server error: ${text.substring(0, 100)}`);
+        }
+      }
+
+      const result = await response.json();
+      console.log("Formation langue email sent:", result);
+
+      setSubmitSuccess(true);
+
+      // Reset form after 3 seconds
+      setTimeout(() => {
+        setFormData({
+          firstName: "",
+          lastName: "",
+          birthDate: "",
+          phone: "",
+          email: "",
+          city: "",
+          level: "",
+          message: "",
+          courseType: "",
+        });
+        setSelectedCourse(null);
+        setSubmitSuccess(false);
+      }, 3000);
+    } catch (error) {
+      console.error("Form submission error:", error);
+      setSubmitError(error instanceof Error ? error.message : "Failed to send message");
+      alert(`Erreur: ${error instanceof Error ? error.message : "Échec de l'envoi"}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <>
       <Navbar />
       
-      {/* Hero Section */}
-      <section className="relative pt-32 pb-16 md:pt-40 md:pb-24 bg-gradient-to-b from-brand-imperial/5 via-surface-container-low to-transparent">
+      {/* Hero Section - FIXED SPACING */}
+      <section className="relative pt-32 pb-8 md:pt-40 md:pb-12 bg-gradient-to-b from-brand-imperial/5 via-surface-container-low to-transparent">
         <div className="max-w-container-max mx-auto px-margin-mobile md:px-gutter">
           <div className="max-w-4xl">
             <div className="flex flex-wrap items-center gap-3 mb-4">
@@ -306,10 +343,10 @@ export default function FormationLangue() {
         </div>
       </section>
 
-      {/* Main Content Section */}
-      <section className="max-w-container-max mx-auto px-margin-mobile md:px-gutter py-section-gap-lg">
+      {/* Main Content Section - FIXED SPACING */}
+      <section className="max-w-container-max mx-auto px-margin-mobile md:px-gutter pt-4 pb-section-gap-lg">
         
-        {/* Course Cards Grid */}
+        {/* Course Cards Grid - NOW 5 CARDS (removed professionnel) */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {courseData.map((course) => (
             <div
@@ -317,7 +354,6 @@ export default function FormationLangue() {
               className="group cursor-pointer overflow-hidden rounded-2xl bg-surface-container-lowest shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border border-outline-variant/30"
               onClick={() => setSelectedCourse(course)}
             >
-              {/* Image Slider */}
               <ImageSlider images={course.images} />
 
               <div className="p-5">
@@ -342,7 +378,7 @@ export default function FormationLangue() {
         </div>
       </section>
 
-      {/* Popup Modal */}
+      {/* Popup Modal with Form - UPDATED WITH EMAILJS INTEGRATION */}
       {selectedCourse && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm animate-in fade-in duration-200"
@@ -416,193 +452,217 @@ export default function FormationLangue() {
                 )}
               </div>
 
-              {/* Form */}
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <h3 className="font-headline-md text-brand-imperial text-lg">
-                  Formulaire d'inscription
-                </h3>
-
-                {selectedCourse.id === "intensif" && (
-                  <div>
-                    <label className="font-label-md text-on-surface-variant text-sm mb-1.5 block">
-                      Type de cours
-                    </label>
-                    <div className="flex gap-4">
-                      <label className="flex items-center gap-2 text-sm text-on-surface-variant">
-                        <input
-                          type="radio"
-                          name="courseType"
-                          value="matin"
-                          onChange={handleInputChange}
-                          className="text-secondary"
-                        />
-                        Matin
-                      </label>
-                      <label className="flex items-center gap-2 text-sm text-on-surface-variant">
-                        <input
-                          type="radio"
-                          name="courseType"
-                          value="soir"
-                          onChange={handleInputChange}
-                          className="text-secondary"
-                        />
-                        Soir
-                      </label>
-                    </div>
+              {/* Form - UPDATED WITH EMAILJS INTEGRATION */}
+              {submitSuccess ? (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
                   </div>
-                )}
+                  <h4 className="text-xl font-bold text-gray-900 mb-2">Inscription envoyée !</h4>
+                  <p className="text-gray-600">
+                    Votre demande a été transmise avec succès. Nous vous contacterons dans les plus brefs délais.
+                  </p>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <h3 className="font-headline-md text-brand-imperial text-lg">
+                    Formulaire d'inscription
+                  </h3>
 
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div>
-                    <label className="font-label-md text-on-surface-variant text-sm mb-1.5 block">
-                      Prénom <span className="text-error">*</span>
-                    </label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">👤</span>
+                  {selectedCourse.id === "intensif" && (
+                    <div>
+                      <label className="font-label-md text-on-surface-variant text-sm mb-1.5 block">
+                        Type de cours
+                      </label>
+                      <div className="flex gap-4">
+                        <label className="flex items-center gap-2 text-sm text-on-surface-variant">
+                          <input
+                            type="radio"
+                            name="courseType"
+                            value="matin"
+                            onChange={handleInputChange}
+                            className="text-secondary"
+                          />
+                          Matin
+                        </label>
+                        <label className="flex items-center gap-2 text-sm text-on-surface-variant">
+                          <input
+                            type="radio"
+                            name="courseType"
+                            value="soir"
+                            onChange={handleInputChange}
+                            className="text-secondary"
+                          />
+                          Soir
+                        </label>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label className="font-label-md text-on-surface-variant text-sm mb-1.5 block">
+                        Prénom <span className="text-error">*</span>
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">👤</span>
+                        <input
+                          type="text"
+                          name="firstName"
+                          value={formData.firstName}
+                          onChange={handleInputChange}
+                          required
+                          className="w-full rounded-lg border border-outline-variant/30 bg-surface-container-lowest px-10 py-2.5 text-sm transition-colors focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20"
+                          placeholder="Votre prénom"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="font-label-md text-on-surface-variant text-sm mb-1.5 block">
+                        Nom <span className="text-error">*</span>
+                      </label>
                       <input
                         type="text"
-                        name="firstName"
-                        value={formData.firstName}
+                        name="lastName"
+                        value={formData.lastName}
                         onChange={handleInputChange}
                         required
-                        className="w-full rounded-lg border border-outline-variant/30 bg-surface-container-lowest px-10 py-2.5 text-sm transition-colors focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20"
-                        placeholder="Votre prénom"
+                        className="w-full rounded-lg border border-outline-variant/30 bg-surface-container-lowest px-3 py-2.5 text-sm transition-colors focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20"
+                        placeholder="Votre nom"
                       />
                     </div>
+                    <div>
+                      <label className="font-label-md text-on-surface-variant text-sm mb-1.5 block">
+                        Date de naissance <span className="text-error">*</span>
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">📅</span>
+                        <input
+                          type="date"
+                          name="birthDate"
+                          value={formData.birthDate}
+                          onChange={handleInputChange}
+                          required
+                          className="w-full rounded-lg border border-outline-variant/30 bg-surface-container-lowest px-10 py-2.5 text-sm transition-colors focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="font-label-md text-on-surface-variant text-sm mb-1.5 block">
+                        Tél./Mobile <span className="text-error">*</span>
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">📱</span>
+                        <input
+                          type="tel"
+                          name="phone"
+                          value={formData.phone}
+                          onChange={handleInputChange}
+                          required
+                          className="w-full rounded-lg border border-outline-variant/30 bg-surface-container-lowest px-10 py-2.5 text-sm transition-colors focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20"
+                          placeholder="Votre numéro de téléphone"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="font-label-md text-on-surface-variant text-sm mb-1.5 block">
+                        Email <span className="text-error">*</span>
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">✉️</span>
+                        <input
+                          type="email"
+                          name="email"
+                          value={formData.email}
+                          onChange={handleInputChange}
+                          required
+                          className="w-full rounded-lg border border-outline-variant/30 bg-surface-container-lowest px-10 py-2.5 text-sm transition-colors focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20"
+                          placeholder="Votre adresse email"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="font-label-md text-on-surface-variant text-sm mb-1.5 block">
+                        Ville <span className="text-error">*</span>
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">📍</span>
+                        <input
+                          type="text"
+                          name="city"
+                          value={formData.city}
+                          onChange={handleInputChange}
+                          required
+                          className="w-full rounded-lg border border-outline-variant/30 bg-surface-container-lowest px-10 py-2.5 text-sm transition-colors focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20"
+                          placeholder="Votre ville"
+                        />
+                      </div>
+                    </div>
                   </div>
+
                   <div>
                     <label className="font-label-md text-on-surface-variant text-sm mb-1.5 block">
-                      Nom <span className="text-error">*</span>
+                      Niveau
                     </label>
-                    <input
-                      type="text"
-                      name="lastName"
-                      value={formData.lastName}
+                    <select
+                      name="level"
+                      value={formData.level}
                       onChange={handleInputChange}
-                      required
                       className="w-full rounded-lg border border-outline-variant/30 bg-surface-container-lowest px-3 py-2.5 text-sm transition-colors focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20"
-                      placeholder="Votre nom"
+                    >
+                      <option value="">Sélectionnez votre niveau</option>
+                      {levelOptions.map((level) => (
+                        <option key={level} value={level}>
+                          {level}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="font-label-md text-on-surface-variant text-sm mb-1.5 block">
+                      Votre message <span className="text-on-surface-variant/60">(facultatif)</span>
+                    </label>
+                    <textarea
+                      name="message"
+                      value={formData.message}
+                      onChange={handleInputChange}
+                      rows={3}
+                      className="w-full rounded-lg border border-outline-variant/30 bg-surface-container-lowest px-3 py-2.5 text-sm transition-colors focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20"
+                      placeholder="Écrivez votre message ici..."
                     />
                   </div>
-                  <div>
-                    <label className="font-label-md text-on-surface-variant text-sm mb-1.5 block">
-                      Date de naissance <span className="text-error">*</span>
-                    </label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">📅</span>
-                      <input
-                        type="date"
-                        name="birthDate"
-                        value={formData.birthDate}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full rounded-lg border border-outline-variant/30 bg-surface-container-lowest px-10 py-2.5 text-sm transition-colors focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="font-label-md text-on-surface-variant text-sm mb-1.5 block">
-                      Tél./Mobile <span className="text-error">*</span>
-                    </label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">📱</span>
-                      <input
-                        type="tel"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full rounded-lg border border-outline-variant/30 bg-surface-container-lowest px-10 py-2.5 text-sm transition-colors focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20"
-                        placeholder="Votre numéro de téléphone"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="font-label-md text-on-surface-variant text-sm mb-1.5 block">
-                      Email <span className="text-error">*</span>
-                    </label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">✉️</span>
-                      <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full rounded-lg border border-outline-variant/30 bg-surface-container-lowest px-10 py-2.5 text-sm transition-colors focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20"
-                        placeholder="Votre adresse email"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="font-label-md text-on-surface-variant text-sm mb-1.5 block">
-                      Ville <span className="text-error">*</span>
-                    </label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">📍</span>
-                      <input
-                        type="text"
-                        name="city"
-                        value={formData.city}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full rounded-lg border border-outline-variant/30 bg-surface-container-lowest px-10 py-2.5 text-sm transition-colors focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20"
-                        placeholder="Votre ville"
-                      />
-                    </div>
-                  </div>
-                </div>
 
-                <div>
-                  <label className="font-label-md text-on-surface-variant text-sm mb-1.5 block">
-                    Niveau
-                  </label>
-                  <select
-                    name="level"
-                    value={formData.level}
-                    onChange={handleInputChange}
-                    className="w-full rounded-lg border border-outline-variant/30 bg-surface-container-lowest px-3 py-2.5 text-sm transition-colors focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20"
-                  >
-                    <option value="">Sélectionnez votre niveau</option>
-                    {levelOptions.map((level) => (
-                      <option key={level} value={level}>
-                        {level}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="font-label-md text-on-surface-variant text-sm mb-1.5 block">
-                    Votre message <span className="text-on-surface-variant/60">(facultatif)</span>
-                  </label>
-                  <textarea
-                    name="message"
-                    value={formData.message}
-                    onChange={handleInputChange}
-                    rows={3}
-                    className="w-full rounded-lg border border-outline-variant/30 bg-surface-container-lowest px-3 py-2.5 text-sm transition-colors focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20"
-                    placeholder="Écrivez votre message ici..."
-                  />
-                </div>
-
-                <div className="flex justify-end gap-3 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setSelectedCourse(null)}
-                    className="rounded-lg border border-outline-variant/30 px-4 py-2.5 text-sm font-medium text-on-surface-variant transition-colors hover:bg-surface-container-low"
-                  >
-                    Annuler
-                  </button>
-                  <button
-                    type="submit"
-                    className="inline-flex items-center gap-2 px-6 py-2.5 bg-brand-imperial text-white rounded-lg font-label-md transition-all duration-300 hover:bg-brand-imperial/90 hover:scale-[1.02] shadow-lg"
-                  >
-                    <span>✉️</span>
-                    Envoyer
-                  </button>
-                </div>
-              </form>
+                  <div className="flex justify-end gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedCourse(null)}
+                      className="rounded-lg border border-outline-variant/30 px-4 py-2.5 text-sm font-medium text-on-surface-variant transition-colors hover:bg-surface-container-low"
+                    >
+                      Annuler
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="inline-flex items-center gap-2 px-6 py-2.5 bg-brand-imperial text-white rounded-lg font-label-md transition-all duration-300 hover:bg-brand-imperial/90 hover:scale-[1.02] shadow-lg disabled:opacity-70 disabled:cursor-not-allowed"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          Envoi en cours...
+                        </>
+                      ) : (
+                        <>
+                          <span>✉️</span>
+                          Envoyer
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              )}
             </div>
           </div>
         </div>
