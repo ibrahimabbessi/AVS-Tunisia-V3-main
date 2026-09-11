@@ -272,6 +272,33 @@ const YOUTUBE_VIDEOS = [
     category: "Radio",
     tags: ["Radio"],
   },
+  {
+    id: 28,
+    title: "Hommage aux enseignants - Célébration d'un siècle de savoir",
+    description: "Plus de cent ans de science et de connaissance, et un hommage à ceux qui ont éclairé nos chemins. Leurs noms méritent de briller pour l'éternité. ⭐\n\nCette cérémonie d'hommage rend hommage à des générations d'enseignants qui ont consacré leur vie à la transmission du savoir et à la formation des esprits. Un moment d'émotion et de reconnaissance envers ces piliers de notre société.",
+    date: "Sep 2, 2026",
+    videoUrl: "https://www.youtube.com/watch?v=N6wCRQ4QWtk",
+    category: "hommage, éducation, enseignants, cérémonie",
+    tags: ["hommage", "éducation", "enseignants", "cérémonie", "savoir", "reconnaissance", "100 ans"],
+  },
+  {
+    id: 29,
+    title: "Témoignages des enseignants honorés",
+    description: "Des moments sincères, où se mêlent les émotions de joie et de gratitude…\n\nIci, nos enseignants honorés expriment l'impact de cette initiative sur leurs cœurs, et la valeur inestimable de voir la société reconnaître ceux qui ont consacré des années de leur vie au service de la science et des générations futures.\n\nDes paroles chargées d'émotion et de fierté qui témoignent de l'importance de la reconnaissance du travail des éducateurs.",
+    date: "Sep 7, 2026",
+    videoUrl: "https://www.youtube.com/watch?v=SzrzUk0br70",
+    category: "témoignages, enseignants, émotion, hommage",
+    tags: ["témoignages", "enseignants", "émotion", "hommage", "gratitude", "reconnaissance", "éducation"],
+  },
+  {
+    id: 30,
+    title: "École Habib El Kamil - Un siècle d'éducation et de transmission",
+    description: "L'école Habib El Kamil à Hergla… Un siècle d'éducation et de générosité, et une initiative collective pour honorer les éducateurs.\n\nL'enseignante Iqbal El Amine nous dévoile les détails de cette belle initiative qui a réuni toute une communauté autour de la reconnaissance de ses enseignants. Découvrez les coulisses de cette cérémonie émouvante et l'impact de cette démarche sur les enseignants, les élèves et toute la région.",
+    date: "Sep 8, 2026",
+    videoUrl: "https://www.youtube.com/watch?v=xmaO8SCEEoY",
+    category: "école, Hergla, éducation, cérémonie, Iqbal El Amine",
+    tags: ["école Habib El Kamil", "Hergla", "éducation", "cérémonie", "Iqbal El Amine", "hommage", "siècle", "transmission"],
+  },
 ];
 
 // Group videos by year
@@ -282,7 +309,8 @@ function groupVideosByYear(videos: typeof YOUTUBE_VIDEOS) {
     let year = 0;
     
     // Extract year from date string
-    if (video.date.includes("2025")) year = 2025;
+    if (video.date.includes("2026")) year = 2026;  // ADD THIS LINE
+    else if (video.date.includes("2025")) year = 2025;
     else if (video.date.includes("2024")) year = 2024;
     else if (video.date.includes("2023")) year = 2023;
     else if (video.date.includes("2022")) year = 2022;

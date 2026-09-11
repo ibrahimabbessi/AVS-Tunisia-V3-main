@@ -215,7 +215,8 @@ export default function Navbar() {
     { name: "Équipe", href: "/a-propos/equipe" },
     { name: "Projets Pilotes", href: "/a-propos/projets-pilotes" },
     { name: "Presse", href: "/a-propos/presse" },
-    { name: "Vidéos", href: "/a-propos/videos" }, 
+    { name: "Vidéos", href: "/a-propos/videos" },
+    { name: "Événements", href: "/a-propos/events" }, // ADDED: Events below Videos
     { name: "Gallerie", href: "/a-propos/galerie" },
   ];
 

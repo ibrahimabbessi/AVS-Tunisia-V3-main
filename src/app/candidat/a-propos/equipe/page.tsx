@@ -87,6 +87,44 @@ const TEAM = [
     expertise: ["Gestion administrative", "Coordination", "Suivi"],
     yearsOfExperience: "5+",
   },
+  // NEW MEMBERS
+  {
+    name: "Oussama Abbassi",
+    image: "v1788891722/oussama_profile_pic.jpg",
+    primaryRole: "Photographe & Community Manager",
+    secondaryRoles: [
+      "Photographe",
+      "Community Manager",
+      "Graphic Designer",
+      "Video Editor",
+    ],
+    socialLinks: {
+      linkedin: "https://linkedin.com/in/oussama-abbassi",
+      email: "mailto:oussemaabbassi399@gmail.com",
+    },
+    experience: "8 ans",
+    languages: ["Français", "Arabe", "Anglais"],
+    expertise: ["Photographie", "Community Management", "Design Graphique", "Montage Vidéo"],
+    yearsOfExperience: "8",
+  },
+  {
+    name: "Ibrahim Abbessi",
+    image: "v1788891722/ibrahim_profile_pic.jpg",
+    primaryRole: "Software Engineer & Full-Stack Developer",
+    secondaryRoles: [
+      "Software Engineer",
+      "Full-Stack Developer",
+      "Solutions Engineer",
+    ],
+    socialLinks: {
+      linkedin: "https://linkedin.com/in/ibrahim-abbessi",
+      email: "mailto:abbessiibrahim@gmail.com",
+    },
+    experience: "2 ans",
+    languages: ["Français", "Arabe", "Anglais","Allemand"],
+    expertise: ["Software Engineering", "Full-Stack Development", "Solutions Engineering"],
+    yearsOfExperience: "2",
+  },
 ];
 
 // Team Member Card Component with Enhanced Flip - Homepage Style
@@ -371,8 +409,8 @@ export default function EquipePage() {
       {/* Main Content */}
       <section className="max-w-container-max mx-auto px-margin-mobile md:px-gutter py-section-gap-lg">
         
-        {/* Team Grid - Same as Homepage */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        {/* Team Grid - Max 3 per row */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {TEAM.map((member, index) => (
             <TeamMemberCard key={member.name} member={member} index={index} />
           ))}
