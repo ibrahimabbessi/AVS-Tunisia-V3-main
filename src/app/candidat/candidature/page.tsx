@@ -90,7 +90,7 @@ export default function CandidaturePage() {
   };
 
   const nextStep = () => {
-    if (currentStep < 5) setCurrentStep(currentStep + 1);
+    if (currentStep < 4) setCurrentStep(currentStep + 1);
   };
 
   const prevStep = () => {
@@ -142,7 +142,7 @@ export default function CandidaturePage() {
     },
   ];
 
-  // Document sample images for Step 2
+  // Document sample images for Upload step
   const documentImages = [
     { id: 1, url: "https://static.onlinecv.fr/wp-content/uploads/sites/36/2023/12/12113530/FRE_Munich_Photo-1040x1433.webp", label: "Photo d'identité" },
     { id: 2, url: "https://thumbs.dreamstime.com/b/un-jeune-br%C3%A9silien-portant-tshirt-bleu-debout-sur-fond-blanc-isol%C3%A9-visage-joyeux-souriant-aux-bras-crois%C3%A9s-regardant-la-cam%C3%A9ra-228325198.jpg", label: "Photo portrait" },
@@ -230,15 +230,14 @@ export default function CandidaturePage() {
                 <div className="absolute top-1/2 left-0 w-full h-[2px] bg-surface-variant -z-10 -translate-y-1/2"></div>
                 <div 
                   className="absolute top-1/2 left-0 h-[2px] bg-brand-imperial -z-10 -translate-y-1/2 transition-all duration-500"
-                  style={{ width: `${((currentStep - 1) / 4) * 100}%` }}
+                  style={{ width: `${((currentStep - 1) / 3) * 100}%` }}
                 ></div>
                 <div className="flex justify-between items-center relative z-0">
                   {[
                     { num: 1, label: "Personal Info" },
-                    { num: 2, label: "Documents" },
-                    { num: 3, label: "Sector" },
-                    { num: 4, label: "CV Complet" },
-                    { num: 5, label: "Upload" },
+                    { num: 2, label: "Sector" },
+                    { num: 3, label: "CV Complet" },
+                    { num: 4, label: "Upload" },
                   ].map((step) => (
                     <div 
                       key={step.num}
@@ -401,124 +400,8 @@ export default function CandidaturePage() {
                   </div>
                 )}
 
-                {/* Step 2: Documents */}
+                {/* Step 2: Sector */}
                 {currentStep === 2 && (
-                  <div className="space-y-6 animate-fade-in">
-                    <h2 className="font-headline-md text-headline-md text-brand-imperial border-b border-outline-variant/30 pb-2">
-                      Documents
-                    </h2>
-                    
-                    <div className="rounded-xl bg-brand-ice/20 p-4 border border-brand-imperial/10">
-                      <p className="mb-2 font-body-md text-sm font-medium text-brand-imperial">
-                        Téléchargez le questionnaire à remplir :
-                      </p>
-                      <a
-                        href="/Fragenbogen-fur-potentielle-Bewerber-questionnaire-pour-les-candidats-potentiels-Fragenbogen-fuer-potentielle-Bewerber-V3-juin-2025.pdf"
-                        download
-                        className="inline-flex items-center gap-2 rounded-lg bg-brand-imperial px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-imperial/90"
-                      >
-                        <span>📄</span>
-                        Questionnaire IFT Global
-                      </a>
-                      <p className="mt-1 font-body-md text-xs text-on-surface-variant/60">
-                        Veuillez remplir ce questionnaire et le joindre à votre dossier
-                      </p>
-                    </div>
-
-                    <div>
-                      <p className="mb-3 font-body-md text-sm font-medium text-on-surface-variant">
-                        Documents à fournir (exemples) :
-                      </p>
-                      <div className="flex flex-wrap gap-4 justify-center">
-                        {documentImages.map((doc, index) => {
-                          const isHovered = hoveredDocIndex === index;
-                          return (
-                            <div 
-                              key={doc.id}
-                              className="relative rounded-lg overflow-hidden border border-outline-variant/30 bg-surface-container-low transition-all duration-500 ease-in-out cursor-pointer"
-                              style={{
-                                flex: isHovered ? '0 0 220px' : '0 0 100px',
-                                height: isHovered ? '320px' : '200px',
-                                transform: isHovered ? 'scale(1.05)' : 'scale(1)',
-                                zIndex: isHovered ? 10 : 1,
-                                boxShadow: isHovered ? '0 20px 40px rgba(0,0,0,0.2)' : 'none',
-                              }}
-                              onMouseEnter={() => setHoveredDocIndex(index)}
-                              onMouseLeave={() => setHoveredDocIndex(null)}
-                            >
-                              <div className="w-full h-full overflow-hidden relative">
-                                <img
-                                  src={doc.url}
-                                  alt={doc.label}
-                                  className="w-full h-full object-cover transition-all duration-500"
-                                  style={{
-                                    transform: isHovered ? 'scale(1.1)' : 'scale(1)',
-                                    objectPosition: isHovered ? 'center' : 'center 30%',
-                                  }}
-                                  onError={(e) => {
-                                    (e.target as HTMLImageElement).src =
-                                      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='267'%3E%3Crect width='200' height='267' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%239ca3af' font-size='14'%3E" + doc.label + "%3C/text%3E%3C/svg%3E";
-                                  }}
-                                />
-                                <div 
-                                  className="absolute bottom-0 left-0 right-0 transition-all duration-500"
-                                  style={{
-                                    height: isHovered ? '0%' : '50%',
-                                    background: 'linear-gradient(to top, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 100%)',
-                                  }}
-                                />
-                              </div>
-                              <div 
-                                className="absolute bottom-0 left-0 right-0 p-3 transition-all duration-500"
-                                style={{
-                                  background: isHovered 
-                                    ? 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)' 
-                                    : 'linear-gradient(to top, rgba(0,0,0,0.3), transparent)',
-                                }}
-                              >
-                                <span className={`text-white font-body-md text-center block transition-all duration-500 ${
-                                  isHovered ? 'text-sm font-bold' : 'text-xs'
-                                }`}>
-                                  {doc.label}
-                                </span>
-                                {isHovered && (
-                                  <span className="text-white/80 text-xs block text-center mt-1 animate-fade-in">
-                                    ✨ Voir en détail
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                      <p className="mt-4 font-body-md text-xs text-on-surface-variant/60 italic text-center">
-                        * Passez votre souris sur chaque document pour le voir en détail
-                      </p>
-                    </div>
-
-                    <div className="flex justify-between pt-6 mt-8 border-t border-outline-variant/30">
-                      <button
-                        type="button"
-                        onClick={prevStep}
-                        className="bg-transparent hover:bg-surface-container-low text-on-surface-variant font-label-md text-label-md py-3 px-8 rounded-lg transition-all duration-300 flex items-center"
-                      >
-                        <span className="mr-2">←</span>
-                        Retour
-                      </button>
-                      <button
-                        type="button"
-                        onClick={nextStep}
-                        className="bg-brand-imperial hover:bg-brand-imperial/90 text-white font-label-md text-label-md py-3 px-8 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 flex items-center"
-                      >
-                        Étape suivante
-                        <span className="ml-2">→</span>
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {/* Step 3: Sector */}
-                {currentStep === 3 && (
                   <div className="space-y-6 animate-fade-in">
                     <h2 className="font-headline-md text-headline-md text-brand-imperial border-b border-outline-variant/30 pb-2">
                       Target Sector & Message
@@ -576,8 +459,8 @@ export default function CandidaturePage() {
                   </div>
                 )}
 
-                {/* Step 4: Resume/CV Complete Form - With Popup Button */}
-                {currentStep === 4 && (
+                {/* Step 3: Resume/CV Complete Form - With Popup Button */}
+                {currentStep === 3 && (
                   <div className="space-y-6 animate-fade-in">
                     <h2 className="font-headline-md text-headline-md text-brand-imperial border-b border-outline-variant/30 pb-2">
                       Questionnaire Complet
@@ -675,12 +558,84 @@ export default function CandidaturePage() {
                   </div>
                 )}
 
-                {/* Step 5: Upload */}
-                {currentStep === 5 && (
+                {/* Step 4: Upload */}
+                {currentStep === 4 && (
                   <div className="space-y-6 animate-fade-in">
                     <h2 className="font-headline-md text-headline-md text-brand-imperial border-b border-outline-variant/30 pb-2">
                       Upload Documents
                     </h2>
+                    {/* Documents à fournir (exemples) */}
+                    <div className="rounded-xl bg-brand-ice/20 p-4 border border-brand-imperial/10">
+                      <p className="mb-3 font-body-md text-sm font-medium text-on-surface-variant">
+                        Documents à fournir (exemples) :
+                      </p>
+                      <div className="flex flex-nowrap gap-2 justify-center overflow-x-auto pb-2">
+                        {documentImages.map((doc, index) => {
+                          const isHovered = hoveredDocIndex === index;
+                          const isAnyHovered = hoveredDocIndex !== null;
+                          return (
+                            <div
+                              key={doc.id}
+                              className="relative rounded-lg overflow-hidden border border-outline-variant/30 bg-surface-container-low transition-all duration-500 ease-in-out cursor-pointer flex-shrink-0"
+                              style={{
+                                flex: isHovered ? '0 0 220px' : isAnyHovered ? '0 0 60px' : '0 0 100px',
+                                height: isHovered ? '320px' : '200px',
+                                transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+                                zIndex: isHovered ? 10 : 1,
+                                boxShadow: isHovered ? '0 20px 40px rgba(0,0,0,0.2)' : 'none',
+                              }}
+                              onMouseEnter={() => setHoveredDocIndex(index)}
+                              onMouseLeave={() => setHoveredDocIndex(null)}
+                            >
+                              <div className="w-full h-full overflow-hidden relative">
+                                <img
+                                  src={doc.url}
+                                  alt={doc.label}
+                                  className="w-full h-full object-cover transition-all duration-500"
+                                  style={{
+                                    transform: isHovered ? 'scale(1.1)' : 'scale(1)',
+                                    objectPosition: isHovered ? 'center' : 'center 30%',
+                                  }}
+                                  onError={(e) => {
+                                    (e.target as HTMLImageElement).src =
+                                      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='267'%3E%3Crect width='200' height='267' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%239ca3af' font-size='14'%3E" + doc.label + "%3C/text%3E%3C/svg%3E";
+                                  }}
+                                />
+                                <div
+                                  className="absolute bottom-0 left-0 right-0 transition-all duration-500"
+                                  style={{
+                                    height: isHovered ? '0%' : '50%',
+                                    background: 'linear-gradient(to top, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 100%)',
+                                  }}
+                                />
+                              </div>
+                              <div
+                                className="absolute bottom-0 left-0 right-0 p-3 transition-all duration-500"
+                                style={{
+                                  background: isHovered
+                                    ? 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)'
+                                    : 'linear-gradient(to top, rgba(0,0,0,0.3), transparent)',
+                                }}
+                              >
+                                <span className={`text-white font-body-md text-center block transition-all duration-500 ${
+                                  isHovered ? 'text-sm font-bold' : 'text-xs'
+                                }`}>
+                                  {doc.label}
+                                </span>
+                                {isHovered && (
+                                  <span className="text-white/80 text-xs block text-center mt-1 animate-fade-in">
+                                    ✨ Voir en détail
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <p className="mt-4 font-body-md text-xs text-on-surface-variant/60 italic text-center">
+                        * Passez votre souris sur chaque document pour le voir en détail
+                      </p>
+                    </div>
                     
                     {/* Agreements Section */}
                     <div className="rounded-xl bg-brand-ice/10 p-6 border border-brand-imperial/10">
