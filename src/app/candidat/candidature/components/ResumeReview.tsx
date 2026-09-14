@@ -25,6 +25,7 @@ const EMPTY_CANDIDATE: Candidate = {
     numberOfChildren: 0,
     nationality: '',
   },
+
   contact: {
     address: '',
     postalCode: '',
@@ -35,6 +36,7 @@ const EMPTY_CANDIDATE: Candidate = {
     skype: '',
     availableFrom: '',
   },
+
   germany: {
     hasFamilyOrFriends: false,
     familyOrFriendsDetails: '',
@@ -47,6 +49,7 @@ const EMPTY_CANDIDATE: Candidate = {
     stays: [],
     otherAgency: '',
   },
+
   languages: {
     german: { level: '' },
     french: { level: '' },
@@ -55,6 +58,7 @@ const EMPTY_CANDIDATE: Candidate = {
     italian: { level: '' },
     other: [],
   },
+
   germanCourses: [],
   schoolEducation: [],
   vocationalEducation: [],
@@ -62,6 +66,7 @@ const EMPTY_CANDIDATE: Candidate = {
   workExperience: [],
   internships: [],
   computerSkills: [],
+
   recognition: {
     ihk: false,
     ihkDetails: '',
@@ -70,11 +75,13 @@ const EMPTY_CANDIDATE: Candidate = {
     zab: false,
     zabDetails: '',
   },
+
   drivingLicence: {
     hasLicence: false,
     categories: [],
     sinceYear: '',
   },
+
   career: {
     desiredAusbildung: '',
     desiredProfession: '',
@@ -82,8 +89,10 @@ const EMPTY_CANDIDATE: Candidate = {
     desiredSector: '',
     otherPreferences: '',
   },
+
   interests: '',
   notes: '',
+
   declarations: {
     healthDeclaration: false,
     informationCorrect: false,
@@ -99,21 +108,28 @@ const safeGet = <T,>(obj: any, path: string, fallback: T): T => {
   try {
     const keys = path.split('.');
     let current = obj;
+
     for (const key of keys) {
-      if (current === undefined || current === null || !Object.prototype.hasOwnProperty.call(current, key)) {
+      if (
+        current === undefined ||
+        current === null ||
+        !Object.prototype.hasOwnProperty.call(current, key)
+      ) {
         return fallback;
       }
+
       current = current[key];
     }
+
     return (current ?? fallback) as T;
   } catch {
     return fallback;
   }
 };
 
-export const ResumeReview: React.FC<ResumeReviewProps> = ({ 
-  data = EMPTY_CANDIDATE, 
-  onGeneratePDF 
+export const ResumeReview: React.FC<ResumeReviewProps> = ({
+  data = EMPTY_CANDIDATE,
+  onGeneratePDF,
 }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [pdfGenerated, setPdfGenerated] = useState(false);
@@ -127,6 +143,7 @@ export const ResumeReview: React.FC<ResumeReviewProps> = ({
       female: 'Weiblich',
       diverse: 'Divers',
     };
+
     return map[gender] || gender || '-';
   };
 
@@ -137,6 +154,7 @@ export const ResumeReview: React.FC<ResumeReviewProps> = ({
       divorced: 'Geschieden',
       widowed: 'Verwitwet',
     };
+
     return map[status] || status || '-';
   };
 
@@ -148,15 +166,23 @@ export const ResumeReview: React.FC<ResumeReviewProps> = ({
       intermediate: 'Mittelstufe (B1/B2)',
       beginner: 'Anfänger (A1/A2)',
     };
+
     return map[level] || level || '-';
   };
 
   const formatDate = (date: string) => {
     if (!date) return '-';
+
     try {
       const d = new Date(date);
+
       if (isNaN(d.getTime())) return date;
-      return d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+      return d.toLocaleDateString('de-DE', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      });
     } catch {
       return date || '-';
     }
@@ -164,16 +190,34 @@ export const ResumeReview: React.FC<ResumeReviewProps> = ({
 
   const handleGeneratePDF = async () => {
     setIsGenerating(true);
+
     try {
-      const lastName = safeGet(safeData, 'personal.lastName', 'Bewerber');
-      const firstName = safeGet(safeData, 'personal.firstName', '');
+      const lastName = safeGet(
+        safeData,
+        'personal.lastName',
+        'Bewerber'
+      );
+
+      const firstName = safeGet(
+        safeData,
+        'personal.firstName',
+        ''
+      );
+
       const filename = `Bewerberfragebogen_${lastName}_${firstName}.pdf`;
+
       await downloadPDF(safeData, filename);
+
       setPdfGenerated(true);
-      if (onGeneratePDF) onGeneratePDF();
+
+      if (onGeneratePDF) {
+        onGeneratePDF();
+      }
     } catch (error) {
       console.error('PDF generation failed:', error);
-      alert('Fehler beim Generieren des PDFs. Bitte versuchen Sie es erneut.');
+      alert(
+        'Fehler beim Generieren des PDFs. Bitte versuchen Sie es erneut.'
+      );
     } finally {
       setIsGenerating(false);
     }
@@ -194,17 +238,21 @@ export const ResumeReview: React.FC<ResumeReviewProps> = ({
 
   return (
     <div className="space-y-8">
+
       {/* PDF Generation Button */}
       <div className="bg-brand-ice/10 p-6 rounded-lg border border-brand-imperial/10">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+
           <div>
             <h3 className="font-headline-sm text-brand-imperial text-sm font-bold">
               📄 PDF generieren
             </h3>
+
             <p className="text-sm text-on-surface-variant/60">
               Erstellen Sie einen vollständigen Fragebogen als PDF mit allen Ihren Angaben.
             </p>
           </div>
+
           <button
             onClick={handleGeneratePDF}
             disabled={isGenerating}
@@ -218,10 +266,27 @@ export const ResumeReview: React.FC<ResumeReviewProps> = ({
           >
             {isGenerating ? (
               <>
-                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                <svg
+                  className="animate-spin h-5 w-5"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                    fill="none"
+                  />
+
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  />
                 </svg>
+
                 Generiere...
               </>
             ) : pdfGenerated ? (
@@ -237,6 +302,7 @@ export const ResumeReview: React.FC<ResumeReviewProps> = ({
             )}
           </button>
         </div>
+
         {pdfGenerated && (
           <p className="text-sm text-secondary mt-2">
             ✅ Das PDF wurde erfolgreich generiert und heruntergeladen.
@@ -253,94 +319,688 @@ export const ResumeReview: React.FC<ResumeReviewProps> = ({
 
       {/* Personal Information */}
       <div className="border-b border-outline-variant/30 pb-6">
-        <h3 className="font-headline-sm text-brand-imperial mb-4">1. Persönliche Angaben</h3>
+        <h3 className="font-headline-sm text-brand-imperial mb-4">
+          1. Persönliche Angaben
+        </h3>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
-          <div><span className="font-label-md text-on-surface-variant/60">Vorname:</span> <span className="font-body-md">{safeData.personal.firstName || '-'}</span></div>
-          <div><span className="font-label-md text-on-surface-variant/60">Nachname:</span> <span className="font-body-md">{safeData.personal.lastName || '-'}</span></div>
-          <div><span className="font-label-md text-on-surface-variant/60">Geburtsdatum:</span> <span className="font-body-md">{formatDate(safeData.personal.birthDate)}</span></div>
-          <div><span className="font-label-md text-on-surface-variant/60">Geburtsort:</span> <span className="font-body-md">{safeData.personal.birthPlace || '-'}</span></div>
-          <div><span className="font-label-md text-on-surface-variant/60">Geschlecht:</span> <span className="font-body-md">{getGenderLabel(safeData.personal.gender)}</span></div>
-          <div><span className="font-label-md text-on-surface-variant/60">Familienstand:</span> <span className="font-body-md">{getMaritalStatusLabel(safeData.personal.maritalStatus)}</span></div>
-          <div><span className="font-label-md text-on-surface-variant/60">Kinder:</span> <span className="font-body-md">{safeData.personal.hasChildren ? `Ja (${safeData.personal.numberOfChildren})` : 'Nein'}</span></div>
-          <div><span className="font-label-md text-on-surface-variant/60">Nationalität:</span> <span className="font-body-md">{safeData.personal.nationality || '-'}</span></div>
+          <div>
+            <span className="font-label-md text-on-surface-variant/60">
+              Vorname:
+            </span>{' '}
+            <span className="font-body-md">
+              {safeData.personal.firstName || '-'}
+            </span>
+          </div>
+
+          <div>
+            <span className="font-label-md text-on-surface-variant/60">
+              Nachname:
+            </span>{' '}
+            <span className="font-body-md">
+              {safeData.personal.lastName || '-'}
+            </span>
+          </div>
+
+          <div>
+            <span className="font-label-md text-on-surface-variant/60">
+              Geburtsdatum:
+            </span>{' '}
+            <span className="font-body-md">
+              {formatDate(safeData.personal.birthDate)}
+            </span>
+          </div>
+
+          <div>
+            <span className="font-label-md text-on-surface-variant/60">
+              Geburtsort:
+            </span>{' '}
+            <span className="font-body-md">
+              {safeData.personal.birthPlace || '-'}
+            </span>
+          </div>
+
+          <div>
+            <span className="font-label-md text-on-surface-variant/60">
+              Geschlecht:
+            </span>{' '}
+            <span className="font-body-md">
+              {getGenderLabel(safeData.personal.gender)}
+            </span>
+          </div>
+
+          <div>
+            <span className="font-label-md text-on-surface-variant/60">
+              Familienstand:
+            </span>{' '}
+            <span className="font-body-md">
+              {getMaritalStatusLabel(
+                safeData.personal.maritalStatus
+              )}
+            </span>
+          </div>
+
+          <div>
+            <span className="font-label-md text-on-surface-variant/60">
+              Kinder:
+            </span>{' '}
+            <span className="font-body-md">
+              {safeData.personal.hasChildren
+                ? `Ja (${safeData.personal.numberOfChildren})`
+                : 'Nein'}
+            </span>
+          </div>
+
+          <div>
+            <span className="font-label-md text-on-surface-variant/60">
+              Nationalität:
+            </span>{' '}
+            <span className="font-body-md">
+              {safeData.personal.nationality || '-'}
+            </span>
+          </div>
         </div>
       </div>
 
       {/* Contact Information */}
       <div className="border-b border-outline-variant/30 pb-6">
-        <h3 className="font-headline-sm text-brand-imperial mb-4">2. Kontakt</h3>
+        <h3 className="font-headline-sm text-brand-imperial mb-4">
+          2. Kontakt
+        </h3>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
-          <div><span className="font-label-md text-on-surface-variant/60">Adresse:</span> <span className="font-body-md">{safeData.contact.address || '-'}</span></div>
-          <div><span className="font-label-md text-on-surface-variant/60">PLZ:</span> <span className="font-body-md">{safeData.contact.postalCode || '-'}</span></div>
-          <div><span className="font-label-md text-on-surface-variant/60">Stadt:</span> <span className="font-body-md">{safeData.contact.city || '-'}</span></div>
-          <div><span className="font-label-md text-on-surface-variant/60">Land:</span> <span className="font-body-md">{safeData.contact.country || '-'}</span></div>
-          <div><span className="font-label-md text-on-surface-variant/60">Telefon:</span> <span className="font-body-md">{safeData.contact.phone || '-'}</span></div>
-          <div><span className="font-label-md text-on-surface-variant/60">E-Mail:</span> <span className="font-body-md">{safeData.contact.email || '-'}</span></div>
-          <div><span className="font-label-md text-on-surface-variant/60">Skype:</span> <span className="font-body-md">{safeData.contact.skype || '-'}</span></div>
-          <div><span className="font-label-md text-on-surface-variant/60">Verfügbar ab:</span> <span className="font-body-md">{formatDate(safeData.contact.availableFrom)}</span></div>
+          <div>
+            <span className="font-label-md text-on-surface-variant/60">
+              Adresse:
+            </span>{' '}
+            <span className="font-body-md">
+              {safeData.contact.address || '-'}
+            </span>
+          </div>
+
+          <div>
+            <span className="font-label-md text-on-surface-variant/60">
+              PLZ:
+            </span>{' '}
+            <span className="font-body-md">
+              {safeData.contact.postalCode || '-'}
+            </span>
+          </div>
+
+          <div>
+            <span className="font-label-md text-on-surface-variant/60">
+              Stadt:
+            </span>{' '}
+            <span className="font-body-md">
+              {safeData.contact.city || '-'}
+            </span>
+          </div>
+
+          <div>
+            <span className="font-label-md text-on-surface-variant/60">
+              Land:
+            </span>{' '}
+            <span className="font-body-md">
+              {safeData.contact.country || '-'}
+            </span>
+          </div>
+
+          <div>
+            <span className="font-label-md text-on-surface-variant/60">
+              Telefon:
+            </span>{' '}
+            <span className="font-body-md">
+              {safeData.contact.phone || '-'}
+            </span>
+          </div>
+
+          <div>
+            <span className="font-label-md text-on-surface-variant/60">
+              E-Mail:
+            </span>{' '}
+            <span className="font-body-md">
+              {safeData.contact.email || '-'}
+            </span>
+          </div>
+
+          <div>
+            <span className="font-label-md text-on-surface-variant/60">
+              Skype:
+            </span>{' '}
+            <span className="font-body-md">
+              {safeData.contact.skype || '-'}
+            </span>
+          </div>
+
+          <div>
+            <span className="font-label-md text-on-surface-variant/60">
+              Verfügbar ab:
+            </span>{' '}
+            <span className="font-body-md">
+              {formatDate(safeData.contact.availableFrom)}
+            </span>
+          </div>
         </div>
       </div>
 
       {/* Languages */}
       <div className="border-b border-outline-variant/30 pb-6">
-        <h3 className="font-headline-sm text-brand-imperial mb-4">3. Sprachkenntnisse</h3>
+        <h3 className="font-headline-sm text-brand-imperial mb-4">
+          3. Sprachkenntnisse
+        </h3>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
           {safeData.languages?.german?.level && (
             <div className="p-3 bg-surface-container-low rounded-lg">
-              <span className="font-label-md text-brand-imperial">🇩🇪 Deutsch:</span>
-              <span className="ml-2 font-body-md">{getLanguageLevelLabel(safeData.languages.german.level)}</span>
-              {safeData.languages.german.certificate && <span className="block text-sm text-on-surface-variant/60">Zertifikat: {safeData.languages.german.certificate}</span>}
+              <span className="font-label-md text-brand-imperial">
+                🇩🇪 Deutsch:
+              </span>
+
+              <span className="ml-2 font-body-md">
+                {getLanguageLevelLabel(
+                  safeData.languages.german.level
+                )}
+              </span>
+
+              {safeData.languages.german.certificate && (
+                <span className="block text-sm text-on-surface-variant/60">
+                  Zertifikat: {safeData.languages.german.certificate}
+                </span>
+              )}
             </div>
           )}
+
           {safeData.languages?.french?.level && (
             <div className="p-3 bg-surface-container-low rounded-lg">
-              <span className="font-label-md text-brand-imperial">🇫🇷 Französisch:</span>
-              <span className="ml-2 font-body-md">{getLanguageLevelLabel(safeData.languages.french.level)}</span>
-              {safeData.languages.french.certificate && <span className="block text-sm text-on-surface-variant/60">Zertifikat: {safeData.languages.french.certificate}</span>}
+              <span className="font-label-md text-brand-imperial">
+                🇫🇷 Französisch:
+              </span>
+
+              <span className="ml-2 font-body-md">
+                {getLanguageLevelLabel(
+                  safeData.languages.french.level
+                )}
+              </span>
+
+              {safeData.languages.french.certificate && (
+                <span className="block text-sm text-on-surface-variant/60">
+                  Zertifikat: {safeData.languages.french.certificate}
+                </span>
+              )}
             </div>
           )}
+
           {safeData.languages?.english?.level && (
             <div className="p-3 bg-surface-container-low rounded-lg">
-              <span className="font-label-md text-brand-imperial">🇬🇧 Englisch:</span>
-              <span className="ml-2 font-body-md">{getLanguageLevelLabel(safeData.languages.english.level)}</span>
-              {safeData.languages.english.certificate && <span className="block text-sm text-on-surface-variant/60">Zertifikat: {safeData.languages.english.certificate}</span>}
+              <span className="font-label-md text-brand-imperial">
+                🇬🇧 Englisch:
+              </span>
+
+              <span className="ml-2 font-body-md">
+                {getLanguageLevelLabel(
+                  safeData.languages.english.level
+                )}
+              </span>
+
+              {safeData.languages.english.certificate && (
+                <span className="block text-sm text-on-surface-variant/60">
+                  Zertifikat: {safeData.languages.english.certificate}
+                </span>
+              )}
             </div>
           )}
+
           {safeData.languages?.spanish?.level && (
             <div className="p-3 bg-surface-container-low rounded-lg">
-              <span className="font-label-md text-brand-imperial">🇪🇸 Spanisch:</span>
-              <span className="ml-2 font-body-md">{getLanguageLevelLabel(safeData.languages.spanish.level)}</span>
-              {safeData.languages.spanish.certificate && <span className="block text-sm text-on-surface-variant/60">Zertifikat: {safeData.languages.spanish.certificate}</span>}
+              <span className="font-label-md text-brand-imperial">
+                🇪🇸 Spanisch:
+              </span>
+
+              <span className="ml-2 font-body-md">
+                {getLanguageLevelLabel(
+                  safeData.languages.spanish.level
+                )}
+              </span>
+
+              {safeData.languages.spanish.certificate && (
+                <span className="block text-sm text-on-surface-variant/60">
+                  Zertifikat: {safeData.languages.spanish.certificate}
+                </span>
+              )}
             </div>
           )}
+
           {safeData.languages?.italian?.level && (
             <div className="p-3 bg-surface-container-low rounded-lg">
-              <span className="font-label-md text-brand-imperial">🇮🇹 Italienisch:</span>
-              <span className="ml-2 font-body-md">{getLanguageLevelLabel(safeData.languages.italian.level)}</span>
-              {safeData.languages.italian.certificate && <span className="block text-sm text-on-surface-variant/60">Zertifikat: {safeData.languages.italian.certificate}</span>}
+              <span className="font-label-md text-brand-imperial">
+                🇮🇹 Italienisch:
+              </span>
+
+              <span className="ml-2 font-body-md">
+                {getLanguageLevelLabel(
+                  safeData.languages.italian.level
+                )}
+              </span>
+
+              {safeData.languages.italian.certificate && (
+                <span className="block text-sm text-on-surface-variant/60">
+                  Zertifikat: {safeData.languages.italian.certificate}
+                </span>
+              )}
             </div>
           )}
+
           {safeData.languages?.other?.map((lang, idx) => (
-            <div key={idx} className="p-3 bg-surface-container-low rounded-lg">
-              <span className="font-label-md text-brand-imperial">🌐 {lang.name}:</span>
-              <span className="ml-2 font-body-md">{getLanguageLevelLabel(lang.level)}</span>
+            <div
+              key={idx}
+              className="p-3 bg-surface-container-low rounded-lg"
+            >
+              <span className="font-label-md text-brand-imperial">
+                🌐 {lang.name}:
+              </span>
+
+              <span className="ml-2 font-body-md">
+                {getLanguageLevelLabel(lang.level)}
+              </span>
             </div>
           ))}
         </div>
       </div>
 
+      {/* General Questions (NEW) */}
+      <div className="border-b border-outline-variant/30 pb-6">
+        <h3 className="font-headline-sm text-brand-imperial mb-4">
+          Allgemeine Fragen
+        </h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
+
+          <div>
+            <span className="font-label-md text-on-surface-variant/60">
+              Familie in Deutschland:
+            </span>{' '}
+            <span className="font-body-md">
+              {safeGet(
+                safeData,
+                'germany.familyInGermany',
+                false
+              )
+                ? 'Ja'
+                : 'Nein'}
+            </span>
+          </div>
+
+          {safeGet(
+            safeData,
+            'germany.familyInGermanyDetails',
+            ''
+          ) && (
+            <div className="md:col-span-2">
+              <span className="font-label-md text-on-surface-variant/60">
+                Details:
+              </span>{' '}
+              <span className="font-body-md">
+                {safeGet(
+                  safeData,
+                  'germany.familyInGermanyDetails',
+                  ''
+                )}
+              </span>
+            </div>
+          )}
+
+          <div>
+            <span className="font-label-md text-on-surface-variant/60">
+              Freunde in Deutschland:
+            </span>{' '}
+            <span className="font-body-md">
+              {safeGet(
+                safeData,
+                'germany.friendsInGermany',
+                false
+              )
+                ? 'Ja'
+                : 'Nein'}
+            </span>
+          </div>
+
+          {safeGet(
+            safeData,
+            'germany.friendsInGermanyDetails',
+            ''
+          ) && (
+            <div className="md:col-span-2">
+              <span className="font-label-md text-on-surface-variant/60">
+                Details:
+              </span>{' '}
+              <span className="font-body-md">
+                {safeGet(
+                  safeData,
+                  'germany.friendsInGermanyDetails',
+                  ''
+                )}
+              </span>
+            </div>
+          )}
+
+          <div>
+            <span className="font-label-md text-on-surface-variant/60">
+              Visum beantragt:
+            </span>{' '}
+            <span className="font-body-md">
+              {safeGet(
+                safeData,
+                'germany.previousVisaApplication',
+                false
+              )
+                ? `Ja (${safeGet(
+                    safeData,
+                    'germany.visaType',
+                    '-'
+                  ) || '-'})`
+                : 'Nein'}
+            </span>
+          </div>
+
+          {safeGet(safeData, 'germany.visaDate', '') && (
+            <div>
+              <span className="font-label-md text-on-surface-variant/60">
+                Visum Zeitraum:
+              </span>{' '}
+              <span className="font-body-md">
+                {formatDate(
+                  safeGet(
+                    safeData,
+                    'germany.visaDate',
+                    ''
+                  )
+                )}{' '}
+                -{' '}
+                {formatDate(
+                  safeGet(
+                    safeData,
+                    'germany.visaDateUntil',
+                    ''
+                  )
+                )}
+              </span>
+            </div>
+          )}
+
+          <div>
+            <span className="font-label-md text-on-surface-variant/60">
+              Andere Agentur:
+            </span>{' '}
+            <span className="font-body-md">
+              {safeGet(
+                safeData,
+                'germany.appliedToOtherAgency',
+                false
+              )
+                ? `Ja (${safeGet(
+                    safeData,
+                    'germany.otherAgencyName',
+                    '-'
+                  ) || '-'})`
+                : 'Nein'}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* German Course (NEW) */}
+      {safeGet(
+        safeData,
+        'languages.germanCourse.schoolName',
+        ''
+      ) && (
+        <div className="border-b border-outline-variant/30 pb-6">
+          <h3 className="font-headline-sm text-brand-imperial mb-4">
+            Deutsch Unterricht
+          </h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
+
+            <div>
+              <span className="font-label-md text-on-surface-variant/60">
+                Sprachschule:
+              </span>{' '}
+              <span className="font-body-md">
+                {safeGet(
+                  safeData,
+                  'languages.germanCourse.schoolName',
+                  '-'
+                )}
+              </span>
+            </div>
+
+            <div>
+              <span className="font-label-md text-on-surface-variant/60">
+                Stadt:
+              </span>{' '}
+              <span className="font-body-md">
+                {safeGet(
+                  safeData,
+                  'languages.germanCourse.city',
+                  '-'
+                )}
+              </span>
+            </div>
+
+            <div>
+              <span className="font-label-md text-on-surface-variant/60">
+                Zeitraum:
+              </span>{' '}
+              <span className="font-body-md">
+                {formatDate(
+                  safeGet(
+                    safeData,
+                    'languages.germanCourse.startDate',
+                    ''
+                  )
+                )}{' '}
+                -{' '}
+                {formatDate(
+                  safeGet(
+                    safeData,
+                    'languages.germanCourse.endDate',
+                    ''
+                  )
+                )}
+              </span>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* Recognition (NEW) */}
+      <div className="border-b border-outline-variant/30 pb-6">
+        <h3 className="font-headline-sm text-brand-imperial mb-4">
+          Anerkennung
+        </h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
+
+          <div>
+            <span className="font-label-md text-on-surface-variant/60">
+              IHK:
+            </span>{' '}
+            <span className="font-body-md">
+              {safeGet(
+                safeData,
+                'recognition.ihk',
+                false
+              )
+                ? `Ja (${safeGet(
+                    safeData,
+                    'recognition.ihkLocation',
+                    '-'
+                  ) || '-'}, ${formatDate(
+                    safeGet(
+                      safeData,
+                      'recognition.ihkDate',
+                      ''
+                    )
+                  )})`
+                : 'Nein'}
+            </span>
+          </div>
+
+          <div>
+            <span className="font-label-md text-on-surface-variant/60">
+              ANABIN:
+            </span>{' '}
+            <span className="font-body-md">
+              {safeGet(
+                safeData,
+                'recognition.anabin',
+                false
+              )
+                ? `Ja (${safeGet(
+                    safeData,
+                    'recognition.anabinLocation',
+                    '-'
+                  ) || '-'}, ${formatDate(
+                    safeGet(
+                      safeData,
+                      'recognition.anabinDate',
+                      ''
+                    )
+                  )})`
+                : 'Nein'}
+            </span>
+          </div>
+
+          <div>
+            <span className="font-label-md text-on-surface-variant/60">
+              ZAB:
+            </span>{' '}
+            <span className="font-body-md">
+              {safeGet(
+                safeData,
+                'recognition.zab',
+                false
+              )
+                ? 'Ja'
+                : 'Nein'}
+            </span>
+          </div>
+
+        </div>
+      </div>
+
+      {/* Driver's License (NEW) */}
+      <div className="border-b border-outline-variant/30 pb-6">
+        <h3 className="font-headline-sm text-brand-imperial mb-4">
+          Führerschein
+        </h3>
+
+        <div>
+          <span className="font-label-md text-on-surface-variant/60">
+            Führerschein:
+          </span>{' '}
+          <span className="font-body-md">
+            {safeGet(
+              safeData,
+              'drivingLicence.hasLicence',
+              false
+            )
+              ? `Ja (${
+                  safeGet(
+                    safeData,
+                    'drivingLicence.categories',
+                    []
+                  ).join(', ') || '-'
+                }${
+                  safeGet(
+                    safeData,
+                    'drivingLicence.categoriesText',
+                    ''
+                  )
+                    ? ', ' +
+                      safeGet(
+                        safeData,
+                        'drivingLicence.categoriesText',
+                        ''
+                      )
+                    : ''
+                })`
+              : 'Nein'}
+          </span>
+        </div>
+      </div>
+
+      {/* Hobbies & Other Notes (NEW) */}
+      {(
+        safeGet(safeData, 'hobbies', '') ||
+        safeGet(safeData, 'otherNotes', '')
+      ) && (
+        <div className="border-b border-outline-variant/30 pb-6">
+          <h3 className="font-headline-sm text-brand-imperial mb-4">
+            Weitere Angaben
+          </h3>
+
+          {safeGet(safeData, 'hobbies', '') && (
+            <div className="mb-2">
+              <span className="font-label-md text-on-surface-variant/60">
+                Hobbys:
+              </span>{' '}
+              <span className="font-body-md">
+                {safeGet(safeData, 'hobbies', '')}
+              </span>
+            </div>
+          )}
+
+          {safeGet(safeData, 'otherNotes', '') && (
+            <div>
+              <span className="font-label-md text-on-surface-variant/60">
+                Anmerkungen:
+              </span>{' '}
+              <span className="font-body-md">
+                {safeGet(safeData, 'otherNotes', '')}
+              </span>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Work Experience Summary */}
       <div className="border-b border-outline-variant/30 pb-6">
-        <h3 className="font-headline-sm text-brand-imperial mb-4">4. Berufserfahrung ({safeData.workExperience?.length || 0} Einträge)</h3>
-        {!safeData.workExperience || safeData.workExperience.length === 0 ? (
-          <p className="text-on-surface-variant/50 text-sm">Keine Berufserfahrung eingetragen.</p>
+        <h3 className="font-headline-sm text-brand-imperial mb-4">
+          4. Berufserfahrung ({safeData.workExperience?.length || 0} Einträge)
+        </h3>
+
+        {!safeData.workExperience ||
+        safeData.workExperience.length === 0 ? (
+          <p className="text-on-surface-variant/50 text-sm">
+            Keine Berufserfahrung eingetragen.
+          </p>
         ) : (
           safeData.workExperience.map((exp, idx) => (
-            <div key={idx} className="p-3 bg-surface-container-low rounded-lg mb-2">
-              <div className="font-body-md font-medium text-brand-imperial">{exp.profession}</div>
-              <div className="text-sm text-on-surface-variant">{exp.company}, {exp.city}</div>
-              <div className="text-sm text-on-surface-variant/60">{formatDate(exp.startDate)} - {formatDate(exp.endDate)}</div>
-              {exp.tasks && <div className="text-sm mt-1 text-on-surface-variant/70">{exp.tasks}</div>}
+            <div
+              key={idx}
+              className="p-3 bg-surface-container-low rounded-lg mb-2"
+            >
+              <div className="font-body-md font-medium text-brand-imperial">
+                {exp.profession}
+              </div>
+
+              <div className="text-sm text-on-surface-variant">
+                {exp.company}, {exp.city}
+              </div>
+
+              <div className="text-sm text-on-surface-variant/60">
+                {formatDate(exp.startDate)} -{' '}
+                {formatDate(exp.endDate)}
+              </div>
+
+              {exp.tasks && (
+                <div className="text-sm mt-1 text-on-surface-variant/70">
+                  {exp.tasks}
+                </div>
+              )}
             </div>
           ))
         )}
@@ -348,73 +1008,141 @@ export const ResumeReview: React.FC<ResumeReviewProps> = ({
 
       {/* Education Summary */}
       <div className="border-b border-outline-variant/30 pb-6">
-        <h3 className="font-headline-sm text-brand-imperial mb-4">5. Ausbildung</h3>
-        {safeData.schoolEducation && safeData.schoolEducation.length > 0 && (
-          <div className="mb-4">
-            <div className="font-label-md text-on-surface-variant/60">Schulausbildung:</div>
-            {safeData.schoolEducation.map((edu, idx) => (
-              <div key={idx} className="p-2 text-sm">
-                {edu.schoolName} ({edu.type}) - {formatDate(edu.startDate)} bis {formatDate(edu.endDate)}
+        <h3 className="font-headline-sm text-brand-imperial mb-4">
+          5. Ausbildung
+        </h3>
+
+        {safeData.schoolEducation &&
+          safeData.schoolEducation.length > 0 && (
+            <div className="mb-4">
+              <div className="font-label-md text-on-surface-variant/60">
+                Schulausbildung:
               </div>
-            ))}
-          </div>
-        )}
-        {safeData.vocationalEducation && safeData.vocationalEducation.length > 0 && (
-          <div className="mb-4">
-            <div className="font-label-md text-on-surface-variant/60">Berufsausbildung:</div>
-            {safeData.vocationalEducation.map((edu, idx) => (
-              <div key={idx} className="p-2 text-sm">
-                {edu.profession} - {edu.institution}
+
+              {safeData.schoolEducation.map((edu, idx) => (
+                <div key={idx} className="p-2 text-sm">
+                  {edu.schoolName} ({edu.type}) -{' '}
+                  {formatDate(edu.startDate)} bis{' '}
+                  {formatDate(edu.endDate)}
+                </div>
+              ))}
+            </div>
+          )}
+
+        {safeData.vocationalEducation &&
+          safeData.vocationalEducation.length > 0 && (
+            <div className="mb-4">
+              <div className="font-label-md text-on-surface-variant/60">
+                Berufsausbildung:
               </div>
-            ))}
-          </div>
-        )}
-        {safeData.universityEducation && safeData.universityEducation.length > 0 && (
-          <div className="mb-4">
-            <div className="font-label-md text-on-surface-variant/60">Hochschulausbildung:</div>
-            {safeData.universityEducation.map((edu, idx) => (
-              <div key={idx} className="p-2 text-sm">
-                {edu.field} - {edu.university} ({edu.degree})
+
+              {safeData.vocationalEducation.map((edu, idx) => (
+                <div key={idx} className="p-2 text-sm">
+                  {edu.profession} - {edu.institution}
+                </div>
+              ))}
+            </div>
+          )}
+
+        {safeData.universityEducation &&
+          safeData.universityEducation.length > 0 && (
+            <div className="mb-4">
+              <div className="font-label-md text-on-surface-variant/60">
+                Hochschulausbildung:
               </div>
-            ))}
-          </div>
-        )}
-        {safeData.germanCourses && safeData.germanCourses.length > 0 && (
-          <div>
-            <div className="font-label-md text-on-surface-variant/60">Deutschkurse:</div>
-            {safeData.germanCourses.map((course, idx) => (
-              <div key={idx} className="p-2 text-sm">
-                {course.institution} - Niveau {course.level} ({formatDate(course.startDate)} - {formatDate(course.endDate)})
-                {course.certificate && ' ✅ Zertifikat erhalten'}
+
+              {safeData.universityEducation.map((edu, idx) => (
+                <div key={idx} className="p-2 text-sm">
+                  {edu.field} - {edu.university} ({edu.degree})
+                </div>
+              ))}
+            </div>
+          )}
+
+        {safeData.germanCourses &&
+          safeData.germanCourses.length > 0 && (
+            <div>
+              <div className="font-label-md text-on-surface-variant/60">
+                Deutschkurse:
               </div>
-            ))}
-          </div>
-        )}
+
+              {safeData.germanCourses.map((course, idx) => (
+                <div key={idx} className="p-2 text-sm">
+                  {course.institution} - Niveau {course.level} (
+                  {formatDate(course.startDate)} -{' '}
+                  {formatDate(course.endDate)})
+                  {course.certificate &&
+                    ' ✅ Zertifikat erhalten'}
+                </div>
+              ))}
+            </div>
+          )}
       </div>
 
       {/* Computer Skills */}
-      {safeData.computerSkills && safeData.computerSkills.length > 0 && (
-        <div className="border-b border-outline-variant/30 pb-6">
-          <h3 className="font-headline-sm text-brand-imperial mb-4">6. EDV-Kenntnisse</h3>
-          <div className="flex flex-wrap gap-2">
-            {safeData.computerSkills.map((skill, idx) => (
-              <span key={idx} className="px-3 py-1 bg-surface-container-low rounded-full text-sm">
-                {skill.skill}: {skill.level}
-              </span>
-            ))}
+      {safeData.computerSkills &&
+        safeData.computerSkills.length > 0 && (
+          <div className="border-b border-outline-variant/30 pb-6">
+            <h3 className="font-headline-sm text-brand-imperial mb-4">
+              6. EDV-Kenntnisse
+            </h3>
+
+            <div className="flex flex-wrap gap-2">
+              {safeData.computerSkills.map((skill, idx) => (
+                <span
+                  key={idx}
+                  className="px-3 py-1 bg-surface-container-low rounded-full text-sm"
+                >
+                  {skill.skill}: {skill.level}
+                </span>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
       {/* Career Objective */}
       <div className="border-b border-outline-variant/30 pb-6">
-        <h3 className="font-headline-sm text-brand-imperial mb-4">7. Berufliches Ziel</h3>
+        <h3 className="font-headline-sm text-brand-imperial mb-4">
+          7. Berufliches Ziel
+        </h3>
+
         <div className="grid grid-cols-1 gap-2">
-          <div><span className="font-label-md text-on-surface-variant/60">Gewünschte Ausbildung:</span> <span className="font-body-md">{safeData.career?.desiredAusbildung || '-'}</span></div>
-          <div><span className="font-label-md text-on-surface-variant/60">Gewünschter Beruf:</span> <span className="font-body-md">{safeData.career?.desiredProfession || '-'}</span></div>
-          <div><span className="font-label-md text-on-surface-variant/60">Aktueller Beruf:</span> <span className="font-body-md">{safeData.career?.currentProfession || '-'}</span></div>
+          <div>
+            <span className="font-label-md text-on-surface-variant/60">
+              Gewünschte Ausbildung:
+            </span>{' '}
+            <span className="font-body-md">
+              {safeData.career?.desiredAusbildung || '-'}
+            </span>
+          </div>
+
+          <div>
+            <span className="font-label-md text-on-surface-variant/60">
+              Gewünschter Beruf:
+            </span>{' '}
+            <span className="font-body-md">
+              {safeData.career?.desiredProfession || '-'}
+            </span>
+          </div>
+
+          <div>
+            <span className="font-label-md text-on-surface-variant/60">
+              Aktueller Beruf:
+            </span>{' '}
+            <span className="font-body-md">
+              {safeData.career?.currentProfession || '-'}
+            </span>
+          </div>
+
           {safeData.career?.otherPreferences && (
-            <div><span className="font-label-md text-on-surface-variant/60">Weitere Präferenzen:</span> <span className="font-body-md">{safeData.career.otherPreferences}</span></div>
+            <div>
+              <span className="font-label-md text-on-surface-variant/60">
+                Weitere Präferenzen:
+              </span>{' '}
+              <span className="font-body-md">
+                {safeData.career.otherPreferences}
+              </span>
+            </div>
           )}
         </div>
       </div>
@@ -422,53 +1150,137 @@ export const ResumeReview: React.FC<ResumeReviewProps> = ({
       {/* Interests */}
       {safeData.interests && (
         <div className="border-b border-outline-variant/30 pb-6">
-          <h3 className="font-headline-sm text-brand-imperial mb-4">8. Interessen</h3>
-          <p className="text-sm">{safeData.interests}</p>
+          <h3 className="font-headline-sm text-brand-imperial mb-4">
+            8. Interessen
+          </h3>
+
+          <p className="text-sm">
+            {safeData.interests}
+          </p>
         </div>
       )}
 
       {/* Declarations */}
       <div className="pb-4">
-        <h3 className="font-headline-sm text-brand-imperial mb-4">9. Erklärungen</h3>
+        <h3 className="font-headline-sm text-brand-imperial mb-4">
+          9. Erklärungen
+        </h3>
+
         <div className="space-y-2">
+
           <div className="flex items-center gap-2">
-            <span className={safeData.declarations?.healthDeclaration ? 'text-secondary' : 'text-error'}>
-              {safeData.declarations?.healthDeclaration ? '✅' : '❌'}
+            <span
+              className={
+                safeData.declarations?.healthDeclaration
+                  ? 'text-secondary'
+                  : 'text-error'
+              }
+            >
+              {safeData.declarations?.healthDeclaration
+                ? '✅'
+                : '❌'}
             </span>
-            <span className="font-body-md text-sm">Gesundheitliche Erklärung</span>
+
+            <span className="font-body-md text-sm">
+              Gesundheitliche Erklärung
+            </span>
           </div>
+
           <div className="flex items-center gap-2">
-            <span className={safeData.declarations?.informationCorrect ? 'text-secondary' : 'text-error'}>
-              {safeData.declarations?.informationCorrect ? '✅' : '❌'}
+            <span
+              className={
+                safeData.declarations?.informationCorrect
+                  ? 'text-secondary'
+                  : 'text-error'
+              }
+            >
+              {safeData.declarations?.informationCorrect
+                ? '✅'
+                : '❌'}
             </span>
-            <span className="font-body-md text-sm">Informationen sind korrekt</span>
+
+            <span className="font-body-md text-sm">
+              Informationen sind korrekt
+            </span>
           </div>
+
           <div className="flex items-center gap-2">
-            <span className={safeData.declarations?.documentsAuthentic ? 'text-secondary' : 'text-error'}>
-              {safeData.declarations?.documentsAuthentic ? '✅' : '❌'}
+            <span
+              className={
+                safeData.declarations?.documentsAuthentic
+                  ? 'text-secondary'
+                  : 'text-error'
+              }
+            >
+              {safeData.declarations?.documentsAuthentic
+                ? '✅'
+                : '❌'}
             </span>
-            <span className="font-body-md text-sm">Dokumente sind authentisch</span>
+
+            <span className="font-body-md text-sm">
+              Dokumente sind authentisch
+            </span>
           </div>
+
           <div className="flex items-center gap-2">
-            <span className={safeData.declarations?.noFalseIntentions ? 'text-secondary' : 'text-error'}>
-              {safeData.declarations?.noFalseIntentions ? '✅' : '❌'}
+            <span
+              className={
+                safeData.declarations?.noFalseIntentions
+                  ? 'text-secondary'
+                  : 'text-error'
+              }
+            >
+              {safeData.declarations?.noFalseIntentions
+                ? '✅'
+                : '❌'}
             </span>
-            <span className="font-body-md text-sm">Keine falschen Absichten</span>
+
+            <span className="font-body-md text-sm">
+              Keine falschen Absichten
+            </span>
           </div>
+
           <div className="flex items-center gap-2">
-            <span className={safeData.declarations?.informAgencyIfPlacementNoLongerNeeded ? 'text-secondary' : 'text-error'}>
-              {safeData.declarations?.informAgencyIfPlacementNoLongerNeeded ? '✅' : '❌'}
+            <span
+              className={
+                safeData.declarations
+                  ?.informAgencyIfPlacementNoLongerNeeded
+                  ? 'text-secondary'
+                  : 'text-error'
+              }
+            >
+              {safeData.declarations
+                ?.informAgencyIfPlacementNoLongerNeeded
+                ? '✅'
+                : '❌'}
             </span>
-            <span className="font-body-md text-sm">Agentur informieren bei Nichtbedarf</span>
+
+            <span className="font-body-md text-sm">
+              Agentur informieren bei Nichtbedarf
+            </span>
           </div>
+
           <div className="flex items-center gap-2">
-            <span className={safeData.declarations?.feesAccepted ? 'text-secondary' : 'text-error'}>
-              {safeData.declarations?.feesAccepted ? '✅' : '❌'}
+            <span
+              className={
+                safeData.declarations?.feesAccepted
+                  ? 'text-secondary'
+                  : 'text-error'
+              }
+            >
+              {safeData.declarations?.feesAccepted
+                ? '✅'
+                : '❌'}
             </span>
-            <span className="font-body-md text-sm">Gebühren akzeptiert</span>
+
+            <span className="font-body-md text-sm">
+              Gebühren akzeptiert
+            </span>
           </div>
+
         </div>
       </div>
+
     </div>
   );
 };

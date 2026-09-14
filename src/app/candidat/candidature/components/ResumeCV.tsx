@@ -40,6 +40,7 @@ const defaultPersonal: Candidate['personal'] = {
   hasChildren: false,
   numberOfChildren: 0,
   nationality: '',
+  joinDate: '', // ← NEW
 };
 
 const defaultContact: Candidate['contact'] = {
@@ -56,14 +57,23 @@ const defaultContact: Candidate['contact'] = {
 const defaultGermany: Candidate['germany'] = {
   hasFamilyOrFriends: false,
   familyOrFriendsDetails: '',
+  familyInGermany: false, // ← NEW
+  familyInGermanyDetails: '', // ← NEW
+  friendsInGermany: false, // ← NEW
+  friendsInGermanyDetails: '', // ← NEW
   previousVisaApplication: false,
   visaType: '',
   visaResult: '',
   visaDate: '',
+  visaDateUntil: '', // ← NEW
   previousStay: false,
   previousStayDetails: '',
+  previousStayVisaType: '', // ← NEW
   stays: [],
   otherAgency: '',
+  appliedToOtherAgency: false, // ← NEW
+  otherAgencyName: '', // ← NEW
+  otherAgencyDate: '', // ← NEW
 };
 
 const defaultLanguages: Candidate['languages'] = {
@@ -73,13 +83,19 @@ const defaultLanguages: Candidate['languages'] = {
   spanish: { level: '' },
   italian: { level: '' },
   other: [],
+  germanCourse: { schoolName: '', city: '', startDate: '', endDate: '' }, // ← NEW
+  otherNotes: '', // ← NEW
 };
 
 const defaultRecognition: Candidate['recognition'] = {
   ihk: false,
   ihkDetails: '',
+  ihkDate: '', // ← NEW
+  ihkLocation: '', // ← NEW
   anabin: false,
   anabinDetails: '',
+  anabinDate: '', // ← NEW
+  anabinLocation: '', // ← NEW
   zab: false,
   zabDetails: '',
 };
@@ -88,6 +104,7 @@ const defaultDrivingLicence: Candidate['drivingLicence'] = {
   hasLicence: false,
   categories: [],
   sinceYear: '',
+  categoriesText: '', // ← NEW
 };
 
 const defaultCareer: Candidate['career'] = {
@@ -107,7 +124,7 @@ const defaultDeclarations: Candidate['declarations'] = {
   feesAccepted: false,
 };
 
-// Helper function to safely merge initialData with defaults
+// In createDefaultCandidate:
 const createDefaultCandidate = (initialData?: Partial<Candidate>): Candidate => {
   return {
     personal: { ...defaultPersonal, ...(initialData?.personal || {}) },
@@ -122,6 +139,8 @@ const createDefaultCandidate = (initialData?: Partial<Candidate>): Candidate => 
       spanish: { ...defaultLanguages.spanish, ...(initialData?.languages?.spanish || {}) },
       italian: { ...defaultLanguages.italian, ...(initialData?.languages?.italian || {}) },
       other: initialData?.languages?.other || [],
+      germanCourse: { ...defaultLanguages.germanCourse, ...(initialData?.languages?.germanCourse || {}) }, // ← NEW
+      otherNotes: initialData?.languages?.otherNotes || '', // ← NEW
     },
     germanCourses: initialData?.germanCourses || [],
     schoolEducation: initialData?.schoolEducation || [],
@@ -134,7 +153,9 @@ const createDefaultCandidate = (initialData?: Partial<Candidate>): Candidate => 
     drivingLicence: { ...defaultDrivingLicence, ...(initialData?.drivingLicence || {}) },
     career: { ...defaultCareer, ...(initialData?.career || {}) },
     interests: initialData?.interests || '',
+    hobbies: initialData?.hobbies || '', // ← NEW
     notes: initialData?.notes || '',
+    otherNotes: initialData?.otherNotes || '', // ← NEW
     declarations: { ...defaultDeclarations, ...(initialData?.declarations || {}) },
   };
 };
@@ -274,15 +295,26 @@ export const ResumeCV: React.FC<ResumeCVProps> = ({
         {/* Content - Scrollable */}
         <div className="flex-1 overflow-y-auto p-6">
           <div className="animate-fade-in">
-            <CurrentComponent
-              data={sectionData}
-              updateData={(data: any) => {
-                // 🔑 FIX: Review section doesn't update data
-                if (currentSection.isReview) return;
-                updateSection(currentSection.id as keyof Candidate, data);
-              }}
-              allData={candidateData}
-            />
+          <CurrentComponent
+            data={
+              currentSection.id === 'interests'
+                ? { interests: candidateData.interests, hobbies: candidateData.hobbies }
+                : sectionData
+            }
+            updateData={(data: any) => {
+              if (currentSection.isReview) return;
+              if (currentSection.id === 'interests') {
+                setCandidateData(prev => ({
+                  ...prev,
+                  interests: data.interests,
+                  hobbies: data.hobbies,
+                }));
+                return;
+              }
+              updateSection(currentSection.id as keyof Candidate, data);
+            }}
+            allData={candidateData}
+          />
           </div>
         </div>
 

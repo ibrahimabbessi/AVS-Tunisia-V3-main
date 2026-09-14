@@ -5,11 +5,12 @@ export interface PersonalInformation {
   lastName: string;
   birthDate: string;
   birthPlace: string;
-  gender: 'male' | 'female' | 'diverse' | '';
-  maritalStatus: 'single' | 'married' | 'divorced' | 'widowed' | '';
+  gender: string;
+  maritalStatus: string;
   hasChildren: boolean;
   numberOfChildren: number;
   nationality: string;
+  joinDate?: string; // ← NEW: Beitrittsdatum
 }
 
 export interface ContactInformation {
@@ -30,22 +31,35 @@ export interface GermanyStay {
 }
 
 export interface GermanyHistory {
+  // Family & Friends
   hasFamilyOrFriends: boolean;
   familyOrFriendsDetails: string;
+  // NEW: Separate family/friends
+  familyInGermany?: boolean;
+  familyInGermanyDetails?: string;
+  friendsInGermany?: boolean;
+  friendsInGermanyDetails?: string;
+  // Visa
   previousVisaApplication: boolean;
   visaType: string;
   visaResult: string;
   visaDate: string;
+  visaDateUntil?: string; // ← NEW
+  // Previous stays
   previousStay: boolean;
   previousStayDetails: string;
+  previousStayVisaType?: string; // ← NEW
   stays: GermanyStay[];
+  // Other agency
   otherAgency: string;
+  appliedToOtherAgency?: boolean; // ← NEW
+  otherAgencyName?: string; // ← NEW
+  otherAgencyDate?: string; // ← NEW
 }
 
 export interface LanguageSkill {
-  level: 'native' | 'fluent' | 'advanced' | 'intermediate' | 'beginner' | '';
+  level: string;
   certificate?: string;
-  certificateDate?: string;
 }
 
 export interface LanguageSkills {
@@ -54,10 +68,15 @@ export interface LanguageSkills {
   english: LanguageSkill;
   spanish: LanguageSkill;
   italian: LanguageSkill;
-  other: {
-    name: string;
-    level: string;
-  }[];
+  other: Array<{ name: string; level: string }>;
+  // NEW: German course info
+  germanCourse?: {
+    schoolName?: string;   // ← made optional
+    city?: string;         // ← made optional
+    startDate?: string;    // ← made optional
+    endDate?: string;      // ← made optional
+  };
+  otherNotes?: string; // ← NEW
 }
 
 export interface GermanCourse {
@@ -76,6 +95,8 @@ export interface SchoolEducation {
   startDate: string;
   endDate: string;
   degree: string;
+  abiturSubject?: string; // ← NEW
+  abiturYear?: string; // ← NEW
 }
 
 export interface VocationalEducation {
@@ -116,14 +137,18 @@ export interface Internship {
 
 export interface ComputerSkill {
   skill: string;
-  level: 'expert' | 'advanced' | 'intermediate' | 'beginner' | '';
+  level: string;
 }
 
 export interface Recognition {
   ihk: boolean;
   ihkDetails: string;
+  ihkDate?: string; // ← NEW
+  ihkLocation?: string; // ← NEW
   anabin: boolean;
   anabinDetails: string;
+  anabinDate?: string; // ← NEW
+  anabinLocation?: string; // ← NEW
   zab: boolean;
   zabDetails: string;
 }
@@ -132,13 +157,14 @@ export interface DrivingLicence {
   hasLicence: boolean;
   categories: string[];
   sinceYear: string;
+  categoriesText?: string; // ← NEW: free text for "Welche"
 }
 
 export interface CareerObjective {
   desiredAusbildung: string;
   desiredProfession: string;
   currentProfession: string;
-  desiredSector: string;      // new
+  desiredSector: string;
   otherPreferences: string;
 }
 
@@ -167,11 +193,13 @@ export interface Candidate {
   drivingLicence: DrivingLicence;
   career: CareerObjective;
   interests: string;
+  hobbies?: string; // ← NEW
   notes: string;
+  otherNotes?: string; // ← NEW
   declarations: Declarations;
 }
 
-export type FormSection = 
+export type FormSection =
   | 'personal'
   | 'contact'
   | 'germany'

@@ -271,6 +271,85 @@ export const LanguagesSection: React.FC<LanguagesSectionProps> = ({
           </div>
         ))}
       </div>
+
+            {/* ===== GERMAN COURSE (NEW) ===== */}
+      <div className="space-y-4 border-t border-outline-variant/30 pt-6">
+        <h3 className="font-headline-sm text-brand-imperial">
+          Deutsch Unterricht (Cours d'allemand)
+        </h3>
+        <div className="p-4 bg-surface-container-low rounded-lg border border-outline-variant/30">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="block font-label-md text-xs text-brand-imperial">
+                Name der Sprachschule (Nom de l'école de langue)
+              </label>
+              <input
+                type="text"
+                value={data.germanCourse?.schoolName || ''}
+                onChange={(e) => updateData({
+                  germanCourse: { ...(data.germanCourse || { schoolName: '', city: '', startDate: '', endDate: '' }), schoolName: e.target.value }
+                })}
+                className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
+                placeholder="z.B. Goethe-Institut (ex. Goethe-Institut)"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="block font-label-md text-xs text-brand-imperial">
+                Stadt (Ville)
+              </label>
+              <input
+                type="text"
+                value={data.germanCourse?.city || ''}
+                onChange={(e) => updateData({
+                  germanCourse: { ...(data.germanCourse || { schoolName: '', city: '', startDate: '', endDate: '' }), city: e.target.value }
+                })}
+                className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
+                placeholder="Stadt (Ville)"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="block font-label-md text-xs text-brand-imperial">
+                Wann / Von (Quand / De)
+              </label>
+              <input
+                type="date"
+                value={data.germanCourse?.startDate || ''}
+                onChange={(e) => updateData({
+                  germanCourse: { ...(data.germanCourse || { schoolName: '', city: '', startDate: '', endDate: '' }), startDate: e.target.value }
+                })}
+                className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="block font-label-md text-xs text-brand-imperial">
+                Bis (Jusqu'à)
+              </label>
+              <input
+                type="date"
+                value={data.germanCourse?.endDate || ''}
+                onChange={(e) => updateData({
+                  germanCourse: { ...(data.germanCourse || { schoolName: '', city: '', startDate: '', endDate: '' }), endDate: e.target.value }
+                })}
+                className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* ===== SONSTIGES (NEW) ===== */}
+        <div className="space-y-2">
+          <label className="block font-label-md text-xs text-brand-imperial">
+            Sonstiges (Autres)
+          </label>
+          <textarea
+            value={data.otherNotes || ''}
+            onChange={(e) => updateData({ otherNotes: e.target.value })}
+            rows={2}
+            className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
+            placeholder="Weitere Sprachkenntnisse oder Anmerkungen (Autres connaissances linguistiques ou remarques)"
+          />
+        </div>
+      </div>
     </div>
   );
 };

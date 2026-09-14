@@ -67,18 +67,47 @@ export const RecognitionSection: React.FC<RecognitionSectionProps> = ({
           </div>
 
           {data.ihk && (
-            <div className="ml-6 space-y-2">
-              <label className="block font-label-md text-xs text-brand-imperial">
-                Details zur IHK Anerkennung (Détails concernant la reconnaissance IHK)
-              </label>
-              <textarea
-                name="ihkDetails"
-                value={data.ihkDetails}
-                onChange={handleChange}
-                rows={2}
-                className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
-                placeholder="Welcher Beruf? Welche IHK? Wann anerkannt? (Quelle profession ? Quelle IHK ? Quand a-t-elle été reconnue ?)"
-              />
+            <div className="ml-6 space-y-3">
+              <div className="space-y-2">
+                <label className="block font-label-md text-xs text-brand-imperial">
+                  Details zur IHK Anerkennung (Détails concernant la reconnaissance IHK)
+                </label>
+                <textarea
+                  name="ihkDetails"
+                  value={data.ihkDetails}
+                  onChange={handleChange}
+                  rows={2}
+                  className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
+                  placeholder="Welcher Beruf? Welche IHK? (Quelle profession ? Quelle IHK ?)"
+                />
+              </div>
+              {/* ← NEW: IHK Date */}
+              <div className="space-y-2">
+                <label className="block font-label-md text-xs text-brand-imperial">
+                  Wann (Quand)
+                </label>
+                <input
+                  type="date"
+                  name="ihkDate"
+                  value={data.ihkDate || ''}
+                  onChange={handleChange}
+                  className="w-full max-w-xs bg-white border border-outline-variant rounded-lg px-4 py-2 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
+                />
+              </div>
+              {/* ← NEW: IHK Location */}
+              <div className="space-y-2">
+                <label className="block font-label-md text-xs text-brand-imperial">
+                  Wo (Où)
+                </label>
+                <input
+                  type="text"
+                  name="ihkLocation"
+                  value={data.ihkLocation || ''}
+                  onChange={handleChange}
+                  className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
+                  placeholder="Stadt (Ville)"
+                />
+              </div>
             </div>
           )}
         </div>
@@ -121,18 +150,47 @@ export const RecognitionSection: React.FC<RecognitionSectionProps> = ({
           </div>
 
           {data.anabin && (
-            <div className="ml-6 space-y-2">
-              <label className="block font-label-md text-xs text-brand-imperial">
-                Details zum Anabin Eintrag (Détails concernant l’inscription dans Anabin)
-              </label>
-              <textarea
-                name="anabinDetails"
-                value={data.anabinDetails}
-                onChange={handleChange}
-                rows={2}
-                className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
-                placeholder="Hochschulname, Status, etc. (Nom de l’établissement, statut, etc.)"
-              />
+            <div className="ml-6 space-y-3">
+              <div className="space-y-2">
+                <label className="block font-label-md text-xs text-brand-imperial">
+                  Details zum Anabin Eintrag (Détails concernant l'inscription dans Anabin)
+                </label>
+                <textarea
+                  name="anabinDetails"
+                  value={data.anabinDetails}
+                  onChange={handleChange}
+                  rows={2}
+                  className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
+                  placeholder="Hochschulname, Status, etc. (Nom de l'établissement, statut, etc.)"
+                />
+              </div>
+              {/* ← NEW: Anabin Date */}
+              <div className="space-y-2">
+                <label className="block font-label-md text-xs text-brand-imperial">
+                  Wann (Quand)
+                </label>
+                <input
+                  type="date"
+                  name="anabinDate"
+                  value={data.anabinDate || ''}
+                  onChange={handleChange}
+                  className="w-full max-w-xs bg-white border border-outline-variant rounded-lg px-4 py-2 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
+                />
+              </div>
+              {/* ← NEW: Anabin Location */}
+              <div className="space-y-2">
+                <label className="block font-label-md text-xs text-brand-imperial">
+                  Wo (Où)
+                </label>
+                <input
+                  type="text"
+                  name="anabinLocation"
+                  value={data.anabinLocation || ''}
+                  onChange={handleChange}
+                  className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
+                  placeholder="Stadt (Ville)"
+                />
+              </div>
             </div>
           )}
         </div>

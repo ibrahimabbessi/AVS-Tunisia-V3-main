@@ -1,8 +1,8 @@
 // src/app/candidature/sections/SchoolEducation.tsx
 "use client";
 
-import React from 'react';
-import { SchoolEducation } from '../types';
+import React from "react";
+import { SchoolEducation } from "../types";
 
 interface SchoolEducationSectionProps {
   data: SchoolEducation[];
@@ -15,13 +15,16 @@ export const SchoolEducationSection: React.FC<SchoolEducationSectionProps> = ({
 }) => {
   const addEntry = () => {
     const newEntry: SchoolEducation = {
-      schoolName: '',
-      location: '',
-      type: '',
-      startDate: '',
-      endDate: '',
-      degree: '',
+      schoolName: "",
+      location: "",
+      type: "",
+      startDate: "",
+      endDate: "",
+      degree: "",
+      abiturSubject: "",
+      abiturYear: "",
     };
+
     updateData([...data, newEntry]);
   };
 
@@ -31,32 +34,78 @@ export const SchoolEducationSection: React.FC<SchoolEducationSectionProps> = ({
     updateData(newData);
   };
 
-  const updateEntry = (index: number, field: keyof SchoolEducation, value: string) => {
+  const updateEntry = (
+    index: number,
+    field: keyof SchoolEducation,
+    value: string
+  ) => {
     const newData = [...data];
-    newData[index] = { ...newData[index], [field]: value };
+
+    newData[index] = {
+      ...newData[index],
+      [field]: value,
+    };
+
     updateData(newData);
   };
 
   const schoolTypes = [
-    { value: '', label: 'Bitte wählen (Veuillez choisir)' },
-    { value: 'grundschule', label: 'Grundschule (École primaire)' },
-    { value: 'mittelschule', label: 'Mittelschule (Collège)' },
-    { value: 'gymnasium', label: 'Gymnasium (Lycée)' },
-    { value: 'realschule', label: 'Realschule (École secondaire)' },
-    { value: 'hauptschule', label: 'Hauptschule (École secondaire générale)' },
-    { value: 'gesamtschule', label: 'Gesamtschule (École polyvalente)' },
-    { value: 'berufsschule', label: 'Berufsschule (École professionnelle)' },
-    { value: 'college', label: 'Collège (Collège)' },
-    { value: 'lycee', label: 'Lycée (Lycée)' },
-    { value: 'other', label: 'Andere (Autre)' },
+    {
+      value: "",
+      label: "Bitte wählen (Veuillez choisir)",
+    },
+    {
+      value: "grundschule",
+      label: "Grundschule (École primaire)",
+    },
+    {
+      value: "mittelschule",
+      label: "Mittelschule (Collège)",
+    },
+    {
+      value: "gymnasium",
+      label: "Gymnasium (Lycée)",
+    },
+    {
+      value: "realschule",
+      label: "Realschule (École secondaire)",
+    },
+    {
+      value: "hauptschule",
+      label: "Hauptschule (École secondaire générale)",
+    },
+    {
+      value: "gesamtschule",
+      label: "Gesamtschule (École polyvalente)",
+    },
+    {
+      value: "berufsschule",
+      label: "Berufsschule (École professionnelle)",
+    },
+    {
+      value: "college",
+      label: "Collège (Collège)",
+    },
+    {
+      value: "lycee",
+      label: "Lycée (Lycée)",
+    },
+    {
+      value: "other",
+      label: "Andere (Autre)",
+    },
   ];
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <p className="font-body-md text-sm text-on-surface-variant/70">
-          Bitte alle Stationen Ihrer Schulausbildung angeben (in chronologischer Reihenfolge). (Veuillez indiquer toutes les étapes de votre scolarité, dans l’ordre chronologique.)
+          Bitte alle Stationen Ihrer Schulausbildung angeben (in chronologischer
+          Reihenfolge). (Veuillez indiquer toutes les étapes de votre scolarité,
+          dans l’ordre chronologique.)
         </p>
+
         <button
           type="button"
           onClick={addEntry}
@@ -67,19 +116,34 @@ export const SchoolEducationSection: React.FC<SchoolEducationSectionProps> = ({
         </button>
       </div>
 
+      {/* Empty state */}
       {data.length === 0 ? (
         <div className="text-center py-8 text-on-surface-variant/50 border-2 border-dashed border-outline-variant/30 rounded-xl">
           <span className="text-2xl block mb-2">🏫</span>
-          <p className="font-body-md text-sm">Keine Schulausbildung eingetragen (Aucune formation scolaire enregistrée)</p>
-          <p className="font-body-md text-xs">Klicken Sie auf &quot;Schule hinzufügen&quot;, um zu beginnen (Cliquez sur « Ajouter une école » pour commencer)</p>
+
+          <p className="font-body-md text-sm">
+            Keine Schulausbildung eingetragen (Aucune formation scolaire
+            enregistrée)
+          </p>
+
+          <p className="font-body-md text-xs">
+            Klicken Sie auf &quot;Schule hinzufügen&quot;, um zu beginnen
+            (Cliquez sur « Ajouter une école » pour commencer)
+          </p>
         </div>
       ) : (
+        /* Education entries */
         data.map((entry, index) => (
-          <div key={index} className="p-4 bg-surface-container-low rounded-lg border border-outline-variant/30">
+          <div
+            key={index}
+            className="p-4 bg-surface-container-low rounded-lg border border-outline-variant/30"
+          >
+            {/* Entry header */}
             <div className="flex justify-between items-start mb-4">
               <span className="font-label-md text-brand-imperial">
                 Schule #{index + 1} (École n° {index + 1})
               </span>
+
               <button
                 type="button"
                 onClick={() => removeEntry(index)}
@@ -88,84 +152,168 @@ export const SchoolEducationSection: React.FC<SchoolEducationSectionProps> = ({
                 Entfernen (Supprimer)
               </button>
             </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Name der Schule */}
               <div className="space-y-2">
                 <label className="block font-label-md text-xs text-brand-imperial">
-                  Name der Schule (Nom de l’école) <span className="text-error">*</span>
+                  Name der Schule (Nom de l’école){" "}
+                  <span className="text-error">*</span>
                 </label>
+
                 <input
                   type="text"
                   value={entry.schoolName}
-                  onChange={(e) => updateEntry(index, 'schoolName', e.target.value)}
+                  onChange={(e) =>
+                    updateEntry(index, "schoolName", e.target.value)
+                  }
                   className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
                   placeholder="Name der Schule (Nom de l’école)"
                   required
                 />
               </div>
+
+              {/* Ort */}
               <div className="space-y-2">
                 <label className="block font-label-md text-xs text-brand-imperial">
                   Ort (Lieu) <span className="text-error">*</span>
                 </label>
+
                 <input
                   type="text"
                   value={entry.location}
-                  onChange={(e) => updateEntry(index, 'location', e.target.value)}
+                  onChange={(e) =>
+                    updateEntry(index, "location", e.target.value)
+                  }
                   className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
                   placeholder="Stadt, Land (Ville, Pays)"
                   required
                 />
               </div>
+
+              {/* Schultyp */}
               <div className="space-y-2">
                 <label className="block font-label-md text-xs text-brand-imperial">
-                  Schultyp (Type d’établissement scolaire) <span className="text-error">*</span>
+                  Schultyp (Type d’établissement scolaire){" "}
+                  <span className="text-error">*</span>
                 </label>
+
                 <select
                   value={entry.type}
-                  onChange={(e) => updateEntry(index, 'type', e.target.value)}
+                  onChange={(e) =>
+                    updateEntry(index, "type", e.target.value)
+                  }
                   className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
                   required
                 >
-                  {schoolTypes.map(type => (
-                    <option key={type.value} value={type.value}>{type.label}</option>
+                  {schoolTypes.map((type) => (
+                    <option key={type.value} value={type.value}>
+                      {type.label}
+                    </option>
                   ))}
                 </select>
               </div>
+
+              {/* Abschluss */}
               <div className="space-y-2">
                 <label className="block font-label-md text-xs text-brand-imperial">
                   Abschluss (Diplôme)
                 </label>
+
                 <input
                   type="text"
                   value={entry.degree}
-                  onChange={(e) => updateEntry(index, 'degree', e.target.value)}
+                  onChange={(e) =>
+                    updateEntry(index, "degree", e.target.value)
+                  }
                   className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
                   placeholder="z.B. Abitur, Baccalauréat (ex. Abitur, Baccalauréat)"
                 />
               </div>
+
+              {/* Von */}
               <div className="space-y-2">
                 <label className="block font-label-md text-xs text-brand-imperial">
                   Von (De) <span className="text-error">*</span>
                 </label>
+
                 <input
                   type="date"
                   value={entry.startDate}
-                  onChange={(e) => updateEntry(index, 'startDate', e.target.value)}
+                  onChange={(e) =>
+                    updateEntry(index, "startDate", e.target.value)
+                  }
                   className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
                   required
                 />
               </div>
+
+              {/* Bis */}
               <div className="space-y-2">
                 <label className="block font-label-md text-xs text-brand-imperial">
                   Bis (Jusqu’au) <span className="text-error">*</span>
                 </label>
+
                 <input
                   type="date"
                   value={entry.endDate}
-                  onChange={(e) => updateEntry(index, 'endDate', e.target.value)}
+                  onChange={(e) =>
+                    updateEntry(index, "endDate", e.target.value)
+                  }
                   className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
                   required
                 />
               </div>
+
+              {/* =========================================
+                  ABITUR FIELDS
+                  Only displayed for Gymnasium
+              ========================================= */}
+              {entry.type === "gymnasium" && (
+                <>
+                  {/* Abitur Fach */}
+                  <div className="space-y-2">
+                    <label className="block font-label-md text-xs text-brand-imperial">
+                      Abitur Fach (Spécialité Abitur)
+                    </label>
+
+                    <input
+                      type="text"
+                      value={entry.abiturSubject || ""}
+                      onChange={(e) =>
+                        updateEntry(
+                          index,
+                          "abiturSubject",
+                          e.target.value
+                        )
+                      }
+                      className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
+                      placeholder="z.B. Mathematik, Biologie (ex. Mathématiques, Biologie)"
+                    />
+                  </div>
+
+                  {/* Abitur Jahr */}
+                  <div className="space-y-2">
+                    <label className="block font-label-md text-xs text-brand-imperial">
+                      Abitur Jahr (Année Abitur)
+                    </label>
+
+                    <input
+                      type="text"
+                      value={entry.abiturYear || ""}
+                      onChange={(e) =>
+                        updateEntry(
+                          index,
+                          "abiturYear",
+                          e.target.value
+                        )
+                      }
+                      className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
+                      placeholder="z.B. 2020 (ex. 2020)"
+                    />
+                  </div>
+                </>
+              )}
             </div>
           </div>
         ))
@@ -173,3 +321,4 @@ export const SchoolEducationSection: React.FC<SchoolEducationSectionProps> = ({
     </div>
   );
 };
+

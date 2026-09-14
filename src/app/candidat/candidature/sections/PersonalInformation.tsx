@@ -1,4 +1,4 @@
-// src/app/candidat/candidature/sections/PersonalInformation.tsx
+// src/app/candidature/sections/PersonalInformation.tsx
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
@@ -20,6 +20,7 @@ const defaultData: PersonalInformation = {
   hasChildren: false,
   numberOfChildren: 0,
   nationality: '',
+  joinDate: '', // ← NEW
 };
 
 export const PersonalInformationSection: React.FC<PersonalInformationSectionProps> = ({
@@ -27,23 +28,14 @@ export const PersonalInformationSection: React.FC<PersonalInformationSectionProp
   updateData,
   compact = true,
 }) => {
-  // Track previous data to detect changes
   const prevDataRef = useRef(data);
   
-  // Log when component mounts and when data changes
   useEffect(() => {
-    console.log('🔵 PersonalInformationSection mounted/updated');
-    console.log('📥 Received data prop:', data);
-    
-    // Check if data changed from previous render
     if (prevDataRef.current !== data) {
-      console.log('🔄 Data prop changed from:', prevDataRef.current);
-      console.log('🔄 Data prop changed to:', data);
       prevDataRef.current = data;
     }
   });
 
-  // Create safe data with fallbacks
   const safeData = useMemo(() => ({
     firstName: data?.firstName ?? '',
     lastName: data?.lastName ?? '',
@@ -54,35 +46,25 @@ export const PersonalInformationSection: React.FC<PersonalInformationSectionProp
     hasChildren: data?.hasChildren ?? false,
     numberOfChildren: data?.numberOfChildren ?? 0,
     nationality: data?.nationality ?? '',
+    joinDate: data?.joinDate ?? '', // ← NEW
   }), [data]);
-
-  // Log safe data
-  useEffect(() => {
-    console.log('📊 Safe data values:', safeData);
-  }, [safeData]);
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     
-    console.log(`✏️ Input changed: ${name} = ${value} (type: ${type})`);
-    
     if (type === 'checkbox') {
       const checked = (e.target as HTMLInputElement).checked;
-      console.log(`📤 Calling updateData with: { ${name}: ${checked} }`);
       updateData({ [name]: checked });
     } else if (name === 'hasChildren') {
       const boolValue = value === 'true';
-      console.log(`📤 Calling updateData with: { hasChildren: ${boolValue} }`);
       updateData({ 
         hasChildren: boolValue,
         numberOfChildren: boolValue ? safeData.numberOfChildren || 1 : 0 
       });
     } else if (type === 'number') {
       const numValue = value === '' ? 0 : parseInt(value, 10);
-      console.log(`📤 Calling updateData with: { ${name}: ${numValue} }`);
       updateData({ [name]: numValue });
     } else {
-      console.log(`📤 Calling updateData with: { ${name}: "${value}" }`);
       updateData({ [name]: value });
     }
   }, [updateData, safeData.numberOfChildren]);
@@ -159,7 +141,7 @@ export const PersonalInformationSection: React.FC<PersonalInformationSectionProp
 
         <div className="space-y-1.5">
           <label className={labelClasses}>
-            Geschlecht (Geschlecht) <span className="text-error">*</span>
+            Geschlecht (Sexe) <span className="text-error">*</span>
           </label>
           <select
             name="gender"
@@ -177,7 +159,7 @@ export const PersonalInformationSection: React.FC<PersonalInformationSectionProp
 
         <div className="space-y-1.5">
           <label className={labelClasses}>
-            Familienstand (État civil) <span className="text-error">*</span>
+            Familienstand (Situation familiale) <span className="text-error">*</span>
           </label>
           <select
             name="maritalStatus"
@@ -192,6 +174,20 @@ export const PersonalInformationSection: React.FC<PersonalInformationSectionProp
             <option value="divorced">Geschieden (Divorcé(e))</option>
             <option value="widowed">Verwitwet (Veuf/Veuve)</option>
           </select>
+        </div>
+
+        {/* ← NEW: Beitrittsdatum */}
+        <div className="space-y-1.5">
+          <label className={labelClasses}>
+            Beitrittsdatum (Date d'adhésion)
+          </label>
+          <input
+            type="date"
+            name="joinDate"
+            value={safeData.joinDate}
+            onChange={handleChange}
+            className={inputClasses}
+          />
         </div>
       </div>
 
@@ -229,7 +225,7 @@ export const PersonalInformationSection: React.FC<PersonalInformationSectionProp
         {safeData.hasChildren && (
           <div className="ml-6 space-y-1.5">
             <label className={labelClasses}>
-              Anzahl Kinder (Nombre d’enfants)
+              Anzahl Kinder (Nombre d'enfants)
             </label>
             <input
               type="number"

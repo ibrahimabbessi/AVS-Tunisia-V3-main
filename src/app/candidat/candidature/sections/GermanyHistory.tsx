@@ -9,25 +9,32 @@ interface GermanyHistorySectionProps {
   updateData: (data: Partial<GermanyHistory>) => void;
 }
 
-// Default values outside component to prevent recreation
 const DEFAULT_GERMANY_HISTORY: GermanyHistory = {
   hasFamilyOrFriends: false,
   familyOrFriendsDetails: '',
+  familyInGermany: false,
+  familyInGermanyDetails: '',
+  friendsInGermany: false,
+  friendsInGermanyDetails: '',
   previousVisaApplication: false,
   visaType: '',
   visaResult: '',
   visaDate: '',
+  visaDateUntil: '',
   previousStay: false,
   previousStayDetails: '',
+  previousStayVisaType: '',
   stays: [],
   otherAgency: '',
+  appliedToOtherAgency: false,
+  otherAgencyName: '',
+  otherAgencyDate: '',
 };
 
 export const GermanyHistorySection: React.FC<GermanyHistorySectionProps> = ({
   data,
   updateData,
 }) => {
-  // Use a safe data object with fallbacks
   const safeData = React.useMemo(() => ({
     ...DEFAULT_GERMANY_HISTORY,
     ...data,
@@ -37,7 +44,6 @@ export const GermanyHistorySection: React.FC<GermanyHistorySectionProps> = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
-
     if (type === 'checkbox') {
       updateData({ [name]: checked });
     } else {
@@ -46,11 +52,7 @@ export const GermanyHistorySection: React.FC<GermanyHistorySectionProps> = ({
   };
 
   const addStay = () => {
-    const newStay: GermanyStay = {
-      city: '',
-      duration: '',
-      purpose: '',
-    };
+    const newStay: GermanyStay = { city: '', duration: '', purpose: '' };
     updateData({ stays: [...safeData.stays, newStay] });
   };
 
@@ -70,19 +72,20 @@ export const GermanyHistorySection: React.FC<GermanyHistorySectionProps> = ({
 
   return (
     <div className="space-y-6">
+      {/* ===== FAMILY IN GERMANY ===== */}
       <div className="space-y-4">
         <div className="flex items-center gap-4">
           <label className="font-label-md text-label-md text-brand-imperial">
-            Haben Sie Familie oder Freunde in Deutschland? (Avez-vous de la famille ou des amis en Allemagne ?)
+            Familie in Deutschland? (Famille en Allemagne ?)
           </label>
           <div className="flex items-center gap-4">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="radio"
-                name="hasFamilyOrFriends"
+                name="familyInGermany"
                 value="false"
-                checked={!safeData.hasFamilyOrFriends}
-                onChange={() => updateData({ hasFamilyOrFriends: false, familyOrFriendsDetails: '' })}
+                checked={!safeData.familyInGermany}
+                onChange={() => updateData({ familyInGermany: false, familyInGermanyDetails: '' })}
                 className="w-4 h-4"
               />
               Nein (Non)
@@ -90,34 +93,82 @@ export const GermanyHistorySection: React.FC<GermanyHistorySectionProps> = ({
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="radio"
-                name="hasFamilyOrFriends"
+                name="familyInGermany"
                 value="true"
-                checked={safeData.hasFamilyOrFriends}
-                onChange={() => updateData({ hasFamilyOrFriends: true })}
+                checked={safeData.familyInGermany}
+                onChange={() => updateData({ familyInGermany: true })}
                 className="w-4 h-4"
               />
               Ja (Oui)
             </label>
           </div>
         </div>
-
-        {safeData.hasFamilyOrFriends && (
+        {safeData.familyInGermany && (
           <div className="ml-6 space-y-2">
-            <label className="block font-label-md text-label-md text-brand-imperial">
-              Details zu Familie/Freunden (Détails concernant la famille/les amis)
+            <label className="block font-label-md text-xs text-brand-imperial">
+              Details (Détails)
             </label>
             <textarea
-              name="familyOrFriendsDetails"
-              value={safeData.familyOrFriendsDetails || ''}
+              name="familyInGermanyDetails"
+              value={safeData.familyInGermanyDetails || ''}
               onChange={handleChange}
-              rows={3}
-              className="w-full bg-white border border-outline-variant rounded-lg px-4 py-3 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
-              placeholder="Wer? Wo? Seit wann? (Qui ? Où ? Depuis quand ?)"
+              rows={2}
+              className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
+              placeholder="Wer? Wo? (Qui ? Où ?)"
             />
           </div>
         )}
       </div>
 
+      {/* ===== FRIENDS IN GERMANY ===== */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-4">
+          <label className="font-label-md text-label-md text-brand-imperial">
+            Freunde in Deutschland? (Amis en Allemagne ?)
+          </label>
+          <div className="flex items-center gap-4">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="friendsInGermany"
+                value="false"
+                checked={!safeData.friendsInGermany}
+                onChange={() => updateData({ friendsInGermany: false, friendsInGermanyDetails: '' })}
+                className="w-4 h-4"
+              />
+              Nein (Non)
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="friendsInGermany"
+                value="true"
+                checked={safeData.friendsInGermany}
+                onChange={() => updateData({ friendsInGermany: true })}
+                className="w-4 h-4"
+              />
+              Ja (Oui)
+            </label>
+          </div>
+        </div>
+        {safeData.friendsInGermany && (
+          <div className="ml-6 space-y-2">
+            <label className="block font-label-md text-xs text-brand-imperial">
+              Details (Détails)
+            </label>
+            <textarea
+              name="friendsInGermanyDetails"
+              value={safeData.friendsInGermanyDetails || ''}
+              onChange={handleChange}
+              rows={2}
+              className="w-full bg-white border border-outline-variant rounded-lg px-4 py-2 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
+              placeholder="Wer? Wo? (Qui ? Où ?)"
+            />
+          </div>
+        )}
+      </div>
+
+      {/* ===== VISA APPLICATION ===== */}
       <div className="space-y-4 border-t border-outline-variant/30 pt-6">
         <h3 className="font-headline-sm text-brand-imperial">
           Frühere Visumanträge (Demandes de visa précédentes)
@@ -134,7 +185,7 @@ export const GermanyHistorySection: React.FC<GermanyHistorySectionProps> = ({
                 name="previousVisaApplication"
                 value="false"
                 checked={!safeData.previousVisaApplication}
-                onChange={() => updateData({ previousVisaApplication: false, visaType: '', visaResult: '', visaDate: '' })}
+                onChange={() => updateData({ previousVisaApplication: false, visaType: '', visaResult: '', visaDate: '', visaDateUntil: '' })}
                 className="w-4 h-4"
               />
               Nein (Non)
@@ -157,7 +208,7 @@ export const GermanyHistorySection: React.FC<GermanyHistorySectionProps> = ({
           <div className="ml-6 grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="block font-label-md text-label-md text-brand-imperial">
-                Visumtyp (Art des visa)
+                Visumtyp (Type de visa)
               </label>
               <input
                 type="text"
@@ -165,7 +216,7 @@ export const GermanyHistorySection: React.FC<GermanyHistorySectionProps> = ({
                 value={safeData.visaType || ''}
                 onChange={handleChange}
                 className="w-full bg-white border border-outline-variant rounded-lg px-4 py-3 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
-                placeholder="z.B. Schengen, national, etc. (ex. Schengen, national, etc.)"
+                placeholder="z.B. Schengen, national (ex. Schengen, national)"
               />
             </div>
             <div className="space-y-2">
@@ -184,22 +235,37 @@ export const GermanyHistorySection: React.FC<GermanyHistorySectionProps> = ({
                 <option value="pending">Ausstehend (En attente)</option>
               </select>
             </div>
-            <div className="space-y-2 md:col-span-2">
+            {/* ← NEW: From date */}
+            <div className="space-y-2">
               <label className="block font-label-md text-label-md text-brand-imperial">
-                Datum (Date)
+                Wann / Von (Quand / De)
               </label>
               <input
                 type="date"
                 name="visaDate"
                 value={safeData.visaDate || ''}
                 onChange={handleChange}
-                className="w-full max-w-xs bg-white border border-outline-variant rounded-lg px-4 py-3 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
+                className="w-full bg-white border border-outline-variant rounded-lg px-4 py-3 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
+              />
+            </div>
+            {/* ← NEW: Until date */}
+            <div className="space-y-2">
+              <label className="block font-label-md text-label-md text-brand-imperial">
+                Bis (Jusqu'à)
+              </label>
+              <input
+                type="date"
+                name="visaDateUntil"
+                value={safeData.visaDateUntil || ''}
+                onChange={handleChange}
+                className="w-full bg-white border border-outline-variant rounded-lg px-4 py-3 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
               />
             </div>
           </div>
         )}
       </div>
 
+      {/* ===== PREVIOUS STAYS ===== */}
       <div className="space-y-4 border-t border-outline-variant/30 pt-6">
         <h3 className="font-headline-sm text-brand-imperial">
           Aufenthalt in Deutschland (Séjour en Allemagne)
@@ -216,7 +282,7 @@ export const GermanyHistorySection: React.FC<GermanyHistorySectionProps> = ({
                 name="previousStay"
                 value="false"
                 checked={!safeData.previousStay}
-                onChange={() => updateData({ previousStay: false, previousStayDetails: '' })}
+                onChange={() => updateData({ previousStay: false, previousStayDetails: '', previousStayVisaType: '' })}
                 className="w-4 h-4"
               />
               Nein (Non)
@@ -236,19 +302,35 @@ export const GermanyHistorySection: React.FC<GermanyHistorySectionProps> = ({
         </div>
 
         {safeData.previousStay && (
-          <div className="ml-6 space-y-2">
-            <label className="block font-label-md text-label-md text-brand-imperial">
-              Details zum Aufenthalt (Details concernant le séjour)
-            </label>
-            <textarea
-              name="previousStayDetails"
-              value={safeData.previousStayDetails || ''}
-              onChange={handleChange}
-              rows={2}
-              className="w-full bg-white border border-outline-variant rounded-lg px-4 py-3 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
-              placeholder="Wann? Wo? Wie lange? Zweck? (Quand ? Où ? Combien de temps ? Motif ?)"
-            />
-          </div>
+          <>
+            <div className="ml-6 space-y-2">
+              <label className="block font-label-md text-label-md text-brand-imperial">
+                Details zum Aufenthalt (Détails concernant le séjour)
+              </label>
+              <textarea
+                name="previousStayDetails"
+                value={safeData.previousStayDetails || ''}
+                onChange={handleChange}
+                rows={2}
+                className="w-full bg-white border border-outline-variant rounded-lg px-4 py-3 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
+                placeholder="Wann? Wo? Wie lange? Zweck? (Quand ? Où ? Combien de temps ? Motif ?)"
+              />
+            </div>
+            {/* ← NEW: Visa type for previous stay */}
+            <div className="ml-6 space-y-2">
+              <label className="block font-label-md text-label-md text-brand-imperial">
+                Welche Visa Art (Quel type de visa)
+              </label>
+              <input
+                type="text"
+                name="previousStayVisaType"
+                value={safeData.previousStayVisaType || ''}
+                onChange={handleChange}
+                className="w-full bg-white border border-outline-variant rounded-lg px-4 py-3 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
+                placeholder="z.B. Schengen, Studium (ex. Schengen, études)"
+              />
+            </div>
+          </>
         )}
 
         <div className="space-y-4">
@@ -267,7 +349,7 @@ export const GermanyHistorySection: React.FC<GermanyHistorySectionProps> = ({
 
           {safeData.stays.length === 0 ? (
             <p className="text-sm text-on-surface-variant/60 py-4 text-center">
-              Keine Aufenthalte eingetragen. Klicken Sie auf &quot;Weitere hinzufügen&quot;, um einen Eintrag zu erstellen. (Aucun séjour enregistré. Cliquez sur « Ajouter un autre » pour créer une entrée.)
+              Keine Aufenthalte eingetragen. (Aucun séjour enregistré.)
             </p>
           ) : (
             safeData.stays.map((stay, index) => (
@@ -328,18 +410,67 @@ export const GermanyHistorySection: React.FC<GermanyHistorySectionProps> = ({
         </div>
       </div>
 
-      <div className="space-y-2 border-t border-outline-variant/30 pt-6">
-        <label className="block font-label-md text-label-md text-brand-imperial">
-          Haben Sie sich schon bei einer anderen Agentur/Personalvermittlung für Deutschland beworben? (Avez-vous déjà postulé auprès d’une autre agence ou société de recrutement pour l’Allemagne ?)
-        </label>
-        <input
-          type="text"
-          name="otherAgency"
-          value={safeData.otherAgency || ''}
-          onChange={handleChange}
-          className="w-full bg-white border border-outline-variant rounded-lg px-4 py-3 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
-          placeholder="Wenn ja, bitte angeben (Si oui, veuillez préciser)"
-        />
+      {/* ===== OTHER AGENCY ===== */}
+      <div className="space-y-4 border-t border-outline-variant/30 pt-6">
+        <div className="flex items-center gap-4">
+          <label className="font-label-md text-label-md text-brand-imperial">
+            Haben Sie sich bei einer anderen Vermittlungsagentur beworben? (Avez-vous postulé auprès d'une autre agence de placement ?)
+          </label>
+          <div className="flex items-center gap-4">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="appliedToOtherAgency"
+                value="false"
+                checked={!safeData.appliedToOtherAgency}
+                onChange={() => updateData({ appliedToOtherAgency: false, otherAgencyName: '', otherAgencyDate: '' })}
+                className="w-4 h-4"
+              />
+              Nein (Non)
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="appliedToOtherAgency"
+                value="true"
+                checked={safeData.appliedToOtherAgency}
+                onChange={() => updateData({ appliedToOtherAgency: true })}
+                className="w-4 h-4"
+              />
+              Ja (Oui)
+            </label>
+          </div>
+        </div>
+
+        {safeData.appliedToOtherAgency && (
+          <div className="ml-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="block font-label-md text-label-md text-brand-imperial">
+                Welche Agentur (Quelle agence)
+              </label>
+              <input
+                type="text"
+                name="otherAgencyName"
+                value={safeData.otherAgencyName || ''}
+                onChange={handleChange}
+                className="w-full bg-white border border-outline-variant rounded-lg px-4 py-3 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
+                placeholder="Name der Agentur (Nom de l'agence)"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="block font-label-md text-label-md text-brand-imperial">
+                Wann (Quand)
+              </label>
+              <input
+                type="date"
+                name="otherAgencyDate"
+                value={safeData.otherAgencyDate || ''}
+                onChange={handleChange}
+                className="w-full bg-white border border-outline-variant rounded-lg px-4 py-3 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
