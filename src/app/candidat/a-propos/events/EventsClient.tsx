@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, forwardRef } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -12,6 +12,19 @@ import {
   cloudinaryThumb
 } from "@/lib/mediaUrls";
 import type { Event } from "@/lib/db/events";
+import { GalleryLightboxModal } from "@/components/GalleryLightboxModal";
+
+// ─── Local shape mirroring what GalleryLightboxModal expects ──────
+// (The modal keeps its own internal PhotoGalerie interface — we just
+//  build structurally compatible objects and let TS infer the rest.)
+
+interface LightboxPhoto {
+  src: string;
+  titre: string;
+  categorie: string;
+  public_id?: string;
+  secure_url?: string;
+}
 
 // ─── Date & status helpers ────────────────────────────────────────
 
@@ -59,7 +72,6 @@ const LIFECYCLE_COLORS: Record<string, string> = {
 /** Strip HTML tags and produce a short plain-text summary. */
 function htmlToExcerpt(html: string, maxLen = 200): string {
   if (!html) return "";
-  // Replace block-level tags with spaces, strip the rest
   const text = html
     .replace(/<br\s*\/?>/gi, " ")
     .replace(/<\/(p|div|h[1-6]|li)>/gi, " ")
@@ -94,14 +106,11 @@ function VideoEmbed({
   const [hasError, setHasError] = useState(false);
 
   const embedUrl = useMemo(() => {
-    // YouTube
     const ytId = parseYouTubeId(url);
     if (ytId) return youTubeEmbedUrl(ytId);
 
-    // Facebook
     if (isFacebookUrl(url)) return facebookEmbedUrl(url, { showText: false });
 
-    // Already an embed URL (facebook.com/plugins/video.php...)
     if (url.includes("facebook.com/plugins/video.php")) return url;
 
     return url;
@@ -109,7 +118,6 @@ function VideoEmbed({
 
   const isFacebook = isFacebookUrl(url);
 
-  // 16:9 for landscape, 9:16 for reel
   const paddingBottom = variant === "reel" ? "177.78%" : "56.25%";
 
   return (
@@ -165,10 +173,12 @@ function VideoEmbed({
 
 function ImageCarousel({
   photos,
-  eventTitle
+  eventTitle,
+  onPhotoClick
 }: {
   photos: { url: string; publicId: string }[];
   eventTitle: string;
+  onPhotoClick: (index: number) => void;
 }) {
   const [currentPage, setCurrentPage] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -219,27 +229,53 @@ function ImageCarousel({
         {currentImages.map((photo, idx) => {
           const globalIndex = currentPage * imagesPerPage + idx;
           return (
-            <div
+            <button
               key={photo.publicId}
-              className={`relative aspect-[4/3] rounded-xl overflow-hidden bg-surface-container-low border border-outline-variant/20 transition-all duration-500 ${
+              type="button"
+              onClick={() => onPhotoClick(globalIndex)}
+              className={`group relative aspect-[4/3] rounded-xl overflow-hidden bg-surface-container-low border border-outline-variant/20 transition-all duration-500 cursor-zoom-in text-left ${
                 isTransitioning ? "scale-95 opacity-0" : "scale-100 opacity-100"
               }`}
               style={{ transitionDelay: `${idx * 100}ms` }}
+              aria-label={`Agrandir la photo ${globalIndex + 1}`}
             >
               <img
                 src={cloudinaryThumb(photo.url, 800, 600)}
                 alt={`${eventTitle} - Photo ${globalIndex + 1}`}
-                className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                 loading="lazy"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src =
                     "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%23e5e7eb'/%3E%3Ctext x='200' y='160' text-anchor='middle' dy='.3em' fill='%236b7280' font-size='20'%3E📸%3C/text%3E%3C/svg%3E";
                 }}
               />
-              <div className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full">
+
+              {/* Hover overlay with zoom affordance */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-between p-2 pointer-events-none">
+                <span className="text-white text-[10px] font-bold truncate max-w-[70%]">
+                  {eventTitle}
+                </span>
+                <span className="p-1.5 rounded-full bg-white/30 backdrop-blur-md">
+                  <svg
+                    className="w-3.5 h-3.5 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+                    />
+                  </svg>
+                </span>
+              </div>
+
+              <div className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full pointer-events-none">
                 {globalIndex + 1} / {photos.length}
               </div>
-            </div>
+            </button>
           );
         })}
       </div>
@@ -310,8 +346,16 @@ function ImageCarousel({
 
 // ─── Event Card ───────────────────────────────────────────────────
 
-function EventCard({ event }: { event: Event }) {
-  const [isOpen, setIsOpen] = useState(false);
+const EventCard = forwardRef<
+  HTMLDivElement,
+  {
+    event: Event;
+    isOpen: boolean;
+    onToggle: () => void;
+  }
+>(function EventCard({ event, isOpen, onToggle }, ref) {
+  const [selectedPhoto, setSelectedPhoto] = useState<LightboxPhoto | null>(null);
+
   const lifecycle = deriveLifecycle(event);
   const excerpt = htmlToExcerpt(event.body, 200);
   const coverUrl = event.coverImage?.url
@@ -328,17 +372,36 @@ function EventCard({ event }: { event: Event }) {
 
   const facebookReels = (event.facebookReelUrls ?? []).map((url, idx) => ({
     url,
-    title: `🎬 Reel Facebook${event.facebookReelUrls && event.facebookReelUrls.length > 1 ? ` ${idx + 1}` : ""}`
+    title: `🎬 Reel Facebook${
+      event.facebookReelUrls && event.facebookReelUrls.length > 1
+        ? ` ${idx + 1}`
+        : ""
+    }`
   }));
+
+  // Build the lightbox photo list for this event once per render.
+  // Shape matches what GalleryLightboxModal expects.
+  const lightboxPhotos: LightboxPhoto[] = useMemo(
+    () =>
+      (event.photos ?? []).map((p, idx) => ({
+        src: p.url,
+        titre: `${event.title} — Photo ${idx + 1}`,
+        categorie: event.title,
+        public_id: p.publicId,
+        secure_url: p.url
+      })),
+    [event.photos, event.title]
+  );
 
   return (
     <div
+      ref={ref}
       className={`w-full rounded-2xl border border-outline-variant/30 bg-surface-container-lowest overflow-hidden transition-all duration-300 ${
         isOpen ? "shadow-xl" : "shadow-sm hover:shadow-md"
       }`}
     >
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={onToggle}
         className="w-full text-left hover:bg-surface-container-low/50 transition-colors duration-200"
       >
         <div className="flex flex-col sm:flex-row">
@@ -457,10 +520,14 @@ function EventCard({ event }: { event: Event }) {
         }`}
       >
         <div className="px-6 pb-6 pt-4 border-t border-outline-variant/20 space-y-4">
-          {/* Image carousel */}
+          {/* Image carousel — now clickable to open the lightbox */}
           <ImageCarousel
             photos={event.photos ?? []}
             eventTitle={event.title}
+            onPhotoClick={(index) => {
+              const photo = lightboxPhotos[index];
+              if (photo) setSelectedPhoto(photo);
+            }}
           />
 
           {/* Full body as HTML */}
@@ -547,9 +614,20 @@ function EventCard({ event }: { event: Event }) {
           )}
         </div>
       </div>
+
+      {/* Lightbox — rendered only when a photo is selected.
+          GalleryLightboxModal is used exactly as-is, unchanged. */}
+      {selectedPhoto && (
+        <GalleryLightboxModal
+          photo={selectedPhoto}
+          photos={lightboxPhotos}
+          onClose={() => setSelectedPhoto(null)}
+          onNavigate={setSelectedPhoto}
+        />
+      )}
     </div>
   );
-}
+});
 
 // ─── Filter Bar ───────────────────────────────────────────────────
 
@@ -635,6 +713,12 @@ function EventStats({ events }: { events: Event[] }) {
 export default function EventsClient({ events }: { events: Event[] }) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [openEventId, setOpenEventId] = useState<string | null>(null);
+
+  // Map of eventId → DOM node so we can scroll the active card into view
+  const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  // Guard so we only auto-scroll when the user opens (not on initial mount)
+  const shouldScrollRef = useRef(false);
 
   const allCategories = useMemo(
     () => [...new Set(events.flatMap((e) => e.categorySlugs ?? []))],
@@ -670,6 +754,58 @@ export default function EventsClient({ events }: { events: Event[] }) {
       }),
     [filteredEvents]
   );
+
+  // ─── Auto-scroll to the active accordion ───────────────────────
+  useEffect(() => {
+    if (!openEventId) return;
+    if (!shouldScrollRef.current) return;
+    shouldScrollRef.current = false;
+
+    const node = cardRefs.current.get(openEventId);
+    if (!node) return;
+
+    // Navbar offset — tweak to match your sticky navbar height
+    const NAVBAR_OFFSET = 100;
+
+    const scrollToCard = () => {
+      const top =
+        node.getBoundingClientRect().top + window.scrollY - NAVBAR_OFFSET;
+      const prefersReducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+      window.scrollTo({
+        top,
+        behavior: prefersReducedMotion ? "auto" : "smooth"
+      });
+    };
+
+    // Wait for the max-height expand transition to finish before scrolling
+    // so the layout has room to actually reach the card.
+    const onEnd = (e: TransitionEvent) => {
+      if (e.propertyName === "max-height") {
+        node.removeEventListener("transitionend", onEnd);
+        scrollToCard();
+      }
+    };
+    node.addEventListener("transitionend", onEnd);
+
+    // Fallback in case transitionend never fires (e.g. reduced motion)
+    const fallback = setTimeout(scrollToCard, 600);
+
+    return () => {
+      node.removeEventListener("transitionend", onEnd);
+      clearTimeout(fallback);
+    };
+  }, [openEventId]);
+
+  const handleToggle = (id: string) => {
+    setOpenEventId((current) => {
+      const next = current === id ? null : id;
+      // Only auto-scroll when opening (not closing)
+      shouldScrollRef.current = next !== null;
+      return next;
+    });
+  };
 
   return (
     <>
@@ -789,7 +925,16 @@ export default function EventsClient({ events }: { events: Event[] }) {
         {sortedEvents.length > 0 ? (
           <div className="space-y-4">
             {sortedEvents.map((event) => (
-              <EventCard key={event._id} event={event} />
+              <EventCard
+                key={event._id}
+                ref={(el) => {
+                  if (el) cardRefs.current.set(event._id, el);
+                  else cardRefs.current.delete(event._id);
+                }}
+                event={event}
+                isOpen={openEventId === event._id}
+                onToggle={() => handleToggle(event._id)}
+              />
             ))}
           </div>
         ) : (
