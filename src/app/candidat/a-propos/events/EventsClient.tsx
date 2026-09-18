@@ -83,10 +83,12 @@ function isFacebookUrl(url: string): boolean {
 
 function VideoEmbed({
   url,
-  title
+  title,
+  variant = "landscape"
 }: {
   url: string;
   title: string;
+  variant?: "landscape" | "reel";
 }) {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
@@ -107,9 +109,12 @@ function VideoEmbed({
 
   const isFacebook = isFacebookUrl(url);
 
+  // 16:9 for landscape, 9:16 for reel
+  const paddingBottom = variant === "reel" ? "177.78%" : "56.25%";
+
   return (
     <div className="w-full">
-      <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+      <div className="relative w-full" style={{ paddingBottom }}>
         {isLoading && (
           <div className="absolute inset-0 bg-surface-container-low rounded-xl flex items-center justify-center">
             <div className="flex flex-col items-center gap-2">
@@ -160,12 +165,10 @@ function VideoEmbed({
 
 function ImageCarousel({
   photos,
-  eventTitle,
-  facebookReelUrl
+  eventTitle
 }: {
   photos: { url: string; publicId: string }[];
   eventTitle: string;
-  facebookReelUrl?: string | null;
 }) {
   const [currentPage, setCurrentPage] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -204,7 +207,7 @@ function ImageCarousel({
     };
   }, [currentPage, isPaused, totalPages]);
 
-  if (photos.length === 0 && !facebookReelUrl) return null;
+  if (photos.length === 0) return null;
 
   return (
     <div
@@ -212,45 +215,34 @@ function ImageCarousel({
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {photos.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {currentImages.map((photo, idx) => {
-            const globalIndex = currentPage * imagesPerPage + idx;
-            return (
-              <div
-                key={photo.publicId}
-                className={`relative aspect-[4/3] rounded-xl overflow-hidden bg-surface-container-low border border-outline-variant/20 transition-all duration-500 ${
-                  isTransitioning ? "scale-95 opacity-0" : "scale-100 opacity-100"
-                }`}
-                style={{ transitionDelay: `${idx * 100}ms` }}
-              >
-                <img
-                  src={cloudinaryThumb(photo.url, 800, 600)}
-                  alt={`${eventTitle} - Photo ${globalIndex + 1}`}
-                  className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
-                  loading="lazy"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src =
-                      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%23e5e7eb'/%3E%3Ctext x='200' y='160' text-anchor='middle' dy='.3em' fill='%236b7280' font-size='20'%3E📸%3C/text%3E%3C/svg%3E";
-                  }}
-                />
-                <div className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full">
-                  {globalIndex + 1} / {photos.length}
-                </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        {currentImages.map((photo, idx) => {
+          const globalIndex = currentPage * imagesPerPage + idx;
+          return (
+            <div
+              key={photo.publicId}
+              className={`relative aspect-[4/3] rounded-xl overflow-hidden bg-surface-container-low border border-outline-variant/20 transition-all duration-500 ${
+                isTransitioning ? "scale-95 opacity-0" : "scale-100 opacity-100"
+              }`}
+              style={{ transitionDelay: `${idx * 100}ms` }}
+            >
+              <img
+                src={cloudinaryThumb(photo.url, 800, 600)}
+                alt={`${eventTitle} - Photo ${globalIndex + 1}`}
+                className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
+                loading="lazy"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src =
+                    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%23e5e7eb'/%3E%3Ctext x='200' y='160' text-anchor='middle' dy='.3em' fill='%236b7280' font-size='20'%3E📸%3C/text%3E%3C/svg%3E";
+                }}
+              />
+              <div className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full">
+                {globalIndex + 1} / {photos.length}
               </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Facebook Reel */}
-      {facebookReelUrl && (
-        <div className="mt-4 max-w-2xl mx-auto">
-          <div className="rounded-xl overflow-hidden bg-surface-container-lowest border border-outline-variant/20 shadow-sm">
-            <VideoEmbed url={facebookReelUrl} title="🎬 Reel Facebook" />
-          </div>
-        </div>
-      )}
+            </div>
+          );
+        })}
+      </div>
 
       {totalPages > 1 && (
         <div className="flex items-center justify-between mt-4">
@@ -334,9 +326,9 @@ function EventCard({ event }: { event: Event }) {
       title: `Vidéo YouTube (${v.id})`
     }));
 
-  const facebookReels = (event.facebookReelUrls ?? []).map((url) => ({
+  const facebookReels = (event.facebookReelUrls ?? []).map((url, idx) => ({
     url,
-    title: "🎬 Reel Facebook"
+    title: `🎬 Reel Facebook${event.facebookReelUrls && event.facebookReelUrls.length > 1 ? ` ${idx + 1}` : ""}`
   }));
 
   return (
@@ -465,11 +457,10 @@ function EventCard({ event }: { event: Event }) {
         }`}
       >
         <div className="px-6 pb-6 pt-4 border-t border-outline-variant/20 space-y-4">
-          {/* Image carousel with any Facebook reel inline */}
+          {/* Image carousel */}
           <ImageCarousel
             photos={event.photos ?? []}
             eventTitle={event.title}
-            facebookReelUrl={event.facebookReelUrls?.[0] ?? null}
           />
 
           {/* Full body as HTML */}
@@ -502,19 +493,19 @@ function EventCard({ event }: { event: Event }) {
             </div>
           )}
 
-          {/* Facebook reels (beyond the first one shown inline) */}
-          {facebookReels.length > 1 && (
+          {/* Facebook reels — all displayed as reels (portrait) */}
+          {facebookReels.length > 0 && (
             <div>
               <h4 className="font-label-md text-primary text-sm mb-2 flex items-center gap-2">
                 🎬 Autres Reels Facebook
               </h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {facebookReels.slice(1).map((reel, idx) => (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                {facebookReels.map((reel, idx) => (
                   <div
                     key={idx}
                     className="rounded-xl overflow-hidden border border-outline-variant/20 bg-surface-container-low"
                   >
-                    <VideoEmbed url={reel.url} title={reel.title} />
+                    <VideoEmbed url={reel.url} title={reel.title} variant="reel" />
                   </div>
                 ))}
               </div>

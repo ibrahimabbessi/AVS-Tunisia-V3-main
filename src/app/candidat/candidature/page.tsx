@@ -1,14 +1,15 @@
-// src/app/candidature/page.tsx (Updated with Popup)
+// src/app/candidature/page.tsx
 "use client";
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useState, useEffect, useRef } from "react";
-import { ResumeCV } from "./components/ResumeCV";
 import { Candidate } from "./types";
+import { ResumeCV } from "./components/ResumeCV";
 
 export default function CandidaturePage() {
   const [currentStep, setCurrentStep] = useState(1);
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -16,14 +17,16 @@ export default function CandidaturePage() {
     phone: "",
     email: "",
     city: "",
+    sector: "",
     message: "",
   });
+
   const [files, setFiles] = useState<File[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [activeStepIndex, setActiveStepIndex] = useState(0);
   const [hoveredDocIndex, setHoveredDocIndex] = useState<number | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  
+
   // New state for checkboxes
   const [agreements, setAgreements] = useState({
     age: false,
@@ -36,6 +39,13 @@ export default function CandidaturePage() {
   const [resumeComplete, setResumeComplete] = useState(false);
   const [candidateData, setCandidateData] = useState<Candidate | null>(null);
   const [isResumePopupOpen, setIsResumePopupOpen] = useState(false);
+
+  // Resend / submission state
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState("");
+  const [submitMessageType, setSubmitMessageType] = useState<
+    "success" | "error" | ""
+  >("");
 
   // Auto-animation for steps
   useEffect(() => {
@@ -50,27 +60,57 @@ export default function CandidaturePage() {
     };
   }, []);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCheckboxChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const { name, checked } = e.target;
-    setAgreements((prev) => ({ ...prev, [name]: checked }));
+
+    setAgreements((prev) => ({
+      ...prev,
+      [name]: checked,
+    }));
   };
 
   const handleFileDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(false);
+
     const droppedFiles = Array.from(e.dataTransfer.files);
+
     setFiles((prev) => [...prev, ...droppedFiles]);
+
+    // Clear old messages when adding files
+    setSubmitMessage("");
+    setSubmitMessageType("");
   };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     if (e.target.files) {
       const selectedFiles = Array.from(e.target.files);
+
       setFiles((prev) => [...prev, ...selectedFiles]);
+
+      // Clear old messages when adding files
+      setSubmitMessage("");
+      setSubmitMessageType("");
+
+      // Reset input so the same file can be selected again
+      e.target.value = "";
     }
   };
 
@@ -78,139 +118,362 @@ export default function CandidaturePage() {
     setFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // ─────────────────────────────────────────────────────────
+  // Submit candidature
+  // ─────────────────────────────────────────────────────────
+
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
-    console.log("Form submitted:", { 
-      ...formData, 
-      files, 
-      agreements,
-      candidateData 
-    });
-    alert("Votre candidature a été envoyée avec succès !");
+
+    // Prevent multiple submissions
+    if (isSubmitting) {
+      return;
+    }
+
+    // Check agreements
+    if (!allAgreementsChecked) {
+      setSubmitMessageType("error");
+      setSubmitMessage(
+        "Veuillez accepter tous les engagements avant d'envoyer votre candidature."
+      );
+      return;
+    }
+
+    // Check questionnaire
+    if (!resumeComplete || !candidateData) {
+      setSubmitMessageType("error");
+      setSubmitMessage(
+        "Veuillez compléter le questionnaire avant d'envoyer votre candidature."
+      );
+      return;
+    }
+
+    // Check files
+    if (files.length === 0) {
+      setSubmitMessageType("error");
+      setSubmitMessage(
+        "Veuillez ajouter au moins un document avant d'envoyer votre candidature."
+      );
+      return;
+    }
+
+    // Check sector
+    if (!formData.sector) {
+      setSubmitMessageType("error");
+      setSubmitMessage(
+        "Veuillez sélectionner un secteur d'intérêt."
+      );
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      setSubmitMessage("");
+      setSubmitMessageType("");
+
+      // Create multipart FormData
+      const data = new FormData();
+
+      // ─────────────────────────────────────────────────────
+      // Personal information
+      // ─────────────────────────────────────────────────────
+
+      data.append("firstName", formData.firstName);
+      data.append("lastName", formData.lastName);
+      data.append("birthDate", formData.birthDate);
+      data.append("phone", formData.phone);
+      data.append("email", formData.email);
+      data.append("city", formData.city);
+
+      // ─────────────────────────────────────────────────────
+      // Sector + message
+      // ─────────────────────────────────────────────────────
+
+      data.append("sector", formData.sector);
+      data.append("message", formData.message);
+
+      // ─────────────────────────────────────────────────────
+      // Agreements
+      // ─────────────────────────────────────────────────────
+
+      data.append("age", String(agreements.age));
+      data.append(
+        "dataCorrect",
+        String(agreements.dataCorrect)
+      );
+      data.append(
+        "rejectionAccept",
+        String(agreements.rejectionAccept)
+      );
+      data.append(
+        "feesNonRefundable",
+        String(agreements.feesNonRefundable)
+      );
+
+      // ─────────────────────────────────────────────────────
+      // Resume / Questionnaire data
+      // ─────────────────────────────────────────────────────
+
+      data.append(
+        "candidateData",
+        JSON.stringify(candidateData)
+      );
+
+      // ─────────────────────────────────────────────────────
+      // Documents
+      // ─────────────────────────────────────────────────────
+
+      files.forEach((file) => {
+        data.append("files", file);
+      });
+
+      console.log("Sending candidature...");
+
+      // ─────────────────────────────────────────────────────
+      // Send to our Next.js API
+      // ─────────────────────────────────────────────────────
+
+      const response = await fetch("/api/candidature", {
+        method: "POST",
+        body: data,
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          result?.error ||
+            "Une erreur est survenue lors de l'envoi de votre candidature."
+        );
+      }
+
+      // ─────────────────────────────────────────────────────
+      // Success
+      // ─────────────────────────────────────────────────────
+
+      console.log("Candidature successfully sent:", result);
+
+      setSubmitMessageType("success");
+      setSubmitMessage(
+        "✅ Votre candidature a été envoyée avec succès ! Notre équipe va examiner votre dossier."
+      );
+
+      // Clear uploaded files
+      setFiles([]);
+
+      // Reset agreements
+      setAgreements({
+        age: false,
+        dataCorrect: false,
+        rejectionAccept: false,
+        feesNonRefundable: false,
+      });
+
+    } catch (error) {
+      console.error(
+        "Error submitting candidature:",
+        error
+      );
+
+      setSubmitMessageType("error");
+
+      setSubmitMessage(
+        error instanceof Error
+          ? error.message
+          : "Une erreur est survenue lors de l'envoi de votre candidature. Veuillez réessayer."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const nextStep = () => {
-    if (currentStep < 4) setCurrentStep(currentStep + 1);
+    if (currentStep < 4) {
+      setCurrentStep(currentStep + 1);
+    }
   };
 
   const prevStep = () => {
-    if (currentStep > 1) setCurrentStep(currentStep - 1);
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
   };
 
   // Check if all agreements are checked
-  const allAgreementsChecked = Object.values(agreements).every(value => value === true);
+  const allAgreementsChecked = Object.values(agreements).every(
+    (value) => value === true
+  );
 
   // Handle ResumeCV completion
   const handleResumeComplete = (data: Candidate) => {
     setCandidateData(data);
     setResumeComplete(true);
     setIsResumePopupOpen(false);
+
     console.log("Resume/CV data complete:", data);
   };
 
   // Steps for the application process with images
   const applicationSteps = [
-    { 
-      id: 1, 
-      label: "Téléchargez le document", 
-      image: "https://previews.123rf.com/images/arcady31/arcady311609/arcady31160900156/64136621-pdf-document-download-icon.jpg"
+    {
+      id: 1,
+      label: "Téléchargez le document",
+      image:
+        "https://previews.123rf.com/images/arcady31/arcady311609/arcady31160900156/64136621-pdf-document-download-icon.jpg",
     },
-    { 
-      id: 2, 
-      label: "Imprimez le document", 
-      image: "https://www.usscplus.com/wp-content/uploads/2021/09/imprimer-document-ordinateur.jpg"
+    {
+      id: 2,
+      label: "Imprimez le document",
+      image:
+        "https://www.usscplus.com/wp-content/uploads/2021/09/imprimer-document-ordinateur.jpg",
     },
-    { 
-      id: 3, 
-      label: "Remplissez le document", 
-      image: "https://thumbs.dreamstime.com/b/remplir-documents-39095061.jpg"
+    {
+      id: 3,
+      label: "Remplissez le document",
+      image:
+        "https://thumbs.dreamstime.com/b/remplir-documents-39095061.jpg",
     },
-    { 
-      id: 4, 
-      label: "Signez le document", 
-      image: "https://www.leportagesalarial.com/wp-content/uploads/2021/03/signature-documents.jpg"
+    {
+      id: 4,
+      label: "Signez le document",
+      image:
+        "https://www.leportagesalarial.com/wp-content/uploads/2021/03/signature-documents.jpg",
     },
-    { 
-      id: 5, 
-      label: "Scannez le document", 
-      image: "https://www.laposte.fr/ecom/occ/ecommerce/medias/sys_master/productsmedias/hf9/h01/30985916579870/1200Wx1200H_mp-500039798_media/mp-500039798_media.jpg"
+    {
+      id: 5,
+      label: "Scannez le document",
+      image:
+        "https://www.laposte.fr/ecom/occ/ecommerce/medias/sys_master/productsmedias/hf9/h01/30985916579870/1200Wx1200H_mp-500039798_media/mp-500039798_media.jpg",
     },
-    { 
-      id: 6, 
-      label: "Remplissez le formulaire", 
-      image: "https://formulaire-interactif.fr/wp-content/uploads/2022/11/ecran_home_V2.gif"
+    {
+      id: 6,
+      label: "Remplissez le formulaire",
+      image:
+        "https://formulaire-interactif.fr/wp-content/uploads/2022/11/ecran_home_V2.gif",
     },
   ];
 
   // Document sample images for Upload step
   const documentImages = [
-    { id: 1, url: "https://static.onlinecv.fr/wp-content/uploads/sites/36/2023/12/12113530/FRE_Munich_Photo-1040x1433.webp", label: "Photo d'identité" },
-    { id: 2, url: "https://thumbs.dreamstime.com/b/un-jeune-br%C3%A9silien-portant-tshirt-bleu-debout-sur-fond-blanc-isol%C3%A9-visage-joyeux-souriant-aux-bras-crois%C3%A9s-regardant-la-cam%C3%A9ra-228325198.jpg", label: "Photo portrait" },
-    { id: 3, url: "https://www.leconomistemaghrebin.com/wp-content/uploads/2026/07/passeportt.jpg", label: "Passeport" },
-    { id: 4, url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8eMKn143bHBKxv-c7uJpOCBvsFe2RSnpfgZsiawVsmn8uKAUttIRe8WPm&s=10", label: "Diplôme" },
-    { id: 5, url: "https://imgv2-1-f.scribdassets.com/img/document/95226756/original/90995a27a4/1?v=1", label: "Certificat de stage" },
-    { id: 6, url: "https://www.linguaviva-dortmund.de/assets/images/telc-musterzertifikat-b1-451x640.jpg", label: "Certificat de langue" },
+    {
+      id: 1,
+      url: "https://static.onlinecv.fr/wp-content/uploads/sites/36/2023/12/12113530/FRE_Munich_Photo-1040x1433.webp",
+      label: "Photo d'identité",
+    },
+    {
+      id: 2,
+      url: "https://thumbs.dreamstime.com/b/un-jeune-br%C3%A9silien-portant-tshirt-bleu-debout-sur-fond-blanc-isol%C3%A9-visage-joyeux-souriant-aux-bras-crois%C3%A9s-regardant-la-cam%C3%A9ra-228325198.jpg",
+      label: "Photo portrait",
+    },
+    {
+      id: 3,
+      url: "https://www.leconomistemaghrebin.com/wp-content/uploads/2026/07/passeportt.jpg",
+      label: "Passeport",
+    },
+    {
+      id: 4,
+      url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8eMKn143bHBKxv-c7uJpOCBvsFe2RSnpfgZsiawVsmn8uKAUttIRe8WPm&s=10",
+      label: "Diplôme",
+    },
+    {
+      id: 5,
+      url: "https://imgv2-1-f.scribdassets.com/img/document/95226756/original/90995a27a4/1?v=1",
+      label: "Certificat de stage",
+    },
+    {
+      id: 6,
+      url: "https://www.linguaviva-dortmund.de/assets/images/telc-musterzertifikat-b1-451x640.jpg",
+      label: "Certificat de langue",
+    },
   ];
 
   return (
     <>
       <Navbar />
+
       <div className="pt-20">
         <main className="flex-grow pt-28 pb-section-gap-lg px-margin-mobile md:px-gutter">
           <div className="max-w-4xl mx-auto">
+
             {/* Header */}
             <div className="text-center mb-12">
               <div className="flex flex-wrap items-center justify-center gap-3 mb-4">
                 <span className="inline-flex items-center px-4 py-1.5 bg-brand-imperial/10 text-brand-imperial uppercase tracking-wider rounded-full font-label-md text-xs font-bold border border-brand-imperial/20 backdrop-blur-sm">
                   Candidature
                 </span>
+
                 <span className="px-3 py-1 bg-secondary/10 text-secondary rounded-full font-label-md text-xs font-bold border border-secondary/20">
                   En ligne
                 </span>
               </div>
+
               <h1 className="font-display-lg text-display-lg-mobile md:text-display-lg text-primary mb-4">
                 Application Hub
               </h1>
+
               <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">
-                Commencez votre parcours vers des opportunités globales. Complétez votre profil avec soin pour nous aider à vous proposer les meilleurs parcours de carrière.
+                Commencez votre parcours vers des opportunités
+                globales. Complétez votre profil avec soin pour nous
+                aider à vous proposer les meilleurs parcours de
+                carrière.
               </p>
             </div>
 
             {/* Steps - Process in order with images */}
             <div className="mb-8 rounded-2xl bg-surface-container-lowest p-6 shadow-sm border border-outline-variant/30">
-              <h2 className="font-headline-md text-brand-imperial mb-4">Étapes à suivre :</h2>
+              <h2 className="font-headline-md text-brand-imperial mb-4">
+                Étapes à suivre :
+              </h2>
+
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {applicationSteps.map((step, index) => {
                   const isActive = index === activeStepIndex;
+
                   return (
-                    <div 
-                      key={step.id} 
+                    <div
+                      key={step.id}
                       className={`group flex flex-col items-center gap-2 p-4 rounded-xl bg-surface-container-low border border-outline-variant/30 transition-all duration-300 hover:shadow-md ${
-                        isActive 
-                          ? 'border-secondary/70 shadow-lg scale-[1.02] bg-secondary/5' 
-                          : 'hover:border-secondary/50'
+                        isActive
+                          ? "border-secondary/70 shadow-lg scale-[1.02] bg-secondary/5"
+                          : "hover:border-secondary/50"
                       }`}
                     >
-                      <div className={`flex-shrink-0 w-48 h-48 rounded-lg overflow-hidden border border-outline-variant/30 transition-all duration-300 ${
-                        isActive ? 'shadow-xl ring-2 ring-secondary/40' : ''
-                      }`}>
+                      <div
+                        className={`flex-shrink-0 w-48 h-48 rounded-lg overflow-hidden border border-outline-variant/30 transition-all duration-300 ${
+                          isActive
+                            ? "shadow-xl ring-2 ring-secondary/40"
+                            : ""
+                        }`}
+                      >
                         <img
                           src={step.image}
                           alt={step.label}
                           className={`w-full h-full object-cover transition-all duration-300 ${
-                            isActive ? 'scale-110 brightness-110' : 'group-hover:scale-110'
+                            isActive
+                              ? "scale-110 brightness-110"
+                              : "group-hover:scale-110"
                           }`}
                           onError={(e) => {
                             (e.target as HTMLImageElement).src =
-                              "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23e5e7eb'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%239ca3af' font-size='12'%3E" + step.id + "%3C/text%3E%3C/svg%3E";
+                              "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23e5e7eb'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%239ca3af' font-size='12'%3E" +
+                              step.id +
+                              "%3C/text%3E%3C/svg%3E";
                           }}
                         />
                       </div>
-                      <span className={`font-body-md text-sm text-center transition-all duration-300 ${
-                        isActive ? 'text-secondary font-bold' : 'text-on-surface-variant'
-                      }`}>
+
+                      <span
+                        className={`font-body-md text-sm text-center transition-all duration-300 ${
+                          isActive
+                            ? "text-secondary font-bold"
+                            : "text-on-surface-variant"
+                        }`}
+                      >
                         {step.id}/ {step.label}
                       </span>
+
                       {isActive && (
                         <div className="w-12 h-1 bg-secondary rounded-full animate-pulse" />
                       )}
@@ -223,15 +486,20 @@ export default function CandidaturePage() {
             {/* Progress Steps */}
             <div className="glass-panel rounded-xl shadow-[0_20px_40px_rgba(3,4,94,0.05)] p-6 md:p-10 relative overflow-hidden border border-outline-variant/30">
               <div className="absolute top-0 right-0 w-64 h-64 bg-secondary-container/20 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2"></div>
+
               <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary-container/10 rounded-full blur-3xl -z-10 -translate-x-1/2 translate-y-1/2"></div>
 
               {/* Steps Indicator */}
               <div className="mb-12 relative">
                 <div className="absolute top-1/2 left-0 w-full h-[2px] bg-surface-variant -z-10 -translate-y-1/2"></div>
-                <div 
+
+                <div
                   className="absolute top-1/2 left-0 h-[2px] bg-brand-imperial -z-10 -translate-y-1/2 transition-all duration-500"
-                  style={{ width: `${((currentStep - 1) / 3) * 100}%` }}
+                  style={{
+                    width: `${((currentStep - 1) / 3) * 100}%`,
+                  }}
                 ></div>
+
                 <div className="flex justify-between items-center relative z-0">
                   {[
                     { num: 1, label: "Personal Info" },
@@ -239,29 +507,43 @@ export default function CandidaturePage() {
                     { num: 3, label: "CV Complet" },
                     { num: 4, label: "Upload" },
                   ].map((step) => (
-                    <div 
+                    <div
                       key={step.num}
                       className={`flex flex-col items-center cursor-pointer ${
-                        currentStep === step.num ? "step-active" : "step-inactive"
+                        currentStep === step.num
+                          ? "step-active"
+                          : "step-inactive"
                       }`}
                       onClick={() => {
-                        if (step.num <= currentStep || step.num === 1) {
+                        if (
+                          step.num <= currentStep ||
+                          step.num === 1
+                        ) {
                           setCurrentStep(step.num);
                         }
                       }}
                     >
-                      <div className={`w-10 h-10 rounded-full border-2 flex items-center justify-center mb-2 transition-colors duration-300 shadow-sm font-label-md text-label-md ${
-                        currentStep === step.num 
-                          ? "bg-brand-imperial text-white border-brand-imperial"
-                          : currentStep > step.num
-                          ? "bg-secondary text-white border-secondary"
-                          : "bg-white border-outline-variant text-on-surface-variant hover:border-brand-imperial"
-                      }`}>
-                        {currentStep > step.num ? "✓" : step.num}
+                      <div
+                        className={`w-10 h-10 rounded-full border-2 flex items-center justify-center mb-2 transition-colors duration-300 shadow-sm font-label-md text-label-md ${
+                          currentStep === step.num
+                            ? "bg-brand-imperial text-white border-brand-imperial"
+                            : currentStep > step.num
+                            ? "bg-secondary text-white border-secondary"
+                            : "bg-white border-outline-variant text-on-surface-variant hover:border-brand-imperial"
+                        }`}
+                      >
+                        {currentStep > step.num
+                          ? "✓"
+                          : step.num}
                       </div>
-                      <span className={`font-label-md text-caption md:text-label-md text-center ${
-                        currentStep === step.num ? "text-brand-imperial font-bold" : "text-on-surface-variant"
-                      }`}>
+
+                      <span
+                        className={`font-label-md text-caption md:text-label-md text-center ${
+                          currentStep === step.num
+                            ? "text-brand-imperial font-bold"
+                            : "text-on-surface-variant"
+                        }`}
+                      >
                         {step.label}
                       </span>
                     </div>
@@ -270,17 +552,24 @@ export default function CandidaturePage() {
               </div>
 
               <form onSubmit={handleSubmit}>
+
                 {/* Step 1: Personal Information */}
                 {currentStep === 1 && (
                   <div className="space-y-6 animate-fade-in">
                     <h2 className="font-headline-md text-headline-md text-brand-imperial border-b border-outline-variant/30 pb-2">
                       Personal Information
                     </h2>
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
                       <div className="space-y-2">
-                        <label className="block font-label-md text-label-md text-brand-imperial" htmlFor="firstName">
+                        <label
+                          className="block font-label-md text-label-md text-brand-imperial"
+                          htmlFor="firstName"
+                        >
                           Prénom <span className="text-error">*</span>
                         </label>
+
                         <input
                           className="w-full bg-white border border-outline-variant rounded-lg px-4 py-3 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
                           id="firstName"
@@ -292,10 +581,15 @@ export default function CandidaturePage() {
                           required
                         />
                       </div>
+
                       <div className="space-y-2">
-                        <label className="block font-label-md text-label-md text-brand-imperial" htmlFor="lastName">
+                        <label
+                          className="block font-label-md text-label-md text-brand-imperial"
+                          htmlFor="lastName"
+                        >
                           Nom <span className="text-error">*</span>
                         </label>
+
                         <input
                           className="w-full bg-white border border-outline-variant rounded-lg px-4 py-3 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
                           id="lastName"
@@ -307,14 +601,20 @@ export default function CandidaturePage() {
                           required
                         />
                       </div>
+
                       <div className="space-y-2 md:col-span-2">
-                        <label className="block font-label-md text-label-md text-brand-imperial" htmlFor="email">
+                        <label
+                          className="block font-label-md text-label-md text-brand-imperial"
+                          htmlFor="email"
+                        >
                           Email <span className="text-error">*</span>
                         </label>
+
                         <div className="relative">
                           <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-outline pointer-events-none">
                             ✉️
                           </span>
+
                           <input
                             className="w-full bg-white border border-outline-variant rounded-lg pl-10 pr-4 py-3 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
                             id="email"
@@ -327,14 +627,20 @@ export default function CandidaturePage() {
                           />
                         </div>
                       </div>
+
                       <div className="space-y-2">
-                        <label className="block font-label-md text-label-md text-brand-imperial" htmlFor="phone">
+                        <label
+                          className="block font-label-md text-label-md text-brand-imperial"
+                          htmlFor="phone"
+                        >
                           Téléphone <span className="text-error">*</span>
                         </label>
+
                         <div className="relative">
                           <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-outline pointer-events-none">
                             📱
                           </span>
+
                           <input
                             className="w-full bg-white border border-outline-variant rounded-lg pl-10 pr-4 py-3 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
                             id="phone"
@@ -347,14 +653,21 @@ export default function CandidaturePage() {
                           />
                         </div>
                       </div>
+
                       <div className="space-y-2">
-                        <label className="block font-label-md text-label-md text-brand-imperial" htmlFor="birthDate">
-                          Date de naissance <span className="text-error">*</span>
+                        <label
+                          className="block font-label-md text-label-md text-brand-imperial"
+                          htmlFor="birthDate"
+                        >
+                          Date de naissance{" "}
+                          <span className="text-error">*</span>
                         </label>
+
                         <div className="relative">
                           <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-outline pointer-events-none">
                             📅
                           </span>
+
                           <input
                             className="w-full bg-white border border-outline-variant rounded-lg pl-10 pr-4 py-3 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow text-on-surface-variant"
                             id="birthDate"
@@ -366,14 +679,20 @@ export default function CandidaturePage() {
                           />
                         </div>
                       </div>
+
                       <div className="space-y-2 md:col-span-2">
-                        <label className="block font-label-md text-label-md text-brand-imperial" htmlFor="city">
+                        <label
+                          className="block font-label-md text-label-md text-brand-imperial"
+                          htmlFor="city"
+                        >
                           Ville <span className="text-error">*</span>
                         </label>
+
                         <div className="relative">
                           <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-outline pointer-events-none">
                             📍
                           </span>
+
                           <input
                             className="w-full bg-white border border-outline-variant rounded-lg pl-10 pr-4 py-3 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow"
                             id="city"
@@ -387,6 +706,7 @@ export default function CandidaturePage() {
                         </div>
                       </div>
                     </div>
+
                     <div className="flex justify-end pt-6 mt-8 border-t border-outline-variant/30">
                       <button
                         type="button"
@@ -406,28 +726,66 @@ export default function CandidaturePage() {
                     <h2 className="font-headline-md text-headline-md text-brand-imperial border-b border-outline-variant/30 pb-2">
                       Target Sector & Message
                     </h2>
-                    
+
                     <div className="space-y-4">
                       <div>
-                        <label className="block font-label-md text-label-md text-brand-imperial mb-2">
+                        <label
+                          className="block font-label-md text-label-md text-brand-imperial mb-2"
+                          htmlFor="sector"
+                        >
                           Secteur d'intérêt
                         </label>
-                        <select className="w-full bg-white border border-outline-variant rounded-lg px-4 py-3 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow text-on-surface-variant">
-                          <option value="">Sélectionnez un secteur</option>
-                          <option value="sante">Secteur de la santé</option>
-                          <option value="tourisme">Secteur du tourisme</option>
-                          <option value="restauration">Secteur de la restauration</option>
-                          <option value="mecanique">Secteur de la mécanique automobile</option>
-                          <option value="industrie">Secteur de l'industrie</option>
-                          <option value="autres">Autres secteurs</option>
+
+                        <select
+                          id="sector"
+                          name="sector"
+                          value={formData.sector}
+                          onChange={handleInputChange}
+                          className="w-full bg-white border border-outline-variant rounded-lg px-4 py-3 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-shadow text-on-surface-variant"
+                        >
+                          <option value="">
+                            Sélectionnez un secteur
+                          </option>
+
+                          <option value="sante">
+                            Secteur de la santé
+                          </option>
+
+                          <option value="tourisme">
+                            Secteur du tourisme
+                          </option>
+
+                          <option value="restauration">
+                            Secteur de la restauration
+                          </option>
+
+                          <option value="mecanique">
+                            Secteur de la mécanique automobile
+                          </option>
+
+                          <option value="industrie">
+                            Secteur de l'industrie
+                          </option>
+
+                          <option value="autres">
+                            Autres secteurs
+                          </option>
                         </select>
                       </div>
 
                       <div>
-                        <label className="block font-label-md text-label-md text-brand-imperial mb-2">
-                          Message <span className="text-on-surface-variant/60">(facultatif)</span>
+                        <label
+                          className="block font-label-md text-label-md text-brand-imperial mb-2"
+                          htmlFor="message"
+                        >
+                          Message{" "}
+                          <span className="text-on-surface-variant/60">
+                            (facultatif)
+                          </span>
                         </label>
+
                         <textarea
+                          id="message"
                           name="message"
                           value={formData.message}
                           onChange={handleInputChange}
@@ -447,6 +805,7 @@ export default function CandidaturePage() {
                         <span className="mr-2">←</span>
                         Retour
                       </button>
+
                       <button
                         type="button"
                         onClick={nextStep}
@@ -465,29 +824,36 @@ export default function CandidaturePage() {
                     <h2 className="font-headline-md text-headline-md text-brand-imperial border-b border-outline-variant/30 pb-2">
                       Questionnaire Complet
                     </h2>
+
                     <p className="font-body-md text-sm text-on-surface-variant/70">
-                      Remplissez le questionnaire complet en ligne. Cela remplace le PDF que vous deviez télécharger.
+                      Remplissez le questionnaire complet en ligne.
+                      Cela remplace le PDF que vous deviez
+                      télécharger.
                     </p>
-                    
+
                     <div className="flex flex-col items-center justify-center p-8 bg-surface-container-low rounded-xl border-2 border-dashed border-outline-variant/30">
                       <div className="text-6xl mb-4">📋</div>
+
                       <h3 className="font-headline-md text-brand-imperial text-lg mb-2">
                         Bewerberfragebogen
                       </h3>
+
                       <p className="text-sm text-on-surface-variant/60 text-center max-w-md mb-6">
-                        {resumeComplete 
-                          ? '✅ Questionnaire déjà rempli. Vous pouvez le modifier si nécessaire.'
-                          : 'Klicken Sie auf den Button, um den Fragebogen auszufüllen.'}
+                        {resumeComplete
+                          ? "✅ Questionnaire déjà rempli. Vous pouvez le modifier si nécessaire."
+                          : "Klicken Sie auf den Button, um den Fragebogen auszufüllen."}
                       </p>
-                      
+
                       <div className="flex flex-wrap gap-4 justify-center">
                         <button
                           type="button"
-                          onClick={() => setIsResumePopupOpen(true)}
+                          onClick={() =>
+                            setIsResumePopupOpen(true)
+                          }
                           className={`px-6 py-3 rounded-lg font-label-md text-label-md transition-all duration-300 flex items-center gap-2 ${
                             resumeComplete
-                              ? 'bg-secondary/10 text-secondary hover:bg-secondary/20 border border-secondary/30'
-                              : 'bg-brand-imperial hover:bg-brand-imperial/90 text-white shadow-sm hover:shadow-md'
+                              ? "bg-secondary/10 text-secondary hover:bg-secondary/20 border border-secondary/30"
+                              : "bg-brand-imperial hover:bg-brand-imperial/90 text-white shadow-sm hover:shadow-md"
                           }`}
                         >
                           {resumeComplete ? (
@@ -502,13 +868,15 @@ export default function CandidaturePage() {
                             </>
                           )}
                         </button>
-                        
+
                         {resumeComplete && (
                           <button
                             type="button"
                             onClick={() => {
-                              // Show summary or preview
-                              console.log('Preview data:', candidateData);
+                              console.log(
+                                "Preview data:",
+                                candidateData
+                              );
                             }}
                             className="px-6 py-3 rounded-lg font-label-md text-label-md bg-surface-container-low hover:bg-surface-container text-on-surface-variant border border-outline-variant/30 transition-all duration-300 flex items-center gap-2"
                           >
@@ -517,16 +885,20 @@ export default function CandidaturePage() {
                           </button>
                         )}
                       </div>
-                      
+
                       {resumeComplete && (
                         <div className="mt-4 p-3 bg-secondary/10 border border-secondary/30 rounded-lg w-full max-w-md">
                           <p className="text-secondary font-medium text-sm flex items-center gap-2">
                             <span>✅</span>
                             Questionnaire complété avec succès!
                           </p>
+
                           <p className="text-xs text-on-surface-variant/60 mt-1">
-                            {candidateData?.personal.firstName} {candidateData?.personal.lastName} • 
-                            {candidateData?.career.desiredProfession || ' Kein Beruf angegeben'}
+                            {candidateData?.personal.firstName}{" "}
+                            {candidateData?.personal.lastName} •
+                            {candidateData?.career
+                              .desiredProfession ||
+                              " Kein Beruf angegeben"}
                           </p>
                         </div>
                       )}
@@ -541,14 +913,15 @@ export default function CandidaturePage() {
                         <span className="mr-2">←</span>
                         Retour
                       </button>
+
                       <button
                         type="button"
                         onClick={nextStep}
                         disabled={!resumeComplete}
                         className={`font-label-md text-label-md py-3 px-8 rounded-lg shadow-sm transition-all duration-300 flex items-center ${
                           resumeComplete
-                            ? 'bg-brand-imperial hover:bg-brand-imperial/90 text-white hover:shadow-md cursor-pointer'
-                            : 'bg-surface-container-low text-on-surface-variant/40 cursor-not-allowed border border-outline-variant/30'
+                            ? "bg-brand-imperial hover:bg-brand-imperial/90 text-white hover:shadow-md cursor-pointer"
+                            : "bg-surface-container-low text-on-surface-variant/40 cursor-not-allowed border border-outline-variant/30"
                         }`}
                       >
                         Étape suivante
@@ -564,28 +937,52 @@ export default function CandidaturePage() {
                     <h2 className="font-headline-md text-headline-md text-brand-imperial border-b border-outline-variant/30 pb-2">
                       Upload Documents
                     </h2>
+
                     {/* Documents à fournir (exemples) */}
                     <div className="rounded-xl bg-brand-ice/20 p-4 border border-brand-imperial/10">
                       <p className="mb-3 font-body-md text-sm font-medium text-on-surface-variant">
                         Documents à fournir (exemples) :
                       </p>
+
                       <div className="flex flex-nowrap gap-2 justify-center overflow-x-auto pb-2">
                         {documentImages.map((doc, index) => {
-                          const isHovered = hoveredDocIndex === index;
-                          const isAnyHovered = hoveredDocIndex !== null;
+                          const isHovered =
+                            hoveredDocIndex === index;
+
+                          const isAnyHovered =
+                            hoveredDocIndex !== null;
+
                           return (
                             <div
                               key={doc.id}
                               className="relative rounded-lg overflow-hidden border border-outline-variant/30 bg-surface-container-low transition-all duration-500 ease-in-out cursor-pointer flex-shrink-0"
                               style={{
-                                flex: isHovered ? '0 0 220px' : isAnyHovered ? '0 0 60px' : '0 0 100px',
-                                height: isHovered ? '320px' : '200px',
-                                transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+                                flex: isHovered
+                                  ? "0 0 220px"
+                                  : isAnyHovered
+                                  ? "0 0 60px"
+                                  : "0 0 100px",
+
+                                height: isHovered
+                                  ? "320px"
+                                  : "200px",
+
+                                transform: isHovered
+                                  ? "scale(1.05)"
+                                  : "scale(1)",
+
                                 zIndex: isHovered ? 10 : 1,
-                                boxShadow: isHovered ? '0 20px 40px rgba(0,0,0,0.2)' : 'none',
+
+                                boxShadow: isHovered
+                                  ? "0 20px 40px rgba(0,0,0,0.2)"
+                                  : "none",
                               }}
-                              onMouseEnter={() => setHoveredDocIndex(index)}
-                              onMouseLeave={() => setHoveredDocIndex(null)}
+                              onMouseEnter={() =>
+                                setHoveredDocIndex(index)
+                              }
+                              onMouseLeave={() =>
+                                setHoveredDocIndex(null)
+                              }
                             >
                               <div className="w-full h-full overflow-hidden relative">
                                 <img
@@ -593,35 +990,55 @@ export default function CandidaturePage() {
                                   alt={doc.label}
                                   className="w-full h-full object-cover transition-all duration-500"
                                   style={{
-                                    transform: isHovered ? 'scale(1.1)' : 'scale(1)',
-                                    objectPosition: isHovered ? 'center' : 'center 30%',
+                                    transform: isHovered
+                                      ? "scale(1.1)"
+                                      : "scale(1)",
+
+                                    objectPosition: isHovered
+                                      ? "center"
+                                      : "center 30%",
                                   }}
                                   onError={(e) => {
-                                    (e.target as HTMLImageElement).src =
-                                      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='267'%3E%3Crect width='200' height='267' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%239ca3af' font-size='14'%3E" + doc.label + "%3C/text%3E%3C/svg%3E";
+                                    (
+                                      e.target as HTMLImageElement
+                                    ).src =
+                                      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='267'%3E%3Crect width='200' height='267' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%239ca3af' font-size='14'%3E" +
+                                      doc.label +
+                                      "%3C/text%3E%3C/svg%3E";
                                   }}
                                 />
+
                                 <div
                                   className="absolute bottom-0 left-0 right-0 transition-all duration-500"
                                   style={{
-                                    height: isHovered ? '0%' : '50%',
-                                    background: 'linear-gradient(to top, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 100%)',
+                                    height: isHovered
+                                      ? "0%"
+                                      : "50%",
+
+                                    background:
+                                      "linear-gradient(to top, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 100%)",
                                   }}
                                 />
                               </div>
+
                               <div
                                 className="absolute bottom-0 left-0 right-0 p-3 transition-all duration-500"
                                 style={{
                                   background: isHovered
-                                    ? 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)'
-                                    : 'linear-gradient(to top, rgba(0,0,0,0.3), transparent)',
+                                    ? "linear-gradient(to top, rgba(0,0,0,0.8), transparent)"
+                                    : "linear-gradient(to top, rgba(0,0,0,0.3), transparent)",
                                 }}
                               >
-                                <span className={`text-white font-body-md text-center block transition-all duration-500 ${
-                                  isHovered ? 'text-sm font-bold' : 'text-xs'
-                                }`}>
+                                <span
+                                  className={`text-white font-body-md text-center block transition-all duration-500 ${
+                                    isHovered
+                                      ? "text-sm font-bold"
+                                      : "text-xs"
+                                  }`}
+                                >
                                   {doc.label}
                                 </span>
+
                                 {isHovered && (
                                   <span className="text-white/80 text-xs block text-center mt-1 animate-fade-in">
                                     ✨ Voir en détail
@@ -632,16 +1049,19 @@ export default function CandidaturePage() {
                           );
                         })}
                       </div>
+
                       <p className="mt-4 font-body-md text-xs text-on-surface-variant/60 italic text-center">
-                        * Passez votre souris sur chaque document pour le voir en détail
+                        * Passez votre souris sur chaque document pour
+                        le voir en détail
                       </p>
                     </div>
-                    
+
                     {/* Agreements Section */}
                     <div className="rounded-xl bg-brand-ice/10 p-6 border border-brand-imperial/10">
                       <h3 className="font-headline-sm text-brand-imperial mb-4 text-sm font-bold">
                         📋 Confirmation & Engagements
                       </h3>
+
                       <div className="space-y-3">
                         <label className="flex items-start gap-3 cursor-pointer group hover:bg-brand-ice/20 p-2 rounded-lg transition-colors">
                           <input
@@ -651,6 +1071,7 @@ export default function CandidaturePage() {
                             onChange={handleCheckboxChange}
                             className="mt-0.5 w-5 h-5 rounded border-outline-variant text-secondary focus:ring-secondary transition-colors cursor-pointer flex-shrink-0"
                           />
+
                           <span className="font-body-md text-sm text-on-surface-variant group-hover:text-brand-imperial transition-colors">
                             Je confirme que j'ai moins de 35 ans.
                           </span>
@@ -664,8 +1085,10 @@ export default function CandidaturePage() {
                             onChange={handleCheckboxChange}
                             className="mt-0.5 w-5 h-5 rounded border-outline-variant text-secondary focus:ring-secondary transition-colors cursor-pointer flex-shrink-0"
                           />
+
                           <span className="font-body-md text-sm text-on-surface-variant group-hover:text-brand-imperial transition-colors">
-                            Je confirme que les données fournies seront remplies correctement.
+                            Je confirme que les données fournies
+                            seront remplies correctement.
                           </span>
                         </label>
 
@@ -677,8 +1100,11 @@ export default function CandidaturePage() {
                             onChange={handleCheckboxChange}
                             className="mt-0.5 w-5 h-5 rounded border-outline-variant text-secondary focus:ring-secondary transition-colors cursor-pointer flex-shrink-0"
                           />
+
                           <span className="font-body-md text-sm text-on-surface-variant group-hover:text-brand-imperial transition-colors">
-                            Je suis d'accord que ma candidature sera immédiatement rejetée en cas où les informations fournies sont incorrectes.
+                            Je suis d'accord que ma candidature sera
+                            immédiatement rejetée en cas où les
+                            informations fournies sont incorrectes.
                           </span>
                         </label>
 
@@ -690,45 +1116,76 @@ export default function CandidaturePage() {
                             onChange={handleCheckboxChange}
                             className="mt-0.5 w-5 h-5 rounded border-outline-variant text-secondary focus:ring-secondary transition-colors cursor-pointer flex-shrink-0"
                           />
+
                           <span className="font-body-md text-sm text-on-surface-variant group-hover:text-brand-imperial transition-colors">
-                            Je suis d'accord que les frais de dossier ne sont pas remboursables.
+                            Je suis d'accord que les frais de dossier
+                            ne sont pas remboursables.
                           </span>
                         </label>
                       </div>
-                      
+
                       <div className="mt-4 pt-4 border-t border-outline-variant/20">
                         <div className="flex items-center justify-between">
                           <span className="font-body-md text-xs text-on-surface-variant/60">
-                            Progression: {Object.values(agreements).filter(v => v).length}/4 confirmations
+                            Progression:{" "}
+                            {
+                              Object.values(agreements).filter(
+                                (v) => v
+                              ).length
+                            }
+                            /4 confirmations
                           </span>
-                          <span className={`font-label-md text-xs font-bold transition-colors duration-300 ${
-                            allAgreementsChecked ? 'text-secondary' : 'text-on-surface-variant/40'
-                          }`}>
-                            {allAgreementsChecked ? '✅ Tous les engagements sont acceptés' : '⚠️ Veuillez accepter tous les engagements'}
+
+                          <span
+                            className={`font-label-md text-xs font-bold transition-colors duration-300 ${
+                              allAgreementsChecked
+                                ? "text-secondary"
+                                : "text-on-surface-variant/40"
+                            }`}
+                          >
+                            {allAgreementsChecked
+                              ? "✅ Tous les engagements sont acceptés"
+                              : "⚠️ Veuillez accepter tous les engagements"}
                           </span>
                         </div>
+
                         <div className="mt-2 w-full h-1.5 bg-surface-container-low rounded-full overflow-hidden">
-                          <div 
+                          <div
                             className="h-full bg-secondary transition-all duration-500 rounded-full"
-                            style={{ width: `${(Object.values(agreements).filter(v => v).length / 4) * 100}%` }}
+                            style={{
+                              width: `${
+                                (Object.values(
+                                  agreements
+                                ).filter((v) => v).length /
+                                  4) *
+                                100
+                              }%`,
+                            }}
                           />
                         </div>
                       </div>
                     </div>
 
                     {/* Upload Section */}
-                    <div className={`relative transition-all duration-500 ${!allAgreementsChecked ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
+                    <div
+                      className={`relative transition-all duration-500 ${
+                        !allAgreementsChecked
+                          ? "opacity-50 pointer-events-none"
+                          : "opacity-100"
+                      }`}
+                    >
                       {!allAgreementsChecked && (
                         <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-10 rounded-xl flex items-center justify-center">
                           <div className="bg-white/90 px-6 py-3 rounded-lg shadow-lg border border-outline-variant/30">
                             <p className="font-body-md text-sm text-on-surface-variant flex items-center gap-2">
                               <span>🔒</span>
-                              Veuillez accepter tous les engagements pour activer l'upload
+                              Veuillez accepter tous les engagements
+                              pour activer l'upload
                             </p>
                           </div>
                         </div>
                       )}
-                      
+
                       <div
                         className={`relative rounded-xl border-2 border-dashed p-8 text-center transition-colors ${
                           isDragging
@@ -739,7 +1196,9 @@ export default function CandidaturePage() {
                           e.preventDefault();
                           setIsDragging(true);
                         }}
-                        onDragLeave={() => setIsDragging(false)}
+                        onDragLeave={() =>
+                          setIsDragging(false)
+                        }
                         onDrop={handleFileDrop}
                       >
                         <input
@@ -748,37 +1207,64 @@ export default function CandidaturePage() {
                           onChange={handleFileSelect}
                           className="absolute inset-0 cursor-pointer opacity-0"
                           accept=".pdf,.doc,.docx,.txt,.jpeg,.jpg,.png"
-                          disabled={!allAgreementsChecked}
+                          disabled={
+                            !allAgreementsChecked ||
+                            isSubmitting
+                          }
                         />
-                        <span className="text-4xl mb-2 block">📤</span>
+
+                        <span className="text-4xl mb-2 block">
+                          📤
+                        </span>
+
                         <p className="font-body-md text-sm text-on-surface-variant">
-                          Glissez-déposez vos fichiers ici ou <span className="text-secondary font-medium">parcourez</span>
+                          Glissez-déposez vos fichiers ici ou{" "}
+                          <span className="text-secondary font-medium">
+                            parcourez
+                          </span>
                         </p>
+
                         <p className="font-body-md text-xs text-on-surface-variant/60 mt-1">
                           PDF, DOC, DOCX, TXT, JPG, PNG • Max 10MB
                         </p>
                       </div>
                     </div>
 
+                    {/* Selected files */}
                     {files.length > 0 && (
                       <div className="mt-4 space-y-2">
                         {files.map((file, index) => (
                           <div
-                            key={index}
+                            key={`${file.name}-${index}`}
                             className="flex items-center justify-between rounded-lg bg-surface-container-low px-4 py-2.5 border border-outline-variant/30"
                           >
-                            <div className="flex items-center gap-3">
-                              <span className="text-secondary">📄</span>
-                              <span className="font-body-md text-sm text-on-surface-variant">{file.name}</span>
-                              <span className="font-body-md text-xs text-on-surface-variant/60">
-                                ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                            <div className="flex items-center gap-3 min-w-0">
+                              <span className="text-secondary">
+                                📄
+                              </span>
+
+                              <span className="font-body-md text-sm text-on-surface-variant truncate">
+                                {file.name}
+                              </span>
+
+                              <span className="font-body-md text-xs text-on-surface-variant/60 flex-shrink-0">
+                                (
+                                {(
+                                  file.size /
+                                  1024 /
+                                  1024
+                                ).toFixed(2)}{" "}
+                                MB)
                               </span>
                             </div>
+
                             <button
                               type="button"
-                              onClick={() => removeFile(index)}
-                              className="text-sm text-error hover:text-error/80"
-                              disabled={!allAgreementsChecked}
+                              onClick={() =>
+                                removeFile(index)
+                              }
+                              className="text-sm text-error hover:text-error/80 flex-shrink-0 ml-3"
+                              disabled={isSubmitting}
                             >
                               Supprimer
                             </button>
@@ -787,26 +1273,62 @@ export default function CandidaturePage() {
                       </div>
                     )}
 
+                    {/* Submission message */}
+                    {submitMessage && (
+                      <div
+                        className={`rounded-lg px-4 py-3 border ${
+                          submitMessageType === "success"
+                            ? "bg-secondary/10 border-secondary/30 text-secondary"
+                            : "bg-error/10 border-error/30 text-error"
+                        }`}
+                      >
+                        <p className="font-body-md text-sm">
+                          {submitMessage}
+                        </p>
+                      </div>
+                    )}
+
                     <div className="flex justify-between pt-6 mt-8 border-t border-outline-variant/30">
                       <button
                         type="button"
                         onClick={prevStep}
-                        className="bg-transparent hover:bg-surface-container-low text-on-surface-variant font-label-md text-label-md py-3 px-8 rounded-lg transition-all duration-300 flex items-center"
+                        disabled={isSubmitting}
+                        className="bg-transparent hover:bg-surface-container-low text-on-surface-variant font-label-md text-label-md py-3 px-8 rounded-lg transition-all duration-300 flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <span className="mr-2">←</span>
                         Retour
                       </button>
+
                       <button
                         type="submit"
-                        disabled={!allAgreementsChecked || !resumeComplete}
+                        disabled={
+                          !allAgreementsChecked ||
+                          !resumeComplete ||
+                          files.length === 0 ||
+                          isSubmitting
+                        }
                         className={`font-label-md text-label-md py-3 px-8 rounded-lg shadow-sm transition-all duration-300 flex items-center ${
-                          allAgreementsChecked && resumeComplete
-                            ? 'bg-brand-imperial hover:bg-brand-imperial/90 text-white hover:shadow-md cursor-pointer'
-                            : 'bg-surface-container-low text-on-surface-variant/40 cursor-not-allowed border border-outline-variant/30'
+                          allAgreementsChecked &&
+                          resumeComplete &&
+                          files.length > 0 &&
+                          !isSubmitting
+                            ? "bg-brand-imperial hover:bg-brand-imperial/90 text-white hover:shadow-md cursor-pointer"
+                            : "bg-surface-container-low text-on-surface-variant/40 cursor-not-allowed border border-outline-variant/30"
                         }`}
                       >
-                        ✉️
-                        Envoyer ma candidature
+                        {isSubmitting ? (
+                          <>
+                            <span className="mr-2 animate-pulse">
+                              ⏳
+                            </span>
+                            Envoi en cours...
+                          </>
+                        ) : (
+                          <>
+                            <span className="mr-2">✉️</span>
+                            Envoyer ma candidature
+                          </>
+                        )}
                       </button>
                     </div>
                   </div>
@@ -816,23 +1338,37 @@ export default function CandidaturePage() {
           </div>
         </main>
 
-        <style dangerouslySetInnerHTML={{ __html: `
-          @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-          .animate-fade-in {
-            animation: fadeIn 0.4s ease-out forwards;
-          }
-          .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-          }
-          .scrollbar-hide {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-          }
-        ` }} />
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
+              @keyframes fadeIn {
+                from {
+                  opacity: 0;
+                  transform: translateY(10px);
+                }
+                to {
+                  opacity: 1;
+                  transform: translateY(0);
+                }
+              }
+
+              .animate-fade-in {
+                animation: fadeIn 0.4s ease-out forwards;
+              }
+
+              .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+              }
+
+              .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+              }
+            `,
+          }}
+        />
       </div>
+
       <Footer />
 
       {/* ResumeCV Popup */}
