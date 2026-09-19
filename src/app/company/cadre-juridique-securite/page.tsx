@@ -21,6 +21,7 @@ import {
   Award,
 } from "lucide-react";
 import FirmaNav from "@/components/FirmaNav";
+import CompanyFooter from "@/components/CompanyFooter";
 
 // ============================================================
 // COMPONENT
@@ -353,7 +354,7 @@ export default function CadreJuridiqueSecuritePage() {
         </div>
       </section>
 
-      <Footer />
+      <CompanyFooter /> 
     </>
   );
 }

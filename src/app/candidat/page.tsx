@@ -605,7 +605,6 @@ function TeamSection() {
   const [flippedCard, setFlippedCard] = useState<number | null>(null);
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
 
-  // Enhanced team data with social links and additional info
   const enhancedTeam = [
     {
       name: "Ikbal Lamine",
@@ -624,9 +623,10 @@ function TeamSection() {
       expertise: ["Fondatrice", "Coach International", "Consultante"],
       yearsOfExperience: "15+",
     },
+
     {
-      name: "Ghazala Boussidia",
-      image: TEAM[1].image,
+      name: "Mohamed Ben Said",
+      image: TEAM[2].image,
       primaryRole: "Team Leader & Chef de Projet",
       secondaryRoles: [
         "Team Leader",
@@ -634,15 +634,15 @@ function TeamSection() {
         "Directrice Coordinatrice du Groupe",
       ],
       socialLinks: {
-        linkedin: "https://linkedin.com/in/ghazala-boussidia",
-        email: "mailto:ghazala.boussidia@avstunisia.com",
+        linkedin: "https://linkedin.com/in/mohamed-ben-said",
+        email: "mailto:mohamed.bensaid@avstunisia.com",
       },
       expertise: ["Team Leader", "Chef de Projet", "Coordination"],
       yearsOfExperience: "10+",
     },
-    {
-      name: "Mohamed Ben Said",
-      image: TEAM[2].image,
+        {
+      name: "Ghazala Boussidia",
+      image: TEAM[1].image,
       primaryRole: "Directeur Administratif & Financier",
       secondaryRoles: [
         "Directeur Administratif",
@@ -650,8 +650,8 @@ function TeamSection() {
         "Formateur IT",
       ],
       socialLinks: {
-        linkedin: "https://linkedin.com/in/mohamed-ben-said",
-        email: "mailto:mohamed.bensaid@avstunisia.com",
+        linkedin: "https://linkedin.com/in/ghazala-boussidia",
+        email: "mailto:ghazala.boussidia@avstunisia.com",
       },
       expertise: ["Directeur Administratif", "Manager Financier", "Formateur"],
       yearsOfExperience: "8+",
@@ -673,7 +673,6 @@ function TeamSection() {
       yearsOfExperience: "5+",
       languages: ["Français", "Arabe", "Anglais"],
     },
-    // NEW MEMBERS
     {
       name: "Oussama Abbassi",
       image: TEAM[4].image,
@@ -732,8 +731,7 @@ function TeamSection() {
               en Allemagne.
             </p>
           </div>
-          
-          {/* Team stats */}
+
           <div className="flex gap-6 shrink-0">
             <div className="text-center">
               <div className="font-headline-lg text-secondary text-2xl">15+</div>
@@ -747,7 +745,7 @@ function TeamSection() {
           </div>
         </div>
 
-        {/* Team Grid with Flip Cards - Max 3 per row */}
+        {/* Team Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {enhancedTeam.map((member, index) => {
             const isFlipped = flippedCard === index;
@@ -766,88 +764,61 @@ function TeamSection() {
                   className={`relative w-full transition-transform duration-700 transform-style-3d ${
                     isFlipped ? "rotate-y-180" : ""
                   }`}
-                  style={{ minHeight: "480px" }}
+                  /* ↓ Height reduced from 480px to 336px (~30%) */
+                  style={{ minHeight: "336px" }}
                 >
                   {/* Front Face */}
                   <div className="absolute inset-0 backface-hidden">
-                    <div className="h-full rounded-2xl bg-surface-container-lowest border border-outline-variant/30 p-8 text-center shadow-sm hover:shadow-xl transition-shadow duration-300 flex flex-col">
-                      {/* Image with gradient overlay */}
-                      <div className="relative -mt-16 mb-4">
+                    <div className="h-full rounded-2xl bg-surface-container-lowest border border-outline-variant/30 p-6 text-center shadow-sm hover:shadow-xl transition-shadow duration-300 flex flex-col">
+                      {/* Image — smaller offset & size */}
+                      <div className="relative -mt-14 mb-2">
                         <div className="relative inline-block">
                           <div className="absolute inset-0 rounded-full bg-gradient-to-br from-brand-imperial/10 to-secondary/10 blur-xl opacity-50"></div>
                           <img
                             src={cloudinary(member.image)}
                             alt={member.name}
-                            className="relative h-28 w-28 mx-auto rounded-full object-cover border-4 border-white shadow-lg"
+                            className="relative h-24 w-24 mx-auto rounded-full object-cover border-4 border-white shadow-lg"
                             onError={(e) => {
                               (e.target as HTMLImageElement).src =
                                 "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='112' height='112'%3E%3Crect width='112' height='112' fill='%23e5e7eb'/%3E%3Ctext x='56' y='60' text-anchor='middle' fill='%236b7280' font-size='40'%3E👤%3C/text%3E%3C/svg%3E";
                             }}
                           />
-                          {/* Status indicator */}
                           <div className="absolute bottom-1 right-1 h-4 w-4 rounded-full bg-green-400 border-2 border-white"></div>
                         </div>
                       </div>
 
                       <div className="flex-1">
-                        <h3 className="font-headline-md text-primary text-lg">
+                        <h3 className="font-headline-md text-primary text-base">
                           {member.name}
                         </h3>
-                        <p className="font-label-md text-brand-imperial mt-1 text-sm">
+                        <p className="font-label-md text-brand-imperial mt-0.5 text-xs">
                           {member.primaryRole}
                         </p>
-                        
+
                         {/* Expertise tags */}
-                        <div className="flex flex-wrap gap-1.5 justify-center mt-3">
+                        <div className="flex flex-wrap gap-1.5 justify-center mt-2">
                           {member.expertise.map((skill) => (
                             <span
                               key={skill}
-                              className="px-2.5 py-1 bg-brand-ice/50 text-brand-imperial rounded-full text-[10px] font-medium"
+                              className="px-2 py-0.5 bg-brand-ice/50 text-brand-imperial rounded-full text-[10px] font-medium"
                             >
                               {skill}
                             </span>
                           ))}
                         </div>
 
-                        {/* Secondary roles */}
-                        <div className="mt-4 space-y-1">
-                          {member.secondaryRoles.map((role) => (
-                            <p
-                              key={role}
-                              className="font-caption text-on-surface-variant text-xs leading-relaxed"
-                            >
-                              {role}
-                            </p>
-                          ))}
-                        </div>
-
                         {/* Experience indicator */}
-                        <div className="mt-4 flex items-center justify-center gap-2">
+                        <div className="mt-3 flex items-center justify-center gap-2">
                           <span className="text-xs text-on-surface-variant/60">⭐</span>
                           <span className="text-xs text-on-surface-variant/60">
                             {member.yearsOfExperience} ans d'expérience
                           </span>
                         </div>
-
-                        {/* Languages (for Zaineb) */}
-                        {member.languages && (
-                          <div className="mt-2 flex items-center justify-center gap-1.5">
-                            {member.languages.map((lang) => (
-                              <span
-                                key={lang}
-                                className="px-2 py-0.5 bg-surface-container-low rounded-full text-[9px] text-on-surface-variant/70"
-                              >
-                                {lang}
-                              </span>
-                            ))}
-                          </div>
-                        )}
                       </div>
 
-                      {/* Flip button */}
                       <button
                         onClick={() => setFlippedCard(isFlipped ? null : index)}
-                        className="mt-4 w-full py-2.5 px-4 bg-brand-imperial/5 text-brand-imperial rounded-xl font-label-md text-xs hover:bg-brand-imperial/10 transition-all duration-300 flex items-center justify-center gap-2"
+                        className="mt-3 w-full py-2 px-4 bg-brand-imperial/5 text-brand-imperial rounded-xl font-label-md text-xs hover:bg-brand-imperial/10 transition-all duration-300 flex items-center justify-center gap-2"
                       >
                         <span className="material-symbols-outlined text-[16px]">info</span>
                         En savoir plus
@@ -857,46 +828,41 @@ function TeamSection() {
 
                   {/* Back Face */}
                   <div className="absolute inset-0 backface-hidden rotate-y-180">
-                    <div className="h-full rounded-2xl bg-gradient-to-br from-brand-imperial/5 via-surface-container-lowest to-secondary/5 border border-secondary/30 p-8 flex flex-col items-center justify-between shadow-lg">
-                      {/* Back content */}
-                      <div className="text-center">
-                        <div className="mb-4">
-                          <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-brand-imperial/10">
-                            <span className="material-symbols-outlined text-3xl text-brand-imperial">
+                    <div className="h-full rounded-2xl bg-gradient-to-br from-brand-imperial/5 via-surface-container-lowest to-secondary/5 border border-secondary/30 p-6 flex flex-col items-center justify-between shadow-lg">
+                      <div className="text-center w-full">
+                        <div className="mb-3">
+                          <div className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-brand-imperial/10">
+                            <span className="material-symbols-outlined text-2xl text-brand-imperial">
                               badge
                             </span>
                           </div>
                         </div>
-                        
-                        <h3 className="font-headline-md text-primary text-lg">
+
+                        <h3 className="font-headline-md text-primary text-base">
                           {member.name}
                         </h3>
-                        <p className="font-label-md text-brand-imperial text-sm mt-1">
-                          {member.primaryRole}
-                        </p>
-                        
-                        <div className="mt-4 space-y-2 text-left">
+
+                        <div className="mt-3 space-y-1.5 text-left">
                           {member.secondaryRoles.map((role) => (
                             <div key={role} className="flex items-start gap-2">
-                              <span className="material-symbols-outlined text-brand-imperial text-[16px] mt-0.5">
+                              <span className="material-symbols-outlined text-brand-imperial text-[14px] mt-0.5">
                                 check_circle
                               </span>
-                              <span className="font-body-sm text-on-surface-variant text-xs">
+                              <span className="font-body-sm text-on-surface-variant text-[11px]">
                                 {role}
                               </span>
                             </div>
                           ))}
                         </div>
 
-                        {/* Languages on back (for Zaineb) */}
                         {member.languages && (
-                          <div className="mt-4 pt-3 border-t border-outline-variant/20">
-                            <p className="font-caption text-on-surface-variant text-xs mb-2">Langues parlées</p>
+                          <div className="mt-3 pt-2 border-t border-outline-variant/20">
+                            <p className="font-caption text-on-surface-variant text-[10px] mb-1.5">Langues parlées</p>
                             <div className="flex flex-wrap justify-center gap-1.5">
                               {member.languages.map((lang) => (
                                 <span
                                   key={lang}
-                                  className="px-3 py-1 bg-brand-imperial/10 text-brand-imperial rounded-full text-xs font-medium"
+                                  className="px-2.5 py-0.5 bg-brand-imperial/10 text-brand-imperial rounded-full text-[10px] font-medium"
                                 >
                                   {lang}
                                 </span>
@@ -906,9 +872,8 @@ function TeamSection() {
                         )}
                       </div>
 
-                      {/* Social links */}
                       <div className="w-full">
-                        <div className="flex items-center justify-center gap-4">
+                        <div className="flex items-center justify-center gap-3">
                           <a
                             href={member.socialLinks.linkedin}
                             target="_blank"
@@ -935,7 +900,7 @@ function TeamSection() {
                             <span className="material-symbols-outlined text-[18px]">undo</span>
                           </button>
                         </div>
-                        <p className="text-center text-[10px] text-on-surface-variant/50 mt-3">
+                        <p className="text-center text-[10px] text-on-surface-variant/50 mt-2">
                           Cliquez sur une icône pour contacter
                         </p>
                       </div>
@@ -947,7 +912,6 @@ function TeamSection() {
           })}
         </div>
 
-        {/* Interactive prompt */}
         <div className="mt-8 text-center">
           <p className="font-body-sm text-on-surface-variant/60 text-sm flex items-center justify-center gap-2">
             <span className="material-symbols-outlined text-[18px]">touch_app</span>
@@ -955,7 +919,6 @@ function TeamSection() {
           </p>
         </div>
 
-        {/* Trust indicators */}
         <div className="mt-12 pt-8 border-t border-outline-variant/30">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center">

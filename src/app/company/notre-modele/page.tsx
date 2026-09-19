@@ -4,6 +4,7 @@
 import { FileText, Users, GraduationCap, Briefcase, CheckCircle2, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import CompanyFooter from "@/components/CompanyFooter";
 
 export default function NotreModelePage() {
   const processSteps = [
@@ -158,6 +159,7 @@ export default function NotreModelePage() {
           <ArrowRight className="h-4 w-4" />
         </Link>
       </section>
+      <CompanyFooter />
     </div>
   );
 }

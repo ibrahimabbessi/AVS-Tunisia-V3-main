@@ -1,6 +1,7 @@
 // app/company/opportunites/page.tsx
 "use client";
 
+import CompanyFooter from "@/components/CompanyFooter";
 import { Building2, Heart, Users, Laptop, Plane, Briefcase, CheckCircle2, ArrowRight, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -414,6 +415,8 @@ const processSteps = [
           <div className="text-sm text-gray-600">Étapes d'accompagnement</div>
         </div>
       </div>
+
+      <CompanyFooter />
     </div>
   );
 }

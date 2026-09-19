@@ -194,10 +194,11 @@ function TeamMemberCard({ member, index }: { member: typeof TEAM[0], index: numb
               <h3 className="font-headline-md text-primary text-lg">
                 {member.name}
               </h3>
+              {/* primaryRole — front only */}
               <p className="font-label-md text-brand-imperial mt-1 text-sm">
                 {member.primaryRole}
               </p>
-              
+
               {/* Expertise tags */}
               <div className="flex flex-wrap gap-1.5 justify-center mt-3">
                 {member.expertise.map((skill) => (
@@ -210,36 +211,12 @@ function TeamMemberCard({ member, index }: { member: typeof TEAM[0], index: numb
                 ))}
               </div>
 
-              {/* Secondary roles */}
-              <div className="mt-4 space-y-1">
-                {member.secondaryRoles.slice(0, 3).map((role) => (
-                  <p
-                    key={role}
-                    className="font-caption text-on-surface-variant text-xs leading-relaxed"
-                  >
-                    {role}
-                  </p>
-                ))}
-              </div>
-
               {/* Experience indicator */}
               <div className="mt-4 flex items-center justify-center gap-2">
                 <span className="text-xs text-on-surface-variant/60">⭐</span>
                 <span className="text-xs text-on-surface-variant/60">
                   {member.yearsOfExperience} ans d'expérience
                 </span>
-              </div>
-
-              {/* Languages */}
-              <div className="mt-2 flex items-center justify-center gap-1.5">
-                {member.languages.map((lang) => (
-                  <span
-                    key={lang}
-                    className="px-2 py-0.5 bg-surface-container-low rounded-full text-[9px] text-on-surface-variant/70"
-                  >
-                    {lang}
-                  </span>
-                ))}
               </div>
             </div>
 
@@ -258,7 +235,7 @@ function TeamMemberCard({ member, index }: { member: typeof TEAM[0], index: numb
         <div className="absolute inset-0 backface-hidden rotate-y-180">
           <div className="h-full rounded-2xl bg-gradient-to-br from-brand-imperial/5 via-surface-container-lowest to-secondary/5 border border-secondary/30 p-8 flex flex-col items-center justify-between shadow-lg">
             {/* Back content */}
-            <div className="text-center">
+            <div className="text-center w-full">
               <div className="mb-4">
                 <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-brand-imperial/10">
                   <span className="material-symbols-outlined text-3xl text-brand-imperial">
@@ -266,14 +243,12 @@ function TeamMemberCard({ member, index }: { member: typeof TEAM[0], index: numb
                   </span>
                 </div>
               </div>
-              
+
               <h3 className="font-headline-md text-primary text-lg">
                 {member.name}
               </h3>
-              <p className="font-label-md text-brand-imperial text-sm mt-1">
-                {member.primaryRole}
-              </p>
-              
+
+              {/* secondaryRoles — back only (full list, no overlap with front) */}
               <div className="mt-4 space-y-2 text-left">
                 {member.secondaryRoles.map((role) => (
                   <div key={role} className="flex items-start gap-2">
@@ -287,7 +262,7 @@ function TeamMemberCard({ member, index }: { member: typeof TEAM[0], index: numb
                 ))}
               </div>
 
-              {/* Languages on back */}
+              {/* Languages — back only */}
               <div className="mt-4 pt-3 border-t border-outline-variant/20">
                 <p className="font-caption text-on-surface-variant text-xs mb-2">Langues parlées</p>
                 <div className="flex flex-wrap justify-center gap-1.5">

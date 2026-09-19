@@ -17,6 +17,7 @@ import {
   Award,
 } from "lucide-react";
 import FirmaNav from "@/components/FirmaNav";
+import CompanyFooter from "@/components/CompanyFooter";
 
 // Cloudinary helper
 const CLOUDINARY_BASE = "https://res.cloudinary.com/girgi5fd/image/upload/";
@@ -696,7 +697,7 @@ export default function CompanyPage() {
         </section>
       </div>
 
-      <Footer />
+      <CompanyFooter />
     </>
   );
 }

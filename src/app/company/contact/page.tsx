@@ -5,6 +5,7 @@ import { Mail, Phone, MapPin, Clock, Send, User, Building, MessageSquare, CheckC
 import { useState, useEffect } from "react";
 import FirmaNav from "@/components/FirmaNav";
 import Footer from "@/components/Footer";
+import CompanyFooter from "@/components/CompanyFooter";
 
 // Function to calculate Ramadan dates for any year
 function getRamadanDates(year: number): { start: Date; end: Date } | null {
@@ -990,7 +991,7 @@ export default function KontaktBeratungPage() {
         </div>
       </section>
 
-      <Footer />
+      <CompanyFooter />
     </>
   );
 }

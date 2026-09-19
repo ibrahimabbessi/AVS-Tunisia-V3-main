@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { Award, Building2, Users, GraduationCap, Star, Quote, ArrowRight, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import CompanyFooter from "@/components/CompanyFooter";
 
 // Helper function to get Google Drive image URL
 const getDriveImageUrl = (id: string) => {
@@ -487,6 +488,7 @@ export default function NosSuccesPage() {
           </Link>
         </div>
       </section>
+      <CompanyFooter />
     </div>
   );
 }

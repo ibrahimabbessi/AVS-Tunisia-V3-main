@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import FirmaNav from "@/components/FirmaNav";
 import Image from "next/image";
+import CompanyFooter from "@/components/CompanyFooter";
 
 export default function CoutsInvestissementPage() {
   const [selectedPlan, setSelectedPlan] = useState<string>("premium");
@@ -507,7 +508,7 @@ export default function CoutsInvestissementPage() {
         </div>
       </section>
 
-      <Footer />
+      <CompanyFooter />
     </>
   );
 }
